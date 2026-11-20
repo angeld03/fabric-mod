@@ -1,8 +1,11 @@
 package com.wildbound;
 
+import com.wildbound.commands.RpgCommands;
 import com.wildbound.core.WildboundConfig;
 import com.wildbound.player.PlayerRpgInitializer;
 import com.wildbound.player.RpgAttachments;
+import com.wildbound.realms.RealmRegistry;
+import com.wildbound.resources.ResourceRegeneration;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
@@ -17,6 +20,9 @@ public class Wildbound implements ModInitializer {
         WildboundConfig.validate();
         RpgAttachments.register();
         PlayerRpgInitializer.register();
+        ResourceRegeneration.register();
+        RpgCommands.register();
+        RealmRegistry.all();
         LOGGER.info("WILDBOUND RPG core initialized");
     }
 
