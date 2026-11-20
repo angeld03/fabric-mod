@@ -1,16 +1,26 @@
-# CÃ³mo colaborar sin pisarnos
+# Cómo colaborar sin pisarnos
 
 La regla es simple: **main es sagrada**. Nadie escribe en ella directamente. Todo pasa por una rama propia + Pull Request.
 
-## 1. PreparaciÃ³n inicial (solo una vez)
+## 1. Preparación inicial (solo una vez)
 
 ```bash
 git clone https://github.com/angeld03/fabric-mod.git
 cd fabric-mod
-git switch -c tu-nombre/setup
+git config core.hooksPath .githooks
 ```
 
-## 2. Trabajar
+Ese último comando activa la **revisión automática**: antes de cada `push`, OpenCode ejecuta el subagente revisor. Si detecta un PR peligroso, el push se bloquea.
+
+## 2. Revisión automática
+
+En OpenCode, `/revisar` lanza el subagente revisor. También se ejecuta solo en cada push gracias al hook.
+
+El revisor **solo informa**: no puede editar, commitear, hacer push, merge ni revert. Da un veredicto por PR: **SEGURO**, **REVISAR** o **PELIGROSO**.
+
+Para terminar una tarea, `/listo` comprueba la rama, compila, commitea y sube.
+
+## 3. Trabajar
 
 Crea una rama por tarea, con tu nombre como prefijo para que nunca choquen dos ramas:
 
@@ -18,41 +28,42 @@ Crea una rama por tarea, con tu nombre como prefijo para que nunca choquen dos r
 git switch main
 git pull --ff-only
 git switch -c tu-nombre/breve-descripcion
-# ... editasARCHIVOS ...
+# ... editas archivos ...
 git add .
-git commit -m "AÃ±ade tal cosa"
+git commit -m "Añade tal cosa"
 git push -u origin tu-nombre/breve-descripcion
 ```
 
-DespuÃ©s abres el Pull Request en GitHub (la URL te la da el propio `git push`).
+Después abres el Pull Request en GitHub (la URL te la da el propio `git push`).
 
-## 3. Normas anti-conflictos
+## 4. Normas anti-conflictos
 
-- **Un archivo, un responsable.** Si vas a tocar un archivo que no es tuyo, avisa por el PR antes.
-- **Nada de `git push --force`** (estÃ¡ bloqueado en `main` y desaconsejado en tus ramas: fuerza a los demÃ¡s a reescribir su historial).
-- **Nada de `git commit --amend`** despuÃ©s de haber hecho `push`.
+- **Un archivo, un responsable.** Si vas a tocar un archivo que no es tuyo, avisa en el PR antes.
+- **Nada de `git push --force`** (bloqueado en `main` y desaconsejado en tus ramas).
+- **Nada de `git commit --amend`** después de haber hecho `push`.
 - **Sincroniza a menudo:** `git fetch origin` + `git rebase origin/main` en tu rama antes del PR.
-- **No edites `gradle.properties`, `build.gradle` ni `fabric.mod.json` a la vez.** Cambios de versiones van en un PR aparte y lo revisan ambos.
-- **Textos nuevos, archivos nuevos.** Cada nueva funcionalidad debe estar en su propio archivo Java; asÃ­ dos personas casi nunca tocan el mismo fichero.
-- `.gitattributes` fuerza finales de lÃ­nea LF para que no haya conflictos raros entre Windows y Linux.
+- **No edites `gradle.properties`, `build.gradle` ni `fabric.mod.json` a la vez.** Los cambios de versiones van en un PR aparte y los revisan ambos.
+- **Cada funcionalidad, en su propio archivo Java.** Así dos personas casi nunca tocan el mismo fichero.
+- `.gitattributes` fuerza finales de línea LF para evitar conflictos entre Windows y Linux.
 
-## 4. Fusionar
+## 5. Fusionar
 
 - Se usa **Squash and merge**: el historial de `main` queda lineal y limpio.
-- El PR debe pasar el check de GitHub Actions `build` (compila con `./gradlew build`).
-- Se borra la rama despuÃ©s de fusionar.
+- El PR necesita **1 aprobación** de la otra persona.
+- Se borra la rama después de fusionar.
+- **Nunca se deshace una fusión automáticamente.** Si algo salió mal, se hace `git revert` a mano y eso crea un nuevo PR que también se revisa.
 
-## 5. Si aparece un conflicto
+## 6. Si aparece un conflicto
 
 No lo fuerces. En tu rama:
 
 ```bash
 git fetch origin
 git rebase origin/main
-# git te marca los archivos en conflicto -> los editas, luego:
+# edita los archivos marcados, luego:
 git add .
 git rebase --continue
 git push --force-with-lease   # solo en TU rama, nunca en main
 ```
 
-Y comÃ©ntalo en el PR para que el otro lo vea.
+Y coméntalo en el PR para que el otro lo vea.
