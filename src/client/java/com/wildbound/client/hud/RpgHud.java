@@ -10,48 +10,61 @@ import com.wildbound.progression.ExperienceCurve;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 
-/** Polished, toggleable RPG HUD. Press O to show/hide. */
+/** WILDBOUND HUD: compact level plaque + custom health/stamina/mana bars. Press K to toggle. */
 public final class RpgHud {
     private static boolean enabled = true;
-
-    private static final int PANEL_W = 180;
-    private static final int PANEL_H = 94;
-    private static final int BAR_W = 108;
-    private static final int BAR_H = 6;
-
-    private static final int COLOR_BORDER = 0xFF0E1420;
-    private static final int COLOR_PANEL = 0xD41B2636;
-    private static final int COLOR_ACCENT = 0xFFFFC857;
-    private static final int COLOR_TITLE = 0xFFFFD479;
-    private static final int COLOR_TEXT = 0xFFD6E2F0;
-    private static final int COLOR_MUTED = 0xFF93A7BF;
-    private static final int COLOR_TRACK = 0xFF0B1018;
-    private static final int COLOR_XP = 0xFF53C8F5;
-    private static final int COLOR_HP = 0xFFFF6B6B;
-    private static final int COLOR_MP = 0xFF6BA8FF;
-    private static final int COLOR_ST = 0xFF63D69A;
+    private static boolean lastDown = false;
 
     private static final KeyMapping TOGGLE = new KeyMapping(
-            "key.wildbound.hud", InputConstants.KEY_O, KeyMapping.Category.MISC);
+            "key.wildbound.hud", InputConstants.KEY_K, KeyMapping.Category.MISC);
+
+    private static final int GOLD = 0xFFFFD479;
+    private static final int TEXT = 0xFFE6EEF8;
+    private static final int MUTED = 0xFF9FB2C9;
+    private static final int PANEL = 0xD418222F;
+    private static final int BORDER = 0xFF0B1018;
+    private static final int ACCENT = 0xFFFFC857;
+    private static final int TRACK = 0xC8080D14;
+    private static final int HP_COLOR = 0xFFE8484B;
+    private static final int HP_DARK = 0xFF6E1E20;
+    private static final int ST_COLOR = 0xFF57CE8E;
+    private static final int MANA = 0xFF63B4FF;
+    private static final int MANA_DARK = 0xFF122B4A;
+    private static final int MANA_RIM = 0xFFBFE1FF;
 
     private RpgHud() {
     }
 
     public static void register() {
         KeyMappingHelper.registerKeyMapping(TOGGLE);
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (TOGGLE.consumeClick()) enabled = !enabled;
+            boolean down = TOGGLE.isDown();
+            if (down && !lastDown) {
+                enabled = !enabled;
+                if (client.player != null) {
+                    client.player.sendOverlayMessage(
+                            Component.literal("HUD RPG: " + (enabled ? "ON" : "OFF")));
+                }
+            }
+            lastDown = down;
         });
+
+        // Vanilla hearts are replaced by a numeric health bar.
+        HudElementRegistry.removeElement(VanillaHudElements.HEALTH_BAR);
         HudElementRegistry.addLast(Wildbound.id("rpg_hud"), RpgHud::render);
     }
 
-    private static void render(GuiGraphicsExtractor g, net.minecraft.client.DeltaTracker delta) {
+    private static void render(GuiGraphicsExtractor g, DeltaTracker delta) {
         if (!enabled) return;
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -59,48 +72,83 @@ public final class RpgHud {
         PlayerRpgProfile profile = player.getAttached(RpgAttachments.PROFILE);
         if (profile == null) return;
 
-        Font font = mc.font;
-        int x = 8;
-        int y = 8;
-
-        // Panel with a crisp 1px border and a subtle accent line.
-        g.fill(x, y, x + PANEL_W, y + PANEL_H, COLOR_BORDER);
-        g.fill(x + 1, y + 1, x + PANEL_W - 1, y + PANEL_H - 1, COLOR_PANEL);
-        g.fill(x + 1, y + 1, x + PANEL_W - 1, y + 3, COLOR_ACCENT);
-
-        // Title row.
-        g.text(font, "WILDBOUND", x + 8, y + 9, COLOR_TITLE, true);
-        String level = "Lv " + profile.level();
-        g.text(font, level, x + PANEL_W - 8 - font.width(level), y + 9, COLOR_TITLE, true);
-
-        g.fill(x + 8, y + 25, x + PANEL_W - 8, y + 26, 0x40FFFFFF);
-
-        // Experience bar.
-        long needed = ExperienceCurve.required(profile.level());
-        float progress = needed > 0 ? Math.min(1f, (float) profile.experience() / needed) : 1f;
-        String xpText = needed > 0 ? "XP " + profile.experience() + " / " + needed : "XP MAX";
-        g.text(font, xpText, x + 8, y + 30, COLOR_MUTED, false);
-        bar(g, x + 8, y + 42, PANEL_W - 16, BAR_H, progress, COLOR_XP);
-
-        DerivedStats stats = DerivedStatsCalculator.calculate(profile);
-        int row = y + 56;
-        resource(g, font, "HP", player.getHealth(), player.getMaxHealth(), row, COLOR_HP);
-        resource(g, font, "MP", profile.mana(), stats.maxMana(), row + 13, COLOR_MP);
-        resource(g, font, "ST", profile.stamina(), stats.maxStamina(), row + 26, COLOR_ST);
+        renderLevelPlaque(g, mc.font, profile);
+        renderBottomBars(g, mc.font, player, profile);
     }
 
-    private static void resource(GuiGraphicsExtractor g, Font font, String label,
-                                 float current, float max, int y, int color) {
+    /** Compact plaque: level + experience only. */
+    private static void renderLevelPlaque(GuiGraphicsExtractor g, Font font, PlayerRpgProfile profile) {
         int x = 8;
-        g.text(font, label, x + 8, y, color, true);
-        bar(g, x + 30, y, BAR_W, BAR_H, max > 0 ? current / max : 0f, color);
-        String value = Math.round(current) + "/" + Math.round(max);
-        g.text(font, value, x + PANEL_W - 8 - font.width(value), y, COLOR_TEXT, false);
+        int y = 8;
+        int w = 152;
+        int h = 34;
+
+        g.fill(x, y, x + w, y + h, BORDER);
+        g.fill(x + 1, y + 1, x + w - 1, y + h - 1, PANEL);
+        g.fill(x + 1, y + 1, x + w - 1, y + 3, ACCENT);
+
+        g.text(font, "WILDBOUND", x + 7, y + 7, GOLD, true);
+        String level = "Lv " + profile.level();
+        g.text(font, level, x + w - 7 - font.width(level), y + 7, GOLD, true);
+
+        long needed = ExperienceCurve.required(profile.level());
+        float progress = needed > 0 ? Math.min(1f, (float) profile.experience() / needed) : 1f;
+        bar(g, x + 7, y + 20, w - 14, 5, progress, MANA);
+        String xp = needed > 0 ? profile.experience() + " / " + needed : "MAX";
+        g.text(font, xp, x + w - 7 - font.width(xp), y + 18, MUTED, false);
+    }
+
+    /** Numeric health bar on the left, stamina above the food bar, mana orb in the center. */
+    private static void renderBottomBars(GuiGraphicsExtractor g, Font font,
+                                         LocalPlayer player, PlayerRpgProfile profile) {
+        int cx = g.guiWidth() / 2;
+        int bottom = g.guiHeight();
+        int y = bottom - 49;
+
+        DerivedStats stats = DerivedStatsCalculator.calculate(profile);
+
+        // Health: vanilla hearts removed; bar with numbers.
+        int hx = cx - 91;
+        bar(g, hx, y, 82, 9, player.getMaxHealth() > 0 ? player.getHealth() / player.getMaxHealth() : 0f,
+                HP_COLOR, HP_DARK);
+        String hp = Math.round(player.getHealth()) + "/" + Math.round(player.getMaxHealth());
+        g.text(font, hp, hx + 41 - font.width(hp) / 2, y - 1, TEXT, true);
+
+        // Stamina: above the vanilla food bar.
+        int sx = cx + 11;
+        bar(g, sx, y - 13, 82, 6,
+                stats.maxStamina() > 0 ? profile.stamina() / stats.maxStamina() : 0f, ST_COLOR, TRACK);
+        String st = "ST " + Math.round(profile.stamina());
+        g.text(font, st, sx + 41 - font.width(st) / 2, y - 25, MUTED, false);
+
+        // Mana: a small orb that fills from the bottom, between both bars.
+        float manaProgress = stats.maxMana() > 0 ? Math.min(1f, profile.mana() / stats.maxMana()) : 0f;
+        orb(g, cx, y + 2, 9, manaProgress);
     }
 
     private static void bar(GuiGraphicsExtractor g, int x, int y, int w, int h, float progress, int color) {
-        g.fill(x, y, x + w, y + h, COLOR_TRACK);
+        bar(g, x, y, w, h, progress, color, TRACK);
+    }
+
+    private static void bar(GuiGraphicsExtractor g, int x, int y, int w, int h,
+                            float progress, int color, int track) {
+        g.fill(x, y, x + w, y + h, track);
         int filled = (int) (w * Math.max(0f, Math.min(1f, progress)));
         if (filled > 0) g.fill(x, y, x + filled, y + h, color);
+    }
+
+    /** Pixel-art orb: radius 9, filled from the bottom according to mana. */
+    private static void orb(GuiGraphicsExtractor g, int cx, int cy, int radius, float progress) {
+        int filledRows = (int) (radius * 2 * Math.max(0f, Math.min(1f, progress)));
+        for (int row = 0; row < radius * 2; row++) {
+            double dy = row - radius + 0.5;
+            double half = Math.sqrt(Math.max(0.0, (double) radius * radius - dy * dy));
+            int x0 = cx - (int) half;
+            int x1 = cx + (int) half + 1;
+            int py = cy - radius + row;
+            boolean filled = row >= radius * 2 - filledRows;
+            g.fill(x0, py, x1, py + 1, filled ? MANA : MANA_DARK);
+            if (row == 0 || row == radius * 2 - 1) g.fill(x0, py, x1, py + 1, MANA_RIM);
+        }
     }
 }
