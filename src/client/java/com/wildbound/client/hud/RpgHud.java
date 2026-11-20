@@ -25,18 +25,18 @@ public final class RpgHud {
             int x = 6;
             int y = 6;
             extractor.fill(x - 2, y - 2, x + 150, y + 62, 0x90000000);
-            extractor.text(mc.font, Component.literal("WILDBOUND  Lv " + profile.level()), x, y, 0xFFD66B);
+            extractor.text(mc.font, Component.literal("WILDBOUND  Lv " + profile.level()), x, y, 0xFFFFD66B);
 
             long required = ExperienceCurve.required(profile.level());
             String xp = required > 0 ? profile.experience() + " / " + required : "MAX";
-            extractor.text(mc.font, Component.literal("XP " + xp), x, y + 10, 0xFFFFFF);
+            extractor.text(mc.font, Component.literal("XP " + xp), x, y + 10, 0xFFFFFFFF);
 
             extractor.text(mc.font, Component.literal("HP " + fmt(player.getHealth()) + " / " + fmt(player.getMaxHealth())),
-                    x, y + 22, 0xFF6666);
+                    x, y + 22, 0xFFFF6666);
             int maxMana = (int) com.wildbound.attributes.DerivedStatsCalculator.calculate(profile).maxMana();
             int maxStamina = (int) com.wildbound.attributes.DerivedStatsCalculator.calculate(profile).maxStamina();
-            extractor.text(mc.font, Component.literal("MP " + (int) profile.mana() + " / " + maxMana), x, y + 34, 0x6699FF);
-            extractor.text(mc.font, Component.literal("ST " + (int) profile.stamina() + " / " + maxStamina), x, y + 46, 0x66DD88);
+            extractor.text(mc.font, Component.literal("MP " + (int) profile.mana() + " / " + maxMana), x, y + 34, 0xFF6699FF);
+            extractor.text(mc.font, Component.literal("ST " + (int) profile.stamina() + " / " + maxStamina), x, y + 46, 0xFF66DD88);
         });
     }
 
