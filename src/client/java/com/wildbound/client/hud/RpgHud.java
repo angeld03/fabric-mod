@@ -69,7 +69,7 @@ public final class RpgHud {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             boolean down = TOGGLE.isDown();
-            if (down && !lastDown && client.screen == null) {
+            if (down && !lastDown && client.gui.screen() == null) {
                 enabled = !enabled;
                 if (client.player != null) {
                     client.player.sendOverlayMessage(Component.translatable(
