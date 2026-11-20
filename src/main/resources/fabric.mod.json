@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "id": "ejemplo-mod",
+  "id": "wildbound",
   "version": "${version}",
-  "name": "Ejemplo Mod",
-  "description": "Mod de ejemplo para Minecraft Fabric 26.3.",
+  "name": "WILDBOUND: Realms of Ascension",
+  "description": "RPG de mundo abierto para Minecraft Fabric.",
   "authors": [
     "angeld03",
     "botellarapida"
@@ -13,20 +13,20 @@
     "sources": "https://github.com/angeld03/fabric-mod"
   },
   "license": "CC0-1.0",
-  "icon": "assets/ejemplo-mod/icon.png",
+  "icon": "assets/wildbound/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "com.ejemplo.EjemploMod"
+      "com.wildbound.Wildbound"
     ],
     "client": [
-      "com.ejemplo.client.EjemploModClient"
+      "com.wildbound.client.WildboundClient"
     ]
   },
   "mixins": [
-    "ejemplo-mod.mixins.json",
+    "wildbound.mixins.json",
     {
-      "config": "ejemplo-mod.client.mixins.json",
+      "config": "wildbound.client.mixins.json",
       "environment": "client"
     }
   ],

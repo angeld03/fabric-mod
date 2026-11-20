@@ -1,4 +1,4 @@
-package com.ejemplo;
+package com.wildbound;
 
 import net.fabricmc.api.ModInitializer;
 
@@ -7,8 +7,8 @@ import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EjemploMod implements ModInitializer {
-	public static final String MOD_ID = "ejemplo-mod";
+public class Wildbound implements ModInitializer {
+	public static final String MOD_ID = "wildbound";
 
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.

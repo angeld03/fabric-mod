@@ -1,8 +1,8 @@
-package com.ejemplo.client;
+package com.wildbound.client;
 
 import net.fabricmc.api.ClientModInitializer;
 
-public class EjemploModClient implements ClientModInitializer {
+public class WildboundClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		// This entrypoint is suitable for setting up client-specific logic, such as rendering.
