@@ -1,0 +1,6 @@
+#!/bin/sh
+# Revision automatica antes de cada push: ejecuta OpenCode con el subagente revisor.
+# Si el revisor dictamina PELIGROSO, el push se bloquea.
+ROOT=$(git rev-parse --show-toplevel)
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$ROOT/.githooks/revisar.ps1"
+exit $?

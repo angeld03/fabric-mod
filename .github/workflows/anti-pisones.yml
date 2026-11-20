@@ -1,0 +1,60 @@
+name: anti-pisones
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Detectar solapes con otros PRs abiertos
+        uses: actions/github-script@v9
+        with:
+          script: |
+            const marker = '<!-- anti-pisones -->';
+            const pr = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+
+            const listFiles = (n) => github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: n, per_page: 100
+            });
+
+            const mine = (await listFiles(pr.number)).map(f => f.filename);
+
+            const openPrs = await github.paginate(github.rest.pulls.list, {
+              owner, repo, state: 'open', per_page: 100
+            });
+
+            const warnings = [];
+            for (const other of openPrs) {
+              if (other.number === pr.number) continue;
+              const theirs = (await listFiles(other.number)).map(f => f.filename);
+              const shared = mine.filter(f => theirs.includes(f));
+              if (shared.length) {
+                warnings.push('- PR #' + other.number + ' de @' + other.user.login + ': ' + shared.map(f => '`' + f + '`').join(', '));
+              }
+            }
+
+            let body = marker + '\n### Comprobacion anti-pisones\n\n';
+            if (warnings.length) {
+              body += 'AVISO: este PR toca archivos que tambien estan en otros PRs abiertos:\n\n'
+                    + warnings.join('\n')
+                    + '\n\nPonederos de acuerdo antes de fusionar. GitHub bloqueara la fusion si hay conflicto.';
+            } else {
+              body += 'OK: sin solapamientos con otros PRs abiertos. Puedes seguir.';
+            }
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ owner, repo, issue_number: pr.number, body });
+            }
