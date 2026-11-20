@@ -1,0 +1,9 @@
+# Los cambios requieren revisiÃ³n de angeld03.
+# AÃ±ade aquÃ­ el usuario de GitHub de tu compaÃ±ero, p. ej.:  * @angeld03 @su-usuario
+* @angeld03
+
+# Los archivos de configuraciÃ³n del build los revisa el responsable del proyecto.
+/gradle.properties @angeld03
+/build.gradle      @angeld03
+/settings.gradle   @angeld03
+/fabric.mod.json   @angeld03

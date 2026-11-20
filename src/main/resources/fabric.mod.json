@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "ejemplo-mod",
+  "version": "${version}",
+  "name": "Ejemplo Mod",
+  "description": "Mod de ejemplo para Minecraft Fabric 26.3.",
+  "authors": [
+    "angeld03",
+    "botellarapida"
+  ],
+  "contact": {
+    "homepage": "https://github.com/angeld03/fabric-mod",
+    "sources": "https://github.com/angeld03/fabric-mod"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/ejemplo-mod/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.ejemplo.EjemploMod"
+    ],
+    "client": [
+      "com.ejemplo.client.EjemploModClient"
+    ]
+  },
+  "mixins": [
+    "ejemplo-mod.mixins.json",
+    {
+      "config": "ejemplo-mod.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.20.1",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}
