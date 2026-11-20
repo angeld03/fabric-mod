@@ -59,8 +59,12 @@ public final class RpgHud {
             lastDown = down;
         });
 
-        // Vanilla hearts are replaced by a numeric health bar.
-        HudElementRegistry.removeElement(VanillaHudElements.HEALTH_BAR);
+        // Wrap vanilla hearts: they show only while the RPG HUD is hidden,
+        // so the player is never left without a health display.
+        HudElementRegistry.replaceElement(VanillaHudElements.HEALTH_BAR,
+                original -> (g, delta) -> {
+                    if (!enabled) original.extractRenderState(g, delta);
+                });
         HudElementRegistry.addLast(Wildbound.id("rpg_hud"), RpgHud::render);
     }
 
