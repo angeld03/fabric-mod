@@ -9,5 +9,5 @@ pluginManagement {
     }
 }
 
-# Debe coincidir con el id del mod
-rootProject.name = 'ejemplo-mod'
+// Debe coincidir con el id del mod
+rootProject.name = 'wildbound'

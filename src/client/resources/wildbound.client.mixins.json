@@ -1,9 +1,9 @@
 {
 	"required": true,
-	"package": "com.ejemplo.client.mixin",
+	"package": "com.wildbound.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"EjemploClientMixin"
+		"WildboundClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
