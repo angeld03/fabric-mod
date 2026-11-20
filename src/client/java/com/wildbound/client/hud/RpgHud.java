@@ -69,7 +69,7 @@ public final class RpgHud {
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             boolean down = TOGGLE.isDown();
-            if (down && !lastDown) {
+            if (down && !lastDown && client.screen == null) {
                 enabled = !enabled;
                 if (client.player != null) {
                     client.player.sendOverlayMessage(Component.translatable(
@@ -124,7 +124,7 @@ public final class RpgHud {
         int x = 8;
         int y = 8;
         int w = 164;
-        int h = 42;
+        int h = 44;
 
         // Frame + vertical panel gradient.
         g.fill(x, y, x + w, y + h, BORDER);
@@ -157,9 +157,9 @@ public final class RpgHud {
         g.text(font, xpValue, x + w - 8 - valueW, y + 27, TEXT, false);
 
         int barX = x + 26;
-        int barY = y + 35;
+        int barY = y + 36;
         int barW = w - 34;
-        int barH = 5;
+        int barH = 7;
         float progress = needed > 0 ? Math.min(1f, (float) profile.experience() / needed) : 1f;
         gradientBar(g, barX, barY, barW, barH, progress, XP_TOP, XP_MID, XP_BOTTOM);
     }
@@ -238,7 +238,7 @@ public final class RpgHud {
     private static void centeredBarText(GuiGraphicsExtractor g, Font font, String text,
                                         int x, int y, int w, int h) {
         int tx = x + (w - font.width(text) - 1) / 2;
-        int ty = y + (h - 9) / 2 + 1;
+        int ty = y + (h - 9) / 2;
         g.text(font, text, tx, ty, TEXT, true);
     }
 
