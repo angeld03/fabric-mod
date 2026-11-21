@@ -367,3 +367,23 @@ Correcciones aplicadas en esta pasada:
 - Las diez habilidades de Agua ahora tienen descripciones específicas que explican su efecto real, en lugar de la plantilla genérica por tier.
 
 **Límites y validación pendiente:** estas son animaciones construidas con partículas y eventos del servidor; no equivalen todavía a modelos 3D animados con huesos ni a una cinemática de renderer dedicada. No se ha ejecutado Gradle ni se ha validado dentro de Minecraft. Probar especialmente curación de aliados en equipos, desplazamiento del dash en servidores con latencia, colisiones del látigo y Pressure Lance, densidad de partículas en multijugador y la lectura de la definitiva.
+
+
+### P4 — Geometría 3D cinemática para las diez habilidades de Agua
+
+Se añadió una capa de geometría volumétrica reconstruida en cada tick de animación, usando muestreo espacial de superficies y curvas 3D en el servidor. No son entidades persistentes ni un renderer de mallas con shaders: son vértices visuales enviados como partículas, para mantener compatibilidad con el pipeline vanilla actual.
+
+- **Water Bolt:** doble carcasa tubular trenzada alrededor del proyectil en vuelo.
+- **Healing Stream:** envolvente elipsoidal y hélices verticales de energía restauradora.
+- **Aqua Whip:** cinta superficial segmentada de doble lectura y núcleo tubular.
+- **Bubble Shield:** dos capas elipsoidales y jaula helicoidal interior.
+- **Tidal Wave:** superficie frontal ondulada con cresta que se curva y crece.
+- **Aqua Dash:** túnel tubular y trenzas helicoidales a lo largo del desplazamiento.
+- **Whirlpool:** hélices múltiples y embudo de capas concéntricas.
+- **Pressure Lance:** núcleo tubular y envolvente exterior de alta presión.
+- **Tsunami:** dos superficies toroidales expansivas a distintas alturas.
+- **Leviathan's Wrath:** cabeza elipsoidal y segmentos corporales con placas de volumen.
+
+Se centralizaron siete primitivas de geometría: tubo, elipsoide, cinta, espiral, embudo, superficie de ola y toroide. La revisión estática confirma que las diez habilidades invocan su geometría correspondiente.
+
+**Límites importantes:** estas superficies son aproximaciones geométricas de partículas, no triángulos/quad meshes reales con normales, UV, materiales transparentes, refracción o interpolación de huesos. La versión de renderer dedicada sigue pendiente. La densidad es alta y necesita medir FPS, paquetes y carga del servidor en mundo real; no se declara rendimiento validado. No se ha ejecutado Gradle ni se ha probado dentro de Minecraft.
