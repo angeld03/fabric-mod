@@ -6,6 +6,7 @@ import com.wildbound.client.screen.CharacterScreen;
 import com.wildbound.client.screen.SkillRadialMenu;
 import com.wildbound.client.screen.SkillScreen;
 import com.wildbound.network.ActivateSkillPayload;
+import com.wildbound.network.AquaSkillFxPayload;
 import com.wildbound.network.RadialSkillsResultPayload;
 import com.wildbound.network.SkillActivateResultPayload;
 import com.wildbound.network.SkillCameraAimPayload;
@@ -48,6 +49,7 @@ public class WildboundClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         RpgHud.register();
+        AquaSkillFxRenderer.register();
 
         KeyMappingHelper.registerKeyMapping(OPEN_CHARACTER);
         KeyMappingHelper.registerKeyMapping(OPEN_SKILLS);
@@ -92,6 +94,7 @@ public class WildboundClient implements ClientModInitializer {
             }
             // Decay cinematic camera aim and update the Water Bolt's quiet idle FX.
             SkillCameraAim.tick();
+            AquaSkillFxRenderer.tick();
             WaterBoltIdlePresentation.tick(client);
             WaterBoltChargePresentation.tick(client);
         });
@@ -125,6 +128,9 @@ public class WildboundClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkillCameraAimPayload.TYPE, (payload, context) ->
                 context.client().execute(() -> SkillCameraAim.play(payload)));
 
+        ClientPlayNetworking.registerGlobalReceiver(AquaSkillFxPayload.TYPE, (payload, context) ->
+                context.client().execute(() -> AquaSkillFxRenderer.accept(payload)));
+
         ClientPlayNetworking.registerGlobalReceiver(RadialSkillsResultPayload.TYPE, (payload, context) ->
                 context.client().execute(() -> {
                     PlayerRpgProfile profile = context.client().player == null ? null
@@ -151,6 +157,7 @@ public class WildboundClient implements ClientModInitializer {
         // connection it came from.
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             RadialSkillState.reset();
+            AquaSkillFxRenderer.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
             WaterBoltIdlePresentation.reset();
