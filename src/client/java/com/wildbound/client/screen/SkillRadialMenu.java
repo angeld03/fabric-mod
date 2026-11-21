@@ -172,7 +172,8 @@ public final class SkillRadialMenu extends Screen {
             showStatus(tr("wildbound.skills.on_cooldown", slot.definition.name()), 0xFFFF8A98);
             return;
         }
-        ClientPlayNetworking.send(new ActivateSkillPayload(slot.skillId));
+        var aim = Minecraft.getInstance().player.getLookAngle().normalize();
+        ClientPlayNetworking.send(new ActivateSkillPayload(slot.skillId, aim.x, aim.y, aim.z));
         onClose();
     }
 
