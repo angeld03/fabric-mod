@@ -742,7 +742,8 @@ public final class SkillScreen extends Screen {
                         : tr("wildbound.skills.mastery_xp", mastery.experience(), mastery.experienceRequired());
                 stateText = tr("wildbound.skills.mastery_rank", mastery.rank()) + "  " + xp
                         + "  ·  " + tr("wildbound.skills.mastery_percent", Math.round(mastery.mastery()))
-                        + "  ·  " + tr("wildbound.skills.upgrade_count", mastery.upgrades().size());
+                        + "  ·  " + tr("wildbound.skills.upgrade_count", mastery.upgrades().size())
+                        + "  ·  " + tr("wildbound.mastery.open_hint");
                 if (!compact) {
                     int barX = x;
                     int barY = detailY + 18;
@@ -1017,6 +1018,18 @@ public final class SkillScreen extends Screen {
     public boolean keyPressed(KeyEvent event) {
         if (WildboundClient.OPEN_CHARACTER.matches(event)) {
             Minecraft.getInstance().setScreenAndShow(new CharacterScreen());
+            return true;
+        }
+        if (event.key() == InputConstants.KEY_M) {
+            SkillElement selected = SkillCatalog.all().isEmpty() ? null
+                    : SkillCatalog.all().get(selectedElement);
+            SkillDefinition focused = focusedSkillDefinition(selected);
+            PlayerRpgProfile current = profile();
+            if (focused != null && current.hasSkill(focused.id())) {
+                Minecraft.getInstance().setScreenAndShow(new SkillMasteryScreen(focused.id()));
+            } else {
+                showToast(tr("wildbound.mastery.select_unlocked"), 0xFFFF9AA6);
+            }
             return true;
         }
         if (WildboundClient.OPEN_SKILLS.matches(event) || event.key() == InputConstants.KEY_ESCAPE) {
