@@ -77,8 +77,8 @@ public final class SkillMasteryScreen extends Screen {
         g.fill(x + Math.round(sweep), y + 1, x + Math.round(sweep) + 34, y + 4, 0x99FFFFFF);
 
         String heading = tr("wildbound.mastery.title");
-        drawCentered(g, heading, x, y + 12, panelW, GOLD, true);
-        drawCentered(g, "✦  SKILL RESONANCE  ✦", x, y + 25, panelW, 0xFF65DDF4, false);
+        drawAnimatedTitle(g, heading, x, y + 12, panelW, time);
+        drawCentered(g, tr("wildbound.mastery.resonance"), x, y + 25, panelW, lerpColor(CYAN, VIOLET, 0.5f + 0.5f * (float) Math.sin(time * 1.4f)), false);
 
         SkillDefinition skill = SkillRegistry.get(skillId).orElse(null);
         if (skill == null) {
@@ -115,13 +115,13 @@ public final class SkillMasteryScreen extends Screen {
         int cardGap = 8;
         int cardW = (contentW - cardGap * 2) / 3;
         drawMetricCard(g, contentX, cardsY, cardW, 48,
-                tr("wildbound.mastery.total_xp", compact(progress.totalExperience())),
+                tr("wildbound.mastery.total_xp_short"), compact(progress.totalExperience()),
                 "✧", CYAN, time);
         drawMetricCard(g, contentX + cardW + cardGap, cardsY, cardW, 48,
-                tr("wildbound.mastery.mastery", Math.round(progress.mastery())),
+                tr("wildbound.mastery.mastery_short"), Math.round(progress.mastery()) + "%",
                 "◆", VIOLET, time + 1.2f);
         drawMetricCard(g, contentX + (cardW + cardGap) * 2, cardsY, cardW, 48,
-                tr("wildbound.mastery.upgrades", progress.upgrades().size()),
+                tr("wildbound.mastery.upgrades_short"), Integer.toString(progress.upgrades().size()),
                 "✦", MINT, time + 2.4f);
 
         int upgradesY = cardsY + 61;
@@ -178,7 +178,9 @@ public final class SkillMasteryScreen extends Screen {
 
         int textX = x + 53;
         String name = fit(skill.name(), w - 150);
-        g.text(font, name, textX, y + 10, WHITE, true);
+        int nameGlow = alpha(CYAN, 0.18f + pulse * 0.18f);
+        g.text(font, name, textX - 1, y + 10, nameGlow, true);
+        g.text(font, name, textX, y + 10, lerpColor(WHITE, CYAN, pulse * 0.35f), true);
         g.text(font, fit(skill.description(), w - 150), textX, y + 25, MUTED, false);
 
         String rank = "R" + progress.rank() + " / " + SkillProgress.MAX_RANK;
@@ -216,12 +218,14 @@ public final class SkillMasteryScreen extends Screen {
     }
 
     private void drawMetricCard(GuiGraphicsExtractor g, int x, int y, int w, int h,
-                                String value, String glyph, int accent, float time) {
+                                String label, String value, String glyph, int accent, float time) {
         float pulse = 0.5f + 0.5f * (float) Math.sin(time * 2.1f);
         g.fill(x, y, x + w, y + h, 0xC9162638);
         g.fill(x, y, x + w, y + 2, alpha(accent, 0.55f + pulse * 0.4f));
         g.fill(x, y + 2, x + 2, y + h, alpha(accent, 0.3f));
         g.text(font, glyph, x + 7, y + 7, accent, true);
+        String heading = fit(label.toUpperCase(java.util.Locale.ROOT), w - 20);
+        g.text(font, heading, x + 21, y + 7, lerpColor(MUTED, accent, pulse * 0.55f), true);
         String display = fit(value, w - 12);
         g.text(font, display, x + 7, y + 25, WHITE, true);
         g.fill(x + w - 9, y + 7, x + w - 5, y + 11, alpha(accent, 0.45f + pulse * 0.5f));
@@ -263,6 +267,17 @@ public final class SkillMasteryScreen extends Screen {
         int footerY = y + h - 20;
         g.fill(x + 12, footerY - 5, x + w - 12, footerY - 4, 0x665D7C98);
         drawCentered(g, hint, x, footerY, w, 0xFF8FEAFF, false);
+    }
+
+    private void drawAnimatedTitle(GuiGraphicsExtractor g, String value, int x, int y, int w, float time) {
+        int cursor = x + (w - font.width(value)) / 2;
+        for (int i = 0; i < value.length(); i++) {
+            String glyph = value.substring(i, i + 1);
+            float wave = 0.5f + 0.5f * (float) Math.sin(time * 2.4f - i * 0.24f);
+            int color = lerpColor(0xFFFFE6A2, 0xFFFFFDF1, wave);
+            g.text(font, glyph, cursor, y, alpha(color, 0.65f + wave * 0.35f), true);
+            cursor += font.width(glyph);
+        }
     }
 
     private void drawCentered(GuiGraphicsExtractor g, String value, int x, int y, int w, int color, boolean shadow) {
