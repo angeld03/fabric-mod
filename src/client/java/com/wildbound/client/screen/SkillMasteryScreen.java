@@ -145,7 +145,7 @@ public final class SkillMasteryScreen extends Screen {
                         0x553C9B83);
                 g.fill(contentX, rowY - 2, contentX + 3, rowY + 12,
                         alpha(MINT, 0.55f + pulse * 0.45f));
-                String label = "✦  " + progress.upgrades().get(i).replace('_', ' ');
+                String label = "✦  " + tr("wildbound.mastery.upgrade." + progress.upgrades().get(i));
                 g.text(font, fit(label, contentW - 16), contentX + 9, rowY,
                         lerpColor(0xFFB8F8DF, 0xFFFFFFFF, pulse), true);
             }
