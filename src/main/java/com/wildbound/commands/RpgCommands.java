@@ -16,6 +16,10 @@ import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerRpgProvider;
 import com.wildbound.progression.ExperienceService;
 import com.wildbound.realms.RealmProgressionService;
+import com.wildbound.resources.ResourceService;
+import com.wildbound.resources.ResourceType;
+import com.wildbound.skills.SkillProgressionService;
+import com.wildbound.skills.SkillUnlockResult;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -63,6 +67,8 @@ public final class RpgCommands {
         addLevelCommands(root);
         addAttributeCommands(root);
         addRealmCommands(root);
+        addSkillCommands(root);
+        addResourceCommands(root);
         addDebugCommands(root);
 
         dispatcher.register(root);
@@ -145,6 +151,82 @@ public final class RpgCommands {
         root.then(realm);
     }
 
+    private static void addSkillCommands(LiteralArgumentBuilder<CommandSourceStack> root) {
+        LiteralArgumentBuilder<CommandSourceStack> skill = Commands.literal("skill");
+        skill.then(Commands.literal("points")
+                .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("amount", IntegerArgumentType.integer(0, 9999))
+                                .executes(ctx -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+                                    int amount = IntegerArgumentType.getInteger(ctx, "amount");
+                                    PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(target);
+                                    PlayerRpgProvider.set(target, new PlayerRpgProfile(p.schemaVersion(), p.uuid(),
+                                            p.level(), p.experience(), p.totalExperience(), p.attributePoints(),
+                                            p.skillPoints() + amount, p.attributes(), p.mana(), p.stamina(),
+                                            p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats()));
+                                    send(ctx.getSource(), "Skill points: " + (p.skillPoints() + amount)
+                                            + " for " + target.getName().getString());
+                                    return 1;
+                                }))));
+        skill.then(Commands.literal("unlock")
+                .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("skill", StringArgumentType.string())
+                                .executes(ctx -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+                                    String skillId = ctx.getArgument("skill", String.class);
+                                    SkillUnlockResult result = SkillProgressionService.unlock(target, skillId);
+                                    send(ctx.getSource(), result.success()
+                                            ? "Skill unlocked: " + skillId
+                                            : "Cannot unlock " + skillId + ": " + result.reason());
+                                    return result.success() ? 1 : 0;
+                                }))));
+        skill.then(Commands.literal("list")
+                .then(Commands.argument("player", EntityArgument.player())
+                        .executes(ctx -> {
+                            ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+                            PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(target);
+                            send(ctx.getSource(), "Skills (" + p.unlockedSkills().size() + "): "
+                                    + String.join(", ", p.unlockedSkills()));
+                            return 1;
+                        })));
+        root.then(skill);
+    }
+
+    private static void addResourceCommands(LiteralArgumentBuilder<CommandSourceStack> root) {
+        root.then(resourceCommand("mana", ResourceType.MANA));
+        root.then(resourceCommand("stamina", ResourceType.STAMINA));
+    }
+
+    private static LiteralArgumentBuilder<CommandSourceStack> resourceCommand(String name, ResourceType type) {
+        LiteralArgumentBuilder<CommandSourceStack> node = Commands.literal(name);
+        node.then(Commands.literal("fill")
+                .then(Commands.argument("player", EntityArgument.player())
+                        .executes(ctx -> {
+                            ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+                            ResourceService.set(target, type, ResourceService.getMax(target, type));
+                            send(ctx.getSource(), capitalize(name) + " filled for "
+                                    + target.getName().getString());
+                            return 1;
+                        })));
+        node.then(Commands.literal("set")
+                .then(Commands.argument("player", EntityArgument.player())
+                        .then(Commands.argument("amount", IntegerArgumentType.integer(0, 100000))
+                                .executes(ctx -> {
+                                    ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
+                                    float amount = IntegerArgumentType.getInteger(ctx, "amount");
+                                    ResourceService.set(target, type, amount);
+                                    send(ctx.getSource(), capitalize(name) + " set to "
+                                            + fmt(ResourceService.get(target, type))
+                                            + " for " + target.getName().getString());
+                                    return 1;
+                                }))));
+        return node;
+    }
+
+    private static String capitalize(String value) {
+        return value.isEmpty() ? value : Character.toUpperCase(value.charAt(0)) + value.substring(1);
+    }
+
     private static void addDebugCommands(LiteralArgumentBuilder<CommandSourceStack> root) {
         LiteralArgumentBuilder<CommandSourceStack> debug = Commands.literal("debug");
         debug.then(Commands.literal("info").executes(ctx -> {
@@ -168,7 +250,7 @@ public final class RpgCommands {
         PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(player);
         PlayerRpgProvider.set(player, new PlayerRpgProfile(p.schemaVersion(), p.uuid(), level, 0L,
                 p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                p.mana(), p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.stats()));
+                p.mana(), p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats()));
     }
 
     private static RpgAttribute parseAttribute(String value) {

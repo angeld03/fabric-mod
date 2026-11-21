@@ -1,5 +1,6 @@
 package com.wildbound.player;
 
+import com.wildbound.persistence.RpgPersistenceManager;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -11,7 +12,7 @@ public final class PlayerRpgInitializer {
     public static void register() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayer player = handler.getPlayer();
-            PlayerRpgProvider.getOrCreate(player);
+            RpgPersistenceManager.load(player);
         });
     }
 }

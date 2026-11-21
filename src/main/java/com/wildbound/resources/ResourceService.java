@@ -63,16 +63,16 @@ public final class ResourceService {
                 profile.schemaVersion(), profile.uuid(), profile.level(), profile.experience(),
                 profile.totalExperience(), profile.attributePoints(), profile.skillPoints(),
                 profile.attributes(), mana, stamina, profile.unlockedSkills(),
-                profile.unlockedRealms(), profile.stats()));
+                profile.unlockedRealms(), profile.radialSkills(), profile.stats()));
     }
 
     private static PlayerRpgProfile withResource(PlayerRpgProfile p, ResourceType type, float value) {
         return type == ResourceType.MANA
                 ? new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
                         p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                        value, p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.stats())
+                        value, p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats())
                 : new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
                         p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                        p.mana(), value, p.unlockedSkills(), p.unlockedRealms(), p.stats());
+                        p.mana(), value, p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats());
     }
 }

@@ -69,7 +69,7 @@ public final class ExperienceService {
         PlayerRpgProfile updated = new PlayerRpgProfile(
                 profile.schemaVersion(), profile.uuid(), level, experience, total,
                 attributePoints, skillPoints, profile.attributes(), profile.mana(), profile.stamina(),
-                profile.unlockedSkills(), profile.unlockedRealms(), profile.stats());
+                profile.unlockedSkills(), profile.unlockedRealms(), profile.radialSkills(), profile.stats());
         RpgPersistenceManager.save(player, updated);
 
         RpgProgressionEvents.EXPERIENCE_GAINED.invoker().onExperienceGained(player, gained, source);
@@ -95,6 +95,6 @@ public final class ExperienceService {
     private static PlayerRpgProfile copyWithExperience(PlayerRpgProfile p, long experience, long total) {
         return new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), experience, total,
                 p.attributePoints(), p.skillPoints(), p.attributes(), p.mana(), p.stamina(),
-                p.unlockedSkills(), p.unlockedRealms(), p.stats());
+                p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats());
     }
 }

@@ -37,7 +37,8 @@ class PersistenceTest {
     void migrationUpgradesSchemaWithoutLosingLevel() {
         PlayerRpgProfile old = new PlayerRpgProfile(0, UUID.randomUUID().toString(), 12,
                 30L, 1000L, 4, 2, com.wildbound.player.AttributeContainer.BASE,
-                0f, 0f, java.util.List.of(), java.util.List.of(), com.wildbound.player.PlayerStatistics.EMPTY);
+                0f, 0f, java.util.List.of(), java.util.List.of(), java.util.List.of(),
+                com.wildbound.player.PlayerStatistics.EMPTY);
         PlayerRpgProfile migrated = RpgDataMigration.migrate(old);
         assertEquals(PlayerRpgProfile.CURRENT_SCHEMA, migrated.schemaVersion());
         assertEquals(12, migrated.level());

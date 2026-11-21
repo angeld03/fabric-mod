@@ -13,7 +13,7 @@ public final class WildboundConfig {
     public static int skillPointsEveryLevels = 3;
     public static double experienceBase = 80.0;
     public static double experienceGrowth = 1.18;
-    public static float manaRegenPerSecond = 2.0f;
+    public static float manaRegenPerSecond = 5.0f;
     public static float staminaRegenPerSecond = 4.0f;
     public static float maxManaPerIntelligence = 3.0f;
     public static float maxStaminaPerAgility = 1.5f;

@@ -28,7 +28,7 @@ public final class DerivedStatsCalculator {
 
         return new DerivedStats(
                 20f + (vit - WildboundConfig.baseAttribute) * WildboundConfig.healthPerVitality * 2f,
-                20f + (intel - WildboundConfig.baseAttribute) * WildboundConfig.maxManaPerIntelligence,
+                100f + (intel - WildboundConfig.baseAttribute) * WildboundConfig.maxManaPerIntelligence,
                 20f + (agi - WildboundConfig.baseAttribute) * WildboundConfig.maxStaminaPerAgility,
                 5f + (str - WildboundConfig.baseAttribute) * WildboundConfig.meleePerStrength,
                 5f + (intel - WildboundConfig.baseAttribute) * WildboundConfig.spellPerIntelligence,

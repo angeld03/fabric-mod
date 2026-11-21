@@ -17,5 +17,5 @@ public record DerivedStats(
         float staminaRegeneration
 ) {
     public static final DerivedStats BASE = new DerivedStats(
-            20f, 20f, 20f, 5f, 5f, 2f, 2f, 0.05f, 1.5f, 0f, 0f, 2f, 4f);
+            20f, 100f, 20f, 5f, 5f, 2f, 2f, 0.05f, 1.5f, 0f, 0f, 5f, 4f);
 }

@@ -14,7 +14,14 @@ public final class RpgPersistenceManager {
     }
 
     public static PlayerRpgProfile load(ServerPlayer player) {
-        return RpgDataMigration.migrate(PlayerRpgProvider.getOrCreate(player));
+        PlayerRpgProfile stored = PlayerRpgProvider.getOrCreate(player);
+        PlayerRpgProfile migrated = RpgDataMigration.migrate(stored);
+        if (!migrated.equals(stored)) {
+            // Persist schema upgrades immediately instead of returning a
+            // migrated value that is discarded when the player leaves.
+            PlayerRpgProvider.set(player, migrated);
+        }
+        return migrated;
     }
 
     public static void save(ServerPlayer player, PlayerRpgProfile profile) {

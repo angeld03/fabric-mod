@@ -4,6 +4,7 @@ import com.wildbound.core.WildboundConfig;
 import com.wildbound.player.AttributeContainer;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerStatistics;
+import com.wildbound.player.RadialSkillConfig;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +31,7 @@ public final class RpgDataMigration {
                 attributes,
                 Math.max(0f, profile.mana()), Math.max(0f, profile.stamina()),
                 profile.unlockedSkills(), realms,
+                RadialSkillConfig.retainUnlocked(profile.radialSkills(), profile.unlockedSkills()),
                 profile.stats().validated()
         ));
     }
@@ -43,6 +45,7 @@ public final class RpgDataMigration {
                 p.attributes().validated(WildboundConfig.maxAttribute),
                 Math.max(0f, p.mana()), Math.max(0f, p.stamina()),
                 p.unlockedSkills(), p.unlockedRealms(),
+                RadialSkillConfig.retainUnlocked(p.radialSkills(), p.unlockedSkills()),
                 p.stats().validated()
         );
     }

@@ -40,7 +40,7 @@ public final class SkillProgressionService {
                 profile.schemaVersion(), profile.uuid(), profile.level(), profile.experience(),
                 profile.totalExperience(), profile.attributePoints(), points, profile.attributes(),
                 profile.mana(), profile.stamina(), profile.unlockedSkills(), profile.unlockedRealms(),
-                profile.stats()).withSkill(skillId);
+                profile.radialSkills(), profile.stats()).withSkill(skillId);
         RpgPersistenceManager.save(player, updated);
         return SkillUnlockResult.OK;
     }

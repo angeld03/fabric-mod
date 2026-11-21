@@ -33,11 +33,12 @@ public final class RpgDataCodec {
         float stamina = buf.readFloat();
         List<String> skills = readStrings(buf);
         List<String> realms = readStrings(buf);
+        List<String> radial = readStrings(buf);
         PlayerStatistics stats = new PlayerStatistics(
                 buf.readLong(), buf.readLong(), buf.readLong(),
                 buf.readLong(), buf.readLong(), buf.readLong());
         return new PlayerRpgProfile(schema, uuid, level, experience, total, attributePoints,
-                skillPoints, attributes, mana, stamina, skills, realms, stats);
+                skillPoints, attributes, mana, stamina, skills, realms, radial, stats);
     }
 
     private static void encode(RegistryFriendlyByteBuf buf, PlayerRpgProfile profile) {
@@ -58,6 +59,7 @@ public final class RpgDataCodec {
         buf.writeFloat(profile.stamina());
         writeStrings(buf, profile.unlockedSkills());
         writeStrings(buf, profile.unlockedRealms());
+        writeStrings(buf, profile.radialSkills());
         PlayerStatistics s = profile.stats();
         buf.writeLong(s.mobsDefeated());
         buf.writeLong(s.bossesDefeated());

@@ -3,7 +3,9 @@
 	"package": "com.wildbound.client.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
-		"WildboundClientMixin"
+		"WildboundClientMixin",
+		"RadialMouseMixin",
+		"CameraShakeMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

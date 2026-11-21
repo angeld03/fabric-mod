@@ -15,7 +15,9 @@ public final class RpgAttachments {
             .persistent(PlayerRpgProfile.CODEC)
             .copyOnDeath()
             .initializer(PlayerRpgProfile::empty)
-            .syncWith(RpgDataCodec.STREAM_CODEC, AttachmentSyncPredicate.all())
+            // The profile is private progression data: it is only ever needed by
+            // its own owner, so restricting sync avoids leaking it to other players.
+            .syncWith(RpgDataCodec.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
             .buildAndRegister(Wildbound.id("rpg_profile"));
 
     private RpgAttachments() {
