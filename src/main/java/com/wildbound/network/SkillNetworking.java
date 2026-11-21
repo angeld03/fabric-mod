@@ -5,12 +5,14 @@ import com.wildbound.network.SkillChargePayload;
 import com.wildbound.attributes.AttributeService;
 import com.wildbound.attributes.RpgAttribute;
 import com.wildbound.skills.SkillActivationService;
+import com.wildbound.skills.SkillAimContext;
 import com.wildbound.skills.SkillProgressionService;
 import com.wildbound.skills.SkillRadialService;
 import com.wildbound.skills.SkillUnlockResult;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Registers the skill menu packets. Unlocks and activations stay
@@ -50,11 +52,15 @@ public final class SkillNetworking {
             ServerPlayer player = context.player();
             context.server().execute(() -> {
                 if (player.hasDisconnected()) return;
-                var result = SkillActivationService.activate(player, payload.skillId());
-                if (ServerPlayNetworking.canSend(player, SkillActivateResultPayload.TYPE)) {
-                    ServerPlayNetworking.send(player, new SkillActivateResultPayload(
-                            payload.skillId(), result.success(), result.reason(), result.cooldownRemaining()));
-                }
+                SkillAimContext.withAim(player,
+                        new Vec3(payload.aimX(), payload.aimY(), payload.aimZ()), () -> {
+                            var result = SkillActivationService.activate(player, payload.skillId());
+                            if (ServerPlayNetworking.canSend(player, SkillActivateResultPayload.TYPE)) {
+                                ServerPlayNetworking.send(player, new SkillActivateResultPayload(
+                                        payload.skillId(), result.success(), result.reason(), result.cooldownRemaining()));
+                            }
+                            return null;
+                        });
             });
         });
 
@@ -89,7 +95,11 @@ public final class SkillNetworking {
             ServerPlayer player = context.player();
             context.server().execute(() -> {
                 if (player.hasDisconnected()) return;
-                SkillActivationService.activateWithCharge(player, payload.skillId(), payload.chargeLevel());
+                SkillAimContext.withAim(player,
+                        new Vec3(payload.aimX(), payload.aimY(), payload.aimZ()), () -> {
+                            SkillActivationService.activateWithCharge(player, payload.skillId(), payload.chargeLevel());
+                            return null;
+                        });
             });
         });
         ServerPlayNetworking.registerGlobalReceiver(AttributeUpgradePayload.TYPE, (payload, context) -> {
