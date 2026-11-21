@@ -101,6 +101,11 @@ public final class SkillActivationService {
             return ActivationResult.fail("execution_failed", 0f);
         }
 
+        // Only a completed server-side execution grants mastery experience.
+        // Cooldown, resource and executor failures return before this point.
+        long masteryXp = 10L + Math.round(getChargeLevel() * 5f);
+        SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
+
         // Update cooldown
         playerCooldowns.put(skillId, now);
 
