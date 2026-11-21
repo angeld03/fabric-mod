@@ -27,9 +27,10 @@ import java.util.Map;
 public final class AquaSkillFxRenderer {
     private static final Identifier WATER_TEXTURE =
             Identifier.fromNamespaceAndPath("wildbound", "textures/misc/aqua_water_flow.png");
+    private static final WaterSerpentMeshDefinition LEVIATHAN_MODEL = WaterSerpentMeshDefinition.load();
     private static final int MAX_EFFECTS = 24;
-    private static final int MAX_QUADS_PER_EFFECT = 2_600;
-    private static final int MAX_QUADS_PER_FRAME = 16_000;
+    private static final int MAX_QUADS_PER_EFFECT = 10_500;
+    private static final int MAX_QUADS_PER_FRAME = 52_000;
     private static final double MAX_DISTANCE_SQR = 80.0 * 80.0;
     private static final Map<Long, Effect> EFFECTS = new LinkedHashMap<>();
 
@@ -94,7 +95,7 @@ public final class AquaSkillFxRenderer {
         for (Effect effect : EFFECTS.values()) {
             if (renderAnchor(mc, effect).distanceToSqr(camera) <= MAX_DISTANCE_SQR) visibleEffects++;
         }
-        int sharedBudget = Math.max(220, Math.min(MAX_QUADS_PER_EFFECT,
+        int sharedBudget = Math.max(560, Math.min(MAX_QUADS_PER_EFFECT,
                 MAX_QUADS_PER_FRAME / Math.max(1, visibleEffects)));
         for (Effect effect : EFFECTS.values()) {
             Vec3 anchor = renderAnchor(mc, effect);
@@ -117,15 +118,16 @@ public final class AquaSkillFxRenderer {
             pose.translate(relative.x, relative.y + 0.68, relative.z);
             Vec3 direction = effect.direction;
             if (!isWorldAligned(effect.skillId)) {
-                pose.rotate(new Quaternionf().rotationY((float) -Math.atan2(direction.x, direction.z)));
-                pose.rotate(new Quaternionf().rotationX((float) Math.atan2(direction.y,
+                // Local +Z is the spell forward axis. Match it to the supplied camera direction.
+                pose.rotate(new Quaternionf().rotationY((float) Math.atan2(direction.x, direction.z)));
+                pose.rotate(new Quaternionf().rotationX((float) -Math.atan2(direction.y,
                         Math.sqrt(direction.x * direction.x + direction.z * direction.z))));
             }
-            int effectBudget = Math.max(160, (int) (sharedBudget * lod));
+            int effectBudget = Math.max(420, (int) (sharedBudget * lod));
 
             context.submitNodeCollector().submitCustomGeometry(
                     pose,
-                    RenderTypes.entityTranslucent(WATER_TEXTURE),
+                    RenderTypes.entityTranslucentEmissive(WATER_TEXTURE),
                     (matrix, buffer) -> draw(effect, age, progress, alpha, lod, effectBudget, matrix, buffer)
             );
             pose.popPose();
