@@ -103,7 +103,11 @@ public final class SkillActivationService {
 
         // Only a completed server-side execution grants mastery experience.
         // Cooldown, resource and executor failures return before this point.
-        long masteryXp = 10L + Math.round(getChargeLevel() * 5f);
+        // Higher-tier abilities grant more mastery XP, while a fully charged
+        // cast earns a modest bonus. This rewards meaningful progression
+        // without making low-tier casts the fastest mastery farm.
+        long masteryXp = 10L + Math.min(18L, definition.requiredLevel() / 3L)
+                + Math.round(getChargeLevel() * 5f);
         SkillProgressionService.SkillProgressResult masteryResult =
                 SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
         if (masteryResult.changed() && masteryResult.rank() > masteryResult.previousRank()) {
