@@ -45,7 +45,8 @@ public record SkillProgress(
         if (amount <= 0 || rank >= MAX_RANK) return this;
         long remaining = amount;
         long xp = experience;
-        long total = totalExperience + amount;
+        long total = amount > Long.MAX_VALUE - totalExperience
+                ? Long.MAX_VALUE : totalExperience + amount;
         int nextRank = rank;
 
         while (remaining > 0 && nextRank < MAX_RANK) {
