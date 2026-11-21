@@ -200,3 +200,31 @@ Además:
 - Se ampliaron pruebas de recompensas acumuladas por subir varios niveles y de hitos de puntos de habilidad.
 
 **Pendiente:** revisar todos los eventos que conceden XP/actualizan estadísticas y ejecutar tests/build con Java 25. No se afirma todavía que P2 esté cerrado ni que el balance esté aprobado.
+
+
+### P3 — Primera revisión de la geometría de la Water Wand
+
+Se amplió el modelo de 20 a 33 elementos cúbicos:
+- Tres collares de hierro para separar visualmente el mango.
+- Incrustaciones y runas cian en las caras del mango.
+- Refuerzos metálicos en la corona del cristal.
+- Gotas de agua flotantes y un núcleo frontal.
+
+Se reutilizan texturas vanilla existentes (hierro, diamante, prismarine, oro, beacon y sea lantern). **No es todavía la versión final con atlas UV artesanal**; la textura propia del proyecto no se ha podido validar visualmente y no se ha sustituido por una imagen inventada. Pendiente comprobar orientación/escala en mano, GUI, suelo y tercera persona.
+
+### P4 — Primera animación de carga de la varita
+
+- `SkillChargeState` expone el progreso 0..1 de carga.
+- Nueva `WaterBoltChargePresentation` genera un vórtice de burbujas que se contrae hacia el cristal, salpicaduras y chispas que aparecen en fases altas de carga.
+- El efecto solo existe en el cliente, primera persona, con Water Wand y Water Bolt seleccionado; no modifica daño, costes ni duración del servidor.
+- Se integra con el ciclo de conexión/desconexión y se limpia al salir.
+
+Esta fase es feedback de carga con partículas/cámara; todavía no anima los huesos o cubos del modelo de la varita. La animación real del objeto en mano requiere un renderer/model pipeline compatible y una prueba en Minecraft.
+
+### P5 — Primera ampliación de la interfaz RPG
+
+- La cabecera del árbol de habilidades muestra puntos de habilidad y puntos de atributo disponibles.
+- Al enfocar una habilidad desbloqueada, el pie del menú muestra su rango individual y XP para el siguiente rango (o MAX).
+- El HUD ya existente continúa mostrando nivel, XP, salud, maná y stamina.
+
+Pendiente para completar P5: pantalla de atributos con inversión y preview de estadísticas derivadas, pantalla/ficha de personaje, y una vista detallada de mejoras de cada habilidad.
