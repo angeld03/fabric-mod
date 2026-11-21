@@ -364,45 +364,91 @@ public final class AquaSkillFxRenderer {
     // 10 — Leviathan's Wrath: a recognizable sea-serpent body made from skins.
     // ---------------------------------------------------------------------
     private static void leviathansWrath(Mesh m, float age, float p) {
-        float t = age * 0.10f;
-        float travel = smooth(p) * 7.2f;
-        float sway = (float) Math.sin(t * 1.65f) * 0.42f;
-        float jawOpen = 0.12f + 0.10f * (0.5f + 0.5f * (float) Math.sin(t * 2.8f));
-        // Muscular neck and segmented serpentine trunk, overlapping into one silhouette.
-        m.tube(new Vec3(0, 0.92, -4.5), new Vec3(sway * 0.4, 1.1, 1.35 + travel),
-                0.63f, 28, 16, t, 0x075EA8, 144);
-        for (int i = 0; i < 8; i++) {
-            float q = i / 7f;
-            float z = -3.7f + q * 5.0f + travel * 0.55f;
-            float x = (float) Math.sin(t * 1.55f + q * 3.4f) * (0.42f + q * 0.24f);
-            float y = 0.83f + (float) Math.sin(t * 1.2f + q * 2.4f) * 0.15f;
-            float radius = 0.53f - q * 0.2f;
-            m.ellipsoid(x, y, z, radius * 0.98f, radius * 0.83f, 0.86f,
-                    15, 9, t + q, 0x0B80C5, 152);
-            m.backFin(x, y + radius * 0.62f, z, radius * 1.25f, t + i, 0x38DFFF, 150);
+        float phase = age * 0.105f;
+        float summon = smooth(clamp(p * 4.2f, 0f, 1f));
+        float travel = smooth(clamp((p - 0.16f) / 0.72f, 0f, 1f)) * 6.8f;
+        float headSway = (float) Math.sin(phase * 1.65f) * 0.16f;
+
+        // Continuous Catmull-Rom body loft loaded from the JSON creature profile.
+        // Two nested skins give the serpent a deep cobalt body and a moving cyan flow layer.
+        m.serpentBody(LEVIATHAN_MODEL, phase, travel, summon, 1.0f,
+                0x075FA9, 190, 1.0f);
+        if (m.remainingQuads() > 2_000) {
+            m.serpentBody(LEVIATHAN_MODEL, phase * 1.17f + 1.8f, travel, summon, 0.91f,
+                    0x19BDEB, 92, 0.62f);
         }
-        // Head dome, lower jaw, snout and swept crown fins.
-        m.ellipsoid(sway, 1.45f, 2.05f + travel, 1.02f, 0.82f, 1.2f,
-                22, 13, t, 0x087CC4, 180);
-        m.ellipsoid(sway, 0.91f, 2.74f + travel, 0.72f, 0.29f, 0.72f,
-                18, 10, -t, 0x22B8E5, 185);
-        m.ellipsoid(sway, 0.68f - jawOpen, 2.44f + travel, 0.78f, 0.20f, 0.72f,
-                18, 9, t, 0x07528F, 178);
-        // Deep mouth cavity and cyan throat flash between the moving jaws.
-        m.ellipsoid(sway, 0.80f - jawOpen * 0.45f, 2.80f + travel, 0.47f, 0.075f, 0.40f,
-                14, 7, -t, 0x012F57, 168);
-        m.ellipsoid(sway, 0.79f - jawOpen * 0.35f, 2.86f + travel, 0.31f, 0.035f, 0.30f,
-                12, 6, t * 1.5f, 0x7EEDFF, 195);
-        m.fin(sway - 0.55f, 1.95f, 2.0f + travel, -0.9f, 1.55f, 0.1f, 0x0A69AF, 172);
-        m.fin(sway + 0.55f, 1.95f, 2.0f + travel, 0.9f, 1.55f, 0.1f, 0x0A69AF, 172);
-        m.fin(sway, 2.05f, 2.55f + travel, 0, 1.0f, -1.15f, 0x48DDF5, 185);
-        // Bright eyes and a foaming jawline make the head read as a creature, not a blob.
-        m.ellipsoid(sway - 0.73f, 1.66f, 2.76f + travel, 0.12f, 0.12f, 0.12f,
-                10, 7, t, 0xC8FFFF, 240);
-        m.ellipsoid(sway + 0.73f, 1.66f, 2.76f + travel, 0.12f, 0.12f, 0.12f,
-                10, 7, -t, 0xC8FFFF, 240);
-        m.rippleRing(sway, 0.74f, 3.08f + travel, 0.58f, 0.09f, 24, t, 0xD9FFFF, 220);
-        m.splashDroplets(sway, 1.9f, 2.3f + travel, 1.45f, 15, t, 0xD6FFFF);
+
+        WaterSerpentMeshDefinition.Head head = LEVIATHAN_MODEL.head();
+        addSerpentEllipsoid(m, head.skull(), headSway, travel, summon, phase, 0x087AC0, 205, 28, 17);
+        addSerpentEllipsoid(m, head.brow(), headSway, travel, summon, phase * 0.7f, 0x0B91D1, 200, 24, 13);
+        addSerpentEllipsoid(m, head.snout(), headSway, travel, summon, phase, 0x21BFEA, 210, 24, 14);
+
+        float jawOpen = head.jawOpen() * (0.55f + 0.45f * (float) Math.sin(phase * 2.6f));
+        WaterSerpentMeshDefinition.Ellipsoid jaw = head.jaw();
+        m.ellipsoid(headSway + jaw.x(), jaw.y() - jawOpen, jaw.z() + travel,
+                jaw.rx() * summon, jaw.ry() * summon, jaw.rz() * summon,
+                24, 14, -phase, 0x07538F, 205);
+        WaterSerpentMeshDefinition.Ellipsoid mouth = head.mouth();
+        m.ellipsoid(headSway + mouth.x(), mouth.y() - jawOpen * 0.45f, mouth.z() + travel,
+                mouth.rx() * summon, mouth.ry() * summon, mouth.rz() * summon,
+                20, 11, phase, 0x012C55, 225);
+        m.ellipsoid(headSway, mouth.y() - jawOpen * 0.42f, mouth.z() + travel + 0.05f,
+                mouth.rx() * 0.66f * summon, 0.035f * summon, mouth.rz() * 0.58f * summon,
+                18, 9, phase * 1.6f, 0x63E9FF, 230);
+
+        // Recessed paired eyes with a luminous cyan iris and tiny white glints.
+        float eyeX = head.eyeOffsetX() * summon;
+        float eyeY = head.eyeY();
+        float eyeZ = head.eyeZ() + travel;
+        for (int sign : new int[]{-1, 1}) {
+            float x = headSway + sign * eyeX;
+            m.ellipsoid(x, eyeY, eyeZ, head.eyeRadius() * 1.32f, head.eyeRadius() * 1.2f,
+                    head.eyeRadius() * 0.7f, 14, 9, phase, 0x042E58, 230);
+            m.ellipsoid(x + sign * 0.012f, eyeY + 0.006f, eyeZ + 0.025f,
+                    head.eyeRadius() * 0.72f, head.eyeRadius() * 0.78f,
+                    head.eyeRadius() * 0.42f, 13, 8, -phase, 0x9BF6FF, 255);
+            m.ellipsoid(x - sign * 0.018f, eyeY + 0.035f, eyeZ + 0.05f,
+                    head.eyeRadius() * 0.22f, head.eyeRadius() * 0.22f,
+                    head.eyeRadius() * 0.18f, 9, 6, phase, 0xFFFFFF, 255);
+        }
+
+        // JSON-authored dorsal fins follow the spine and flex with the swimming cycle.
+        for (int i = 0; i < LEVIATHAN_MODEL.dorsalFins().size(); i++) {
+            WaterSerpentMeshDefinition.Fin fin = LEVIATHAN_MODEL.dorsalFins().get(i);
+            float flex = (float) Math.sin(phase * 1.45f + i * 0.72f) * 0.13f;
+            m.fin(headSway + fin.x(), fin.y() * summon, fin.z() + travel * (0.12f + i * 0.08f),
+                    fin.dx() + flex, fin.dy() * summon, fin.dz(),
+                    i % 2 == 0 ? 0x0A75B7 : 0x19B8E0, 190);
+        }
+
+        WaterSerpentMeshDefinition.TailFluke tail = LEVIATHAN_MODEL.tailFluke();
+        float tailFlex = (float) Math.sin(phase * 1.8f) * 0.28f;
+        m.fin(tailFlex, tail.y() * summon, tail.z() + travel * 0.08f,
+                -tail.spread(), tail.height() * summon, tail.sweepBack(),
+                0x0A71B2, 200);
+        m.fin(tailFlex, tail.y() * summon, tail.z() + travel * 0.08f,
+                tail.spread(), tail.height() * summon, tail.sweepBack(),
+                0x138FCB, 200);
+
+        // Gills and water streamers emphasize the head-to-tail flow direction.
+        for (int gill = 0; gill < 3; gill++) {
+            float z = 1.35f + gill * 0.30f + travel * 0.72f;
+            for (int sign : new int[]{-1, 1}) {
+                m.ellipsoid(headSway + sign * (0.76f - gill * 0.035f), 1.17f - gill * 0.08f,
+                        z, 0.055f, 0.22f, 0.075f, 9, 6, phase + gill, 0x48DDF8, 135);
+            }
+        }
+        m.splashDroplets(headSway, 1.72f, 3.1f + travel, 1.15f, 18, phase, 0xB7FAFF);
+        m.rippleRing(headSway, 0.91f, 3.42f + travel, 0.66f * summon, 0.11f,
+                42, phase, 0x9DF4FF, 165);
+    }
+
+    private static void addSerpentEllipsoid(Mesh mesh, WaterSerpentMeshDefinition.Ellipsoid shape,
+                                             float sway, float travel, float scale, float phase,
+                                             int color, int alpha, int longitude, int latitude) {
+        mesh.ellipsoid(sway + shape.x(), shape.y() * scale, shape.z() + travel,
+                shape.rx() * scale, shape.ry() * scale, shape.rz() * scale,
+                longitude, latitude, phase, color, alpha);
     }
 
     private static float clamp(float value, float min, float max) {
