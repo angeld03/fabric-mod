@@ -123,6 +123,9 @@ public final class AquaSkillExecutors {
                     int dmg = Math.round(lanceDamage[li] * chargeMult * masteryDamageMultiplier);
                     int burst = lanceBursts[li];
                     double shaft = lanceWidth[li];
+                    // A lance may overlap a target for several consecutive ticks.
+                    // Track UUIDs so one cast cannot deal repeated collision damage.
+                    Set<UUID> hitTargets = new HashSet<>();
 
                     // 1) FORM: the lance builds at the wand tip, segment by segment.
                     SkillScheduler.run(player, startTick, 1, FORM_TICKS, t -> {
@@ -184,7 +187,8 @@ public final class AquaSkillExecutors {
                         // Hit detection travels WITH the projectile (only once per target).
                         AABB hitBox = new AABB(head, head).inflate(shaft + 0.9);
                         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, hitBox,
-                                e -> e != player && e.isAlive())) {
+                                e -> e != player && e.isAlive() && !hitTargets.contains(e.getUUID()))) {
+                            if (!hitTargets.add(target.getUUID())) continue;
                             float d = dmg + profile.level() * 0.5f;
                             SkillActivationService.damageEntity(target, player, d);
                             if (frostbiteCurrent) {
