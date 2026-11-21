@@ -54,6 +54,6 @@ public final class AttributeService {
     private static PlayerRpgProfile copy(PlayerRpgProfile p, AttributeContainer attributes, int points) {
         return new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
                 p.totalExperience(), points, p.skillPoints(), attributes, p.mana(), p.stamina(),
-                p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats());
+                p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress());
     }
 }
