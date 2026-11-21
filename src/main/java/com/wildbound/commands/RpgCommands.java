@@ -164,7 +164,7 @@ public final class RpgCommands {
                                     PlayerRpgProvider.set(target, new PlayerRpgProfile(p.schemaVersion(), p.uuid(),
                                             p.level(), p.experience(), p.totalExperience(), p.attributePoints(),
                                             p.skillPoints() + amount, p.attributes(), p.mana(), p.stamina(),
-                                            p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats()));
+                                            p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress()));
                                     send(ctx.getSource(), "Skill points: " + (p.skillPoints() + amount)
                                             + " for " + target.getName().getString());
                                     return 1;
