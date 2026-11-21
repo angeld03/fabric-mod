@@ -118,5 +118,7 @@
   "wildbound.mastery.select_unlocked": "Selecciona una habilidad desbloqueada para ver su maestría.",
   "wildbound.mastery.upgrade.hydrostatic_core": "Núcleo hidrostático",
   "wildbound.mastery.upgrade.frostbite_current": "Corriente glacial",
-  "wildbound.mastery.upgrade.tidal_piercer": "Perforador de mareas"
+  "wildbound.mastery.upgrade.tidal_piercer": "Perforador de mareas",
+  "wildbound.skill.mastery_rank_up": "¡%1$s ha alcanzado el rango %2$s!",
+  "wildbound.skill.upgrade_unlocked": "Mejora de habilidad desbloqueada: %1$s"
 }
