@@ -10,14 +10,14 @@ public final class SkillMasteryRules {
     private SkillMasteryRules() {}
 
     public static float cooldown(float baseCooldown, int rank) {
-        if (baseCooldown <= 0f) return Math.max(0f, baseCooldown);
+        if (!Float.isFinite(baseCooldown) || baseCooldown <= 0f) return 0f;
         int safeRank = Math.max(1, Math.min(SkillProgress.MAX_RANK, rank));
         float reduction = Math.min(0.0675f, (safeRank - 1) * 0.0075f);
         return Math.max(0.25f, baseCooldown * (1f - reduction));
     }
 
     public static float manaCost(float baseCost, int rank, boolean hasCustomCostCurve) {
-        if (baseCost <= 0f || hasCustomCostCurve) return baseCost;
+        if (!Float.isFinite(baseCost) || baseCost <= 0f || hasCustomCostCurve) return 0f;
         int safeRank = Math.max(1, Math.min(SkillProgress.MAX_RANK, rank));
         float reduction = Math.min(0.09f, (safeRank - 1) * 0.01f);
         return Math.max(0.1f, baseCost * (1f - reduction));
