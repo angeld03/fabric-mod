@@ -115,5 +115,8 @@
   "wildbound.mastery.no_upgrades": "No upgrades have been unlocked for this skill yet.",
   "wildbound.mastery.back": "M / ESC · Back",
   "wildbound.mastery.open_hint": "M · Details",
-  "wildbound.mastery.select_unlocked": "Select an unlocked skill to view its mastery."
+  "wildbound.mastery.select_unlocked": "Select an unlocked skill to view its mastery.",
+  "wildbound.mastery.upgrade.hydrostatic_core": "Hydrostatic Core",
+  "wildbound.mastery.upgrade.frostbite_current": "Frostbite Current",
+  "wildbound.mastery.upgrade.tidal_piercer": "Tidal Piercer"
 }
