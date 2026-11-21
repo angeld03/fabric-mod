@@ -14,6 +14,7 @@ import com.wildbound.core.WildboundConfig;
 import com.wildbound.core.WildboundConstants;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerRpgProvider;
+import com.wildbound.player.RpgAttachments;
 import com.wildbound.progression.ExperienceService;
 import com.wildbound.realms.RealmProgressionService;
 import com.wildbound.resources.ResourceService;
@@ -243,6 +244,28 @@ public final class RpgCommands {
                             send(ctx.getSource(), "Profile reset for " + target.getName().getString());
                             return 1;
                         })));
+        debug.then(Commands.literal("attachment").executes(ctx -> {
+            ServerPlayer player = ctx.getSource().getPlayerOrException();
+            boolean attached = player.hasAttached(RpgAttachments.PROFILE);
+            PlayerRpgProfile profile = player.getAttached(RpgAttachments.PROFILE);
+            if (profile == null) {
+                send(ctx.getSource(), "Attachment present=false | profile has not been initialized");
+                return 1;
+            }
+
+            boolean uuidMatches = player.getUUID().toString().equals(profile.uuid());
+            send(ctx.getSource(), "Attachment present=" + attached
+                    + " | UUID matches=" + uuidMatches
+                    + " | schema=" + profile.schemaVersion()
+                    + " | level=" + profile.level()
+                    + " | XP=" + profile.experience()
+                    + " | attribute points=" + profile.attributePoints()
+                    + " | skill points=" + profile.skillPoints()
+                    + " | skills=" + profile.unlockedSkills().size()
+                    + " | realms=" + profile.unlockedRealms().size()
+                    + " | radial=" + profile.radialSkills());
+            return 1;
+        }));
         root.then(debug);
     }
 
