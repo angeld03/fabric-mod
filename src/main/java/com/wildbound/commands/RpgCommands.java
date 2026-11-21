@@ -15,6 +15,8 @@ import com.wildbound.core.WildboundConstants;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerRpgProvider;
 import com.wildbound.player.RpgAttachments;
+import com.wildbound.persistence.RpgPersistenceManager;
+import com.wildbound.persistence.RpgWorldProfilesData;
 import com.wildbound.progression.ExperienceService;
 import com.wildbound.realms.RealmProgressionService;
 import com.wildbound.resources.ResourceService;
@@ -48,7 +50,7 @@ public final class RpgCommands {
 
         root.then(Commands.literal("profile").executes(ctx -> {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
-            PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(player);
+            PlayerRpgProfile p = RpgPersistenceManager.load(player);
             send(ctx.getSource(), "Level " + p.level() + " | XP " + p.experience()
                     + "/" + ExperienceService.getExperienceRequired(player)
                     + " | AP " + p.attributePoints() + " | SP " + p.skillPoints());
@@ -161,7 +163,7 @@ public final class RpgCommands {
                                     ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
                                     int amount = IntegerArgumentType.getInteger(ctx, "amount");
                                     PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(target);
-                                    PlayerRpgProvider.set(target, new PlayerRpgProfile(p.schemaVersion(), p.uuid(),
+                                    RpgPersistenceManager.save(target, new PlayerRpgProfile(p.schemaVersion(), p.uuid(),
                                             p.level(), p.experience(), p.totalExperience(), p.attributePoints(),
                                             p.skillPoints() + amount, p.attributes(), p.mana(), p.stamina(),
                                             p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress()));
@@ -243,7 +245,7 @@ public final class RpgCommands {
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(ctx -> {
                             ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
-                            PlayerRpgProvider.set(target, PlayerRpgProfile.create(target.getUUID(),
+                            RpgPersistenceManager.save(target, PlayerRpgProfile.create(target.getUUID(),
                                     WildboundConstants.REALM_EMERALD_VALE));
                             send(ctx.getSource(), "Profile reset for " + target.getName().getString());
                             return 1;
@@ -258,8 +260,12 @@ public final class RpgCommands {
             }
 
             boolean uuidMatches = player.getUUID().toString().equals(profile.uuid());
+            RpgWorldProfilesData durableData = RpgWorldProfilesData.get(player.getServer());
+            PlayerRpgProfile durableProfile = durableData == null ? null : durableData.getProfile(player.getUUID().toString());
             send(ctx.getSource(), "Attachment present=" + attached
                     + " | UUID matches=" + uuidMatches
+                    + " | durable copy=" + (durableProfile != null)
+                    + " | durable level=" + (durableProfile == null ? "missing" : durableProfile.level())
                     + " | schema=" + profile.schemaVersion()
                     + " | level=" + profile.level()
                     + " | XP=" + profile.experience()
@@ -275,9 +281,10 @@ public final class RpgCommands {
 
     private static void setLevel(ServerPlayer player, int level) {
         PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(player);
-        PlayerRpgProvider.set(player, new PlayerRpgProfile(p.schemaVersion(), p.uuid(), level, 0L,
+        RpgPersistenceManager.save(player, new PlayerRpgProfile(p.schemaVersion(), p.uuid(), level, 0L,
                 p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                p.mana(), p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats()));
+                p.mana(), p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(),
+                p.stats(), p.skillProgress()));
     }
 
     private static RpgAttribute parseAttribute(String value) {
