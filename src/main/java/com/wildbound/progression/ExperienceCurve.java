@@ -14,7 +14,7 @@ public final class ExperienceCurve {
                 * Math.pow(level, 1.45)
                 * Math.pow(WildboundConfig.experienceGrowth, level * 0.45);
         long result = (long) Math.round(value / 5.0) * 5L;
-        return Math.max(20L, Math.min(5_000_000L, result));
+        return Math.max(20L, Math.min(50_000_000L, result));
     }
 
     public static long totalToReach(int level) {
