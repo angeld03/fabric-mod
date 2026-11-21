@@ -29,8 +29,8 @@ public final class AquaSkillFxRenderer {
             Identifier.fromNamespaceAndPath("wildbound", "textures/misc/aqua_water_flow.png");
     private static final WaterSerpentMeshDefinition LEVIATHAN_MODEL = WaterSerpentMeshDefinition.load();
     private static final int MAX_EFFECTS = 24;
-    private static final int MAX_QUADS_PER_EFFECT = 10_500;
-    private static final int MAX_QUADS_PER_FRAME = 52_000;
+    private static final int MAX_QUADS_PER_EFFECT = 13_000;
+    private static final int MAX_QUADS_PER_FRAME = 62_000;
     private static final double MAX_DISTANCE_SQR = 80.0 * 80.0;
     private static final Map<Long, Effect> EFFECTS = new LinkedHashMap<>();
 
@@ -187,10 +187,10 @@ public final class AquaSkillFxRenderer {
             float headZ = 2.2f + smooth(q) * 15.5f;
             float side = (i - 1) * 0.42f;
             m.tube(new Vec3(side, 0.0, 0.0), new Vec3(side, 0.0, headZ),
-                    0.29f, 22, 12, t + i * 1.7f, 0x087FCB, 116);
+                    0.29f, 38, 20, t + i * 1.7f, 0x087FCB, 116);
             m.tube(new Vec3(side, 0.0, 0.25), new Vec3(side, 0.0, headZ + 0.3f),
-                    0.17f, 20, 10, -t * 1.45f + i, 0x37DFFF, 165);
-            m.ellipsoid(side, 0.0f, headZ, 0.36f, 0.36f, 0.62f, 13, 8, t, 0x64EDFF, 190);
+                    0.17f, 34, 18, -t * 1.45f + i, 0x37DFFF, 165);
+            m.ellipsoid(side, 0.0f, headZ, 0.36f, 0.36f, 0.62f, 26, 16, t, 0x64EDFF, 190);
             m.splashDroplets(side, 0.0f, headZ, 0.55f, 5, i * 0.8f + t, 0xB9FAFF);
         }
         m.rippleRing(0, 0, z, 0.62f, 0.10f, 30, t, 0x8DF8FF, 125);
@@ -210,7 +210,7 @@ public final class AquaSkillFxRenderer {
         m.ellipsoid(0, 0.78f * build, 0, 1.12f * radius, height, 1.12f * radius,
                 24, 13, t, 0x087FCB, 52);
         m.ellipsoid(0, 0.82f * build, 0, 0.86f * radius, height * 0.86f, 0.86f * radius,
-                22, 12, -t * 1.2f, 0x2ECFFF, 82);
+                32, 18, -t * 1.2f, 0x2ECFFF, 82);
         for (int strand = 0; strand < 3; strand++) {
             m.spiralRibbon(0, -0.45f * build, 0, (0.78f + strand * 0.08f) * radius,
                     2.65f * build, 42, 0.19f * radius, t + strand * 2.1f, 0x69EFFF, 155);
@@ -230,11 +230,11 @@ public final class AquaSkillFxRenderer {
     private static void aquaWhip(Mesh m, float age, float p) {
         float t = age * 0.13f;
         float reach = 2.0f + smooth(p) * 3.1f;
-        m.curvedRibbon(0, 0.18f, 0, reach, 0.0f, 0.32f, 0.52f, 52, t,
+        m.curvedRibbon(0, 0.18f, 0, reach, 0.0f, 0.32f, 0.52f, 72, t,
                 0x087FCB, 142);
-        m.curvedRibbon(0, 0.22f, 0.02f, reach * 0.98f, 0.0f, 0.28f, 0.29f, 48,
+        m.curvedRibbon(0, 0.22f, 0.02f, reach * 0.98f, 0.0f, 0.28f, 0.29f, 68,
                 -t * 1.4f, 0x3FDFFF, 188);
-        m.curvedRibbon(0, 0.25f, 0.04f, reach * 0.98f, 0.0f, 0.26f, 0.095f, 44,
+        m.curvedRibbon(0, 0.25f, 0.04f, reach * 0.98f, 0.0f, 0.26f, 0.095f, 64,
                 t * 1.8f, 0xD8FFFF, 220);
         m.tube(new Vec3(0, 0.15, 0), new Vec3(0, 0.3, reach),
                 0.12f, 30, 8, t * 2.1f, 0x55E8FF, 176);
@@ -253,15 +253,15 @@ public final class AquaSkillFxRenderer {
         float scale = expansion * pulse;
         float centerY = 0.72f * expansion;
         m.ellipsoid(0, centerY, 0, 1.45f * scale, 1.78f * scale, 1.45f * scale,
-                26, 16, t, 0x087BC5, 48);
+                40, 24, t, 0x087BC5, 48);
         m.ellipsoid(0, centerY, 0, 1.29f * scale, 1.63f * scale, 1.29f * scale,
-                24, 14, -t * 1.3f, 0x44DAFF, 62);
+                36, 20, -t * 1.3f, 0x44DAFF, 62);
         m.ellipsoid(0, centerY, 0, 1.08f * scale, 1.43f * scale, 1.08f * scale,
-                20, 12, t * 0.7f, 0xA9F8FF, 30);
+                32, 18, t * 0.7f, 0xA9F8FF, 30);
         for (int i = 0; i < 5; i++) {
             float latitude = -0.95f + i * 0.47f;
             m.sphericalBand(0, centerY, 0, 1.48f * scale, latitude, 1.43f * scale,
-                    48, t + i * 1.2f, 0xB9FFFF, 125);
+                    64, t + i * 1.2f, 0xB9FFFF, 125);
         }
         m.floatingDrops(0, centerY, 0, 1.55f * scale, 1.68f * scale, 10, t, 0xC8FFFF);
         if (p > 0.14f && p < 0.32f) {
@@ -275,9 +275,9 @@ public final class AquaSkillFxRenderer {
     private static void tidalWave(Mesh m, float age, float p) {
         float t = age * 0.095f;
         float travel = smooth(p) * 5.0f;
-        m.waveWall(0, -0.1f, 2.2f + travel, 6.1f, 4.25f, 0.8f, 34, 19, t,
+        m.waveWall(0, -0.1f, 2.2f + travel, 6.1f, 4.25f, 0.8f, 48, 28, t,
                 0x0876C3, 136);
-        m.waveWall(0, 0.0f, 1.95f + travel, 5.8f, 3.9f, 0.42f, 30, 17, -t * 1.35f,
+        m.waveWall(0, 0.0f, 1.95f + travel, 5.8f, 3.9f, 0.42f, 44, 26, -t * 1.35f,
                 0x26BCEB, 110);
         m.waveCrest(0, 3.9f, 2.35f + travel, 6.05f, 1.15f, t, 0xD4FFFF);
         m.foamArc(0, 3.65f, 2.15f + travel, 5.95f, 0.52f, 44, t, 0xE9FFFF, 205);
@@ -292,9 +292,9 @@ public final class AquaSkillFxRenderer {
         float t = age * 0.15f;
         float pulse = 1f + 0.12f * (float) Math.sin(t * 2.1f);
         m.tube(new Vec3(0, 0.05, -2.65), new Vec3(0, 0.05, 2.65),
-                0.86f * pulse, 32, 16, t, 0x087CCB, 104);
+                0.86f * pulse, 48, 24, t, 0x087CCB, 104);
         m.tube(new Vec3(0, 0.05, -2.45), new Vec3(0, 0.05, 2.75),
-                0.62f, 30, 14, -t * 1.6f, 0x37D9FF, 108);
+                0.62f, 44, 22, -t * 1.6f, 0x37D9FF, 108);
         for (int i = 0; i < 4; i++) {
             m.spiralRibbon(0, -0.3f, -2.4f, 0.68f + i * 0.06f,
                     5.0f, 42, 0.16f, t * (i % 2 == 0 ? 1.6f : -1.35f) + i, 0xA2F8FF, 148);
@@ -312,9 +312,9 @@ public final class AquaSkillFxRenderer {
     private static void whirlpool(Mesh m, float age, float p) {
         float t = age * 0.11f;
         float radius = 2.5f + smooth(p) * 1.65f;
-        m.whirlpoolSurface(0, -0.26f, 0, radius, 20, 38, t, 0x0875BE, 142);
-        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 15, 34, -t * 1.45f, 0x2BC7F0, 74);
-        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 18, 14, t, 0x086FB9, 116);
+        m.whirlpoolSurface(0, -0.26f, 0, radius, 28, 56, t, 0x0875BE, 142);
+        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 22, 48, -t * 1.45f, 0x2BC7F0, 74);
+        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 26, 20, t, 0x086FB9, 116);
         for (int i = 0; i < 3; i++) {
             m.spiralRibbon(0, -0.15f, 0, radius * (0.62f + i * 0.07f),
                     2.1f, 32, 0.24f, t + i * 1.8f, 0x74EDFF, 130);
@@ -330,11 +330,11 @@ public final class AquaSkillFxRenderer {
         float t = age * 0.12f;
         float extension = 3.0f + smooth(p) * 12.5f;
         m.taperedJet(0, 0.12f, 0, 0, 0.12f, extension,
-                0.78f, 0.09f, 30, 16, t, 0x0879C7, 132);
+                0.78f, 0.09f, 48, 24, t, 0x0879C7, 132);
         m.taperedJet(0, 0.12f, 0.12f, 0, 0.12f, extension + 0.15f,
-                0.39f, 0.035f, 28, 13, -t * 1.7f, 0x32D7FF, 145);
+                0.39f, 0.035f, 44, 22, -t * 1.7f, 0x32D7FF, 145);
         m.taperedJet(0, 0.12f, 0.2f, 0, 0.12f, extension + 0.2f,
-                0.16f, 0.012f, 24, 10, t * 2.1f, 0xD3FFFF, 210);
+                0.16f, 0.012f, 40, 18, t * 2.1f, 0xD3FFFF, 210);
         m.rippleRing(0, 0.12f, extension, 0.43f, 0.12f, 34, t, 0xC7FFFF, 180);
         m.splashDroplets(0, 0.12f, extension, 0.66f, 9, t, 0xC8FFFF);
     }
@@ -348,9 +348,9 @@ public final class AquaSkillFxRenderer {
         float z = 3.3f + expansion * 8.5f;
         float scale = 0.88f + expansion * 0.54f;
         m.waveWall(0, -0.4f, z, 10.5f * scale, 7.0f * scale,
-                1.65f, 36, 20, t, 0x075DAA, 158);
+                1.65f, 48, 28, t, 0x075DAA, 158);
         m.waveWall(0, -0.2f, z - 0.72f, 10.0f * scale, 6.65f * scale,
-                0.78f, 34, 18, -t * 1.3f, 0x149FD8, 122);
+                0.78f, 44, 26, -t * 1.3f, 0x149FD8, 122);
         m.waveCrest(0, 6.0f * scale, z + 0.25f, 10.1f * scale, 2.2f, t, 0xC7FFFF);
         m.foamArc(0, 5.8f * scale, z + 0.3f, 10.0f * scale, 0.85f,
                 64, t, 0xF0FFFF, 225);
@@ -379,7 +379,7 @@ public final class AquaSkillFxRenderer {
         }
 
         WaterSerpentMeshDefinition.Head head = LEVIATHAN_MODEL.head();
-        addSerpentEllipsoid(m, head.skull(), headSway, travel, summon, phase, 0x087AC0, 205, 28, 17);
+        addSerpentEllipsoid(m, head.skull(), headSway, travel, summon, phase, 0x087AC0, 205, 36, 22);
         addSerpentEllipsoid(m, head.brow(), headSway, travel, summon, phase * 0.7f, 0x0B91D1, 200, 24, 13);
         addSerpentEllipsoid(m, head.snout(), headSway, travel, summon, phase, 0x21BFEA, 210, 24, 14);
 
@@ -387,11 +387,11 @@ public final class AquaSkillFxRenderer {
         WaterSerpentMeshDefinition.Ellipsoid jaw = head.jaw();
         m.ellipsoid(headSway + jaw.x(), jaw.y() - jawOpen, jaw.z() + travel,
                 jaw.rx() * summon, jaw.ry() * summon, jaw.rz() * summon,
-                24, 14, -phase, 0x07538F, 205);
+                32, 18, -phase, 0x07538F, 205);
         WaterSerpentMeshDefinition.Ellipsoid mouth = head.mouth();
         m.ellipsoid(headSway + mouth.x(), mouth.y() - jawOpen * 0.45f, mouth.z() + travel,
                 mouth.rx() * summon, mouth.ry() * summon, mouth.rz() * summon,
-                20, 11, phase, 0x012C55, 225);
+                28, 16, phase, 0x012C55, 225);
         m.ellipsoid(headSway, mouth.y() - jawOpen * 0.42f, mouth.z() + travel + 0.05f,
                 mouth.rx() * 0.66f * summon, 0.035f * summon, mouth.rz() * 0.58f * summon,
                 18, 9, phase * 1.6f, 0x63E9FF, 230);
