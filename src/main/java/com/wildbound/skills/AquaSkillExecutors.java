@@ -58,7 +58,7 @@ public final class AquaSkillExecutors {
     private static void registerWaterBolt() {
         SkillActivationService.registerExecutor("aqua_water_bolt", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 2.5f; }
-            @Override public float getManaCost(SkillDefinition def, PlayerRpgProfile profile) { return 8f; }
+            @Override public float getManaCost(SkillDefinition def, PlayerRpgProfile profile) { return Math.max(5f, 8f - (profile.getSkillProgress(def.id()).rank() - 1) * 0.25f); }
 
             @Override
             public void execute(ServerPlayer player, SkillDefinition def, PlayerRpgProfile profile) {
