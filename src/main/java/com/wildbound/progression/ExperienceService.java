@@ -37,11 +37,12 @@ public final class ExperienceService {
     public static LevelUpResult grantExperience(ServerPlayer player, long amount, ExperienceSource source) {
         if (amount <= 0L) return LevelUpResult.NONE;
         PlayerRpgProfile profile = RpgPersistenceManager.load(player);
-        long gained = Math.min(amount, Long.MAX_VALUE - profile.experience() - 1);
+        long gained = Math.min(amount, Long.MAX_VALUE - profile.experience());
         if (gained <= 0L) return LevelUpResult.NONE;
 
         long experience = profile.experience() + gained;
-        long total = profile.totalExperience() + gained;
+        long total = gained > Long.MAX_VALUE - profile.totalExperience()
+                ? Long.MAX_VALUE : profile.totalExperience() + gained;
         int level = profile.level();
         long consumed = 0L;
 
