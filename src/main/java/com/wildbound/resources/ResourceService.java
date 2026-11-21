@@ -59,20 +59,12 @@ public final class ResourceService {
         float mana = Math.min(stats.maxMana(), profile.mana() + stats.manaRegeneration() * seconds);
         float stamina = Math.min(stats.maxStamina(), profile.stamina() + stats.staminaRegeneration() * seconds);
         if (mana == profile.mana() && stamina == profile.stamina()) return;
-        RpgPersistenceManager.save(player, new PlayerRpgProfile(
-                profile.schemaVersion(), profile.uuid(), profile.level(), profile.experience(),
-                profile.totalExperience(), profile.attributePoints(), profile.skillPoints(),
-                profile.attributes(), mana, stamina, profile.unlockedSkills(),
-                profile.unlockedRealms(), profile.radialSkills(), profile.stats()));
+        RpgPersistenceManager.save(player, profile.withResources(mana, stamina));
     }
 
     private static PlayerRpgProfile withResource(PlayerRpgProfile p, ResourceType type, float value) {
         return type == ResourceType.MANA
-                ? new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
-                        p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                        value, p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats())
-                : new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
-                        p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                        p.mana(), value, p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress());
+                ? p.withResources(value, p.stamina())
+                : p.withResources(p.mana(), value);
     }
 }
