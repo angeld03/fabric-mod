@@ -55,35 +55,38 @@ public final class CharacterScreen extends Screen {
         g.text(font, tr("wildbound.character.attribute_points", profile.attributePoints()),
                 24, 78, profile.attributePoints() > 0 ? 0xFFFFD479 : 0xFF9FB7CF, true);
 
+        boolean compact = w < 720;
         int left = 24;
-        int top = 108;
-        int rowHeight = 29;
+        int top = compact ? 100 : 108;
+        int rowHeight = compact ? 24 : 29;
+        int attributeWidth = compact ? Math.min(245, w - 48) : 245;
         g.text(font, tr("wildbound.character.attributes"), left, top - 15, 0xFF8EDBFF, true);
         for (int i = 0; i < ATTRIBUTES.length; i++) {
             RpgAttribute attribute = ATTRIBUTES[i];
             int y = top + i * rowHeight;
             int value = profile.attributes().get(attribute);
-            g.fill(left, y, left + 245, y + 23, 0xAA0A1421);
-            g.fill(left, y, left + 2, y + 23, 0xFF4A9BCB);
-            g.text(font, tr("wildbound.attribute." + attribute.id()), left + 9, y + 7, 0xFFEAF4FF, true);
-            String valueText = String.valueOf(value);
-            g.text(font, valueText, left + 168, y + 7, 0xFFFFD479, true);
+            g.fill(left, y, left + attributeWidth, y + 21, 0xAA0A1421);
+            g.fill(left, y, left + 2, y + 21, 0xFF4A9BCB);
+            g.text(font, tr("wildbound.attribute." + attribute.id()), left + 9, y + 6, 0xFFEAF4FF, true);
 
-            int bx = left + 208;
+            int bx = left + attributeWidth - 37;
+            int valueX = bx - 30;
+            g.text(font, String.valueOf(value), valueX, y + 6, 0xFFFFD479, true);
             buttonX[i] = bx;
-            buttonY[i] = y + 3;
+            buttonY[i] = y + 2;
             buttonW[i] = 28;
             buttonH[i] = 17;
             boolean enabled = profile.attributePoints() > 0 && value < WildboundConfig.maxAttribute;
-            int color = enabled ? (inside(mouseX, mouseY, bx, y + 3, 28, 17)
+            int color = enabled ? (inside(mouseX, mouseY, bx, y + 2, 28, 17)
                     ? 0xFF477DA0 : 0xFF274C68) : 0xFF303A45;
-            g.fill(bx, y + 3, bx + 28, y + 20, color);
-            g.text(font, "+", bx + 10, y + 7, enabled ? 0xFFFFFFFF : 0xFF7D8995, true);
+            g.fill(bx, y + 2, bx + 28, y + 19, color);
+            g.text(font, "+", bx + 10, y + 6, enabled ? 0xFFFFFFFF : 0xFF7D8995, true);
         }
 
         DerivedStats stats = DerivedStatsCalculator.calculate(profile);
-        int sx = left + 285;
-        g.text(font, tr("wildbound.character.derived_stats"), sx, top - 15, 0xFF8EDBFF, true);
+        g.text(font, tr("wildbound.character.derived_stats"),
+                compact ? left : left + 285, compact ? top + ATTRIBUTES.length * rowHeight + 18 : top - 15,
+                0xFF8EDBFF, true);
         String[] lines = {
                 tr("wildbound.character.stat.max_health", fmt(stats.maxHealth())),
                 tr("wildbound.character.stat.max_mana", fmt(stats.maxMana())),
@@ -99,8 +102,22 @@ public final class CharacterScreen extends Screen {
                 tr("wildbound.character.stat.mana_regen", fmt(stats.manaRegeneration())),
                 tr("wildbound.character.stat.stamina_regen", fmt(stats.staminaRegeneration()))
         };
-        for (int i = 0; i < lines.length; i++) {
-            g.text(font, lines[i], sx, top + i * 15, 0xFFD1DEEC, false);
+        if (compact) {
+            int statsY = top + ATTRIBUTES.length * rowHeight + 33;
+            int columnGap = 10;
+            int columnWidth = (w - 48 - columnGap) / 2;
+            for (int i = 0; i < lines.length; i++) {
+                int column = i / 7;
+                int row = i % 7;
+                String line = fit(lines[i], columnWidth);
+                g.text(font, line, left + column * (columnWidth + columnGap),
+                        statsY + row * 14, 0xFFD1DEEC, false);
+            }
+        } else {
+            int sx = left + 285;
+            for (int i = 0; i < lines.length; i++) {
+                g.text(font, lines[i], sx, top + i * 15, 0xFFD1DEEC, false);
+            }
         }
 
         g.text(font, tr("wildbound.character.footer", WildboundConfig.maxAttribute),
@@ -138,6 +155,18 @@ public final class CharacterScreen extends Screen {
 
     private static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && my >= y && mx < x + w && my < y + h;
+    }
+
+    private String fit(String value, int maxWidth) {
+        if (font.width(value) <= maxWidth) return value;
+        String ellipsis = "…";
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            String candidate = out.toString() + value.charAt(i);
+            if (font.width(candidate + ellipsis) > maxWidth) break;
+            out.append(value.charAt(i));
+        }
+        return out + ellipsis;
     }
 
     private static String tr(String key, Object... args) {
