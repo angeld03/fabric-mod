@@ -2,6 +2,7 @@ package com.wildbound.player;
 
 import com.wildbound.Wildbound;
 import com.wildbound.persistence.RpgPersistenceManager;
+import com.wildbound.persistence.RpgWorldProfilesData;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.level.ServerPlayer;
 
@@ -23,18 +24,27 @@ public final class PlayerRpgInitializer {
             PlayerRpgProfile stored = player.getAttached(RpgAttachments.PROFILE);
             boolean uuidMatches = stored != null && player.getUUID().toString().equals(stored.uuid());
             int storedSchema = stored == null ? -1 : stored.schemaVersion();
+            RpgWorldProfilesData durableData = RpgWorldProfilesData.get(server);
+            PlayerRpgProfile durable = durableData == null ? null
+                    : durableData.getProfile(player.getUUID().toString());
+            boolean hasDurableCopy = durable != null
+                    && player.getUUID().toString().equals(durable.uuid());
 
             PlayerRpgProfile profile = RpgPersistenceManager.load(player);
-            String loadSource = !attachmentPresent
-                    ? "missing-or-new"
-                    : uuidMatches ? "restored" : "uuid-mismatch-reinitialized";
+            // Mirror any valid attachment restored by Minecraft into the durable
+            // world store as well, so both persistence paths begin in agreement.
+            RpgPersistenceManager.save(player, profile);
+            String loadSource = uuidMatches ? "player-attachment"
+                    : hasDurableCopy ? "world-saveddata-recovery" : "new-profile";
 
             Wildbound.LOGGER.info(
-                    "RPG profile join: player={} uuid={} source={} schemaBefore={} schemaAfter={} " +
+                    "RPG profile join: player={} uuid={} source={} attachmentPresent={} durableCopyBefore={} schemaBefore={} schemaAfter={} " +
                             "level={} xp={} skillPoints={} attributePoints={} unlockedSkills={} unlockedRealms={}",
                     player.getName().getString(),
                     player.getUUID(),
                     loadSource,
+                    attachmentPresent,
+                    hasDurableCopy,
                     storedSchema,
                     profile.schemaVersion(),
                     profile.level(),
@@ -58,8 +68,9 @@ public final class PlayerRpgInitializer {
                 return;
             }
 
-            // This is a final in-memory snapshot, not proof that the world's
-            // player-data file has already been flushed to disk.
+            // Flush the final profile to both the synced attachment and the
+            // independently persisted world SavedData copy.
+            RpgPersistenceManager.save(player, profile);
             Wildbound.LOGGER.info(
                     "RPG profile disconnect snapshot: player={} uuid={} schema={} level={} xp={} " +
                             "skillPoints={} attributePoints={} unlockedSkills={} unlockedRealms={}",
