@@ -318,3 +318,8 @@ Los hitos se registran en `SkillProgress.upgrades` desde el servicio del servido
 Durante la ampliación del hechizo se detectó que una entidad podía permanecer dentro del volumen de colisión durante varios ticks del mismo proyectil y recibir daño repetido en cada tick. Ahora cada una de las tres lanzas mantiene un conjunto de UUID alcanzados y aplica el impacto directo una sola vez por objetivo y por lanza. Las tres lanzas todavía pueden alcanzar al mismo objetivo por separado, como parte del diseño del ataque.
 
 **Validación pendiente:** comprobar en juego el daño por objetivo, el solapamiento entre lanzas y el impacto de área de la detonación.
+
+
+### P5 — Feedback inmediato de maestría
+
+Cuando una activación válida hace subir de rango una habilidad, el servidor muestra una notificación de subida de maestría. En Water Bolt también se anuncia cada mejora al cruzar los rangos 3, 6 y 9. Los mensajes están localizados en español e inglés y se emiten únicamente después de que el servicio de progresión haya guardado el nuevo perfil.
