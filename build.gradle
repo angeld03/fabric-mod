@@ -29,6 +29,19 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// JUnit 5: required by the RPG core to unit-test pure balance/formula logic
+	// without launching Minecraft. No Minecraft runtime is needed for these tests.
+	testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+// Loom's split source sets do not expose main output to tests by default.
+sourceSets.test.compileClasspath += sourceSets.main.output
+sourceSets.test.runtimeClasspath += sourceSets.main.output
+
+test {
+	useJUnitPlatform()
 }
 
 processResources {

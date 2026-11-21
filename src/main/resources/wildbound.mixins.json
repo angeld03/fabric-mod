@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.wildbound.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"WildboundMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	},
+	"overwrites": {
+		"requireAnnotations": true
+	}
+}
