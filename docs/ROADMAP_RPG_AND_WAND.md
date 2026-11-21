@@ -415,3 +415,26 @@ La primera versión de líneas se ha sustituido por una malla de quads rellenos,
 - Se establece un presupuesto de hasta 16.000 quads por frame entre efectos visibles, además del límite de 2.600 por habilidad, LOD y culling por distancia.
 
 **Límites y validación:** son superficies 3D rellenas y texturizadas, no una simulación física de fluidos. Todavía no hay refracción real de escena, espuma física, normales derivadas de un campo de fluido, shaders personalizados ni OIT propio. Las animaciones se construyen proceduralmente y no con un esqueleto de huesos. No se ha ejecutado Gradle ni se ha validado en una sesión real de Minecraft: transparencia, orden de dibujo, repetición UV, rendimiento y legibilidad deben revisarse in-game.
+
+
+### P4 — Calidad visual, criatura acuática y orientación real del lanzamiento
+
+- Material azul de Agua actualizado a una textura seamless de caústicas 256×256 RGBA y pipeline translúcido emisivo. El objetivo es que el color azul/cian no quede contaminado por la iluminación marrón u oscura del entorno.
+- Aumento de teselación del renderer: hasta 13.000 quads por efecto y 62.000 por frame compartidos entre efectos visibles, con LOD y límite por proximidad.
+- Leviathan's Wrath ya no se construye como una cadena de esferas corporales. El torso y la cola son una superficie barrida continua, con interpolación Catmull-Rom de la columna vertebral, 192 cortes longitudinales y 36 secciones radiales definidos por JSON.
+- El perfil JSON describe grosor y altura variables del cuerpo, oscilación, cabeza, frente, hocico, mandíbula, boca, ojos, aletas dorsales y aleta caudal. La malla anima una onda lateral que se propaga hacia la cola y lleva una segunda piel azul/cian.
+- Animación de mandíbula, cavidad bucal, iris/brillos, branquias y espuma facial refuerzan la lectura de una serpiente marina y no de una acumulación de piezas.
+- Los lanzamientos normales y cargados transmiten el vector de cámara en el payload. El servidor crea un contexto de apuntado limitado a la ejecución; los ejecutores de Agua capturan esa dirección y los VFX la reutilizan.
+- Corregido el yaw/pitch de la malla: el eje local +Z se alinea con la dirección real; antes los signos invertidos podían girar los hechizos respecto al cursor.
+- Water Bolt, Aqua Whip y Pressure Lance usan como punto inicial la posición de los ojos del lanzador, no el centro del cuerpo.
+
+### P0 — Copia duradera independiente para perfiles RPG
+
+- Añadido RpgWorldProfilesData, un SavedData mundial guardado en data/wildbound_rpg_profiles.dat, indexado por UUID. El attachment Fabric sigue siendo la copia activa y sincronizada, mientras el SavedData sirve de respaldo independiente.
+- PlayerRpgProvider.set escribe ambas copias; getOrCreate restaura desde SavedData cuando el attachment no existe o lleva UUID incorrecto.
+- JOIN sincroniza el perfil restaurado con ambas copias y DISCONNECT vuelve a escribir el snapshot final.
+- Se encontró y reparó una pérdida concreta: la regeneración de maná/resistencia reconstruía el perfil sin skillProgress. Ahora usa withResources, que conserva todos los campos.
+- /wildbound debug attachment muestra presencia/UUID del attachment y nivel/XP del backup, incluso cuando falta el attachment.
+- Se añadió una prueba de regresión para verificar que actualizar maná/resistencia conserva experiencia, nivel, puntos, atributos, habilidades y maestría.
+
+**Validación pendiente:** no se ha abierto el mundo de prueba para salir y volver a entrar, ni se ha comprobado el fichero SavedData en disco. No declarar persistencia confirmada hasta verificar /wildbound debug attachment después de reiniciar el mundo/servidor. El vector de cámara, la textura emisiva y la malla de serpiente se han revisado estáticamente, pero siguen pendientes de validación visual y de compilación con Java 25/Minecraft 26.3.
