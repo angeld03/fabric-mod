@@ -96,5 +96,7 @@
   "wildbound.skills.attribute_points_short": "PA %s",
   "wildbound.skills.mastery_max": "MÁX.",
   "wildbound.skills.mastery_xp": "%s/%s XP",
-  "wildbound.skills.mastery_rank": "R%s"
+  "wildbound.skills.mastery_rank": "R%s",
+  "wildbound.skills.mastery_percent": "Maestría %s%%",
+  "wildbound.skills.upgrade_count": "Mejoras %s"
 }
