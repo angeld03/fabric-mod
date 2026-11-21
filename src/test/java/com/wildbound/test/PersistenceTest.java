@@ -82,6 +82,40 @@ class PersistenceTest {
     }
 
     @Test
+    void resourceUpdatesPreserveSkillMasteryAndAllCharacterProgression() {
+        SkillProgress mastery = new SkillProgress(5, 140L, 1_140L, 48.5f,
+                List.of("hydrostatic_core", "frostbite_current"));
+        PlayerRpgProfile original = new PlayerRpgProfile(
+                PlayerRpgProfile.CURRENT_SCHEMA,
+                UUID.randomUUID().toString(),
+                42, 275L, 18_275L, 14, 9,
+                new AttributeContainer(12, 16, 18, 20, 14),
+                65f, 37f,
+                List.of("aqua_water_bolt"),
+                List.of("emerald_vale", "sunken_reach"),
+                List.of("aqua_water_bolt", "", "", "", ""),
+                new PlayerStatistics(100L, 8L, 3L, 2L, 15L, 5L),
+                Map.of("aqua_water_bolt", mastery)
+        );
+
+        PlayerRpgProfile updated = original.withResources(82.5f, 49.25f);
+
+        assertEquals(82.5f, updated.mana());
+        assertEquals(49.25f, updated.stamina());
+        assertEquals(original.level(), updated.level());
+        assertEquals(original.experience(), updated.experience());
+        assertEquals(original.totalExperience(), updated.totalExperience());
+        assertEquals(original.attributePoints(), updated.attributePoints());
+        assertEquals(original.skillPoints(), updated.skillPoints());
+        assertEquals(original.attributes(), updated.attributes());
+        assertEquals(original.unlockedSkills(), updated.unlockedSkills());
+        assertEquals(original.unlockedRealms(), updated.unlockedRealms());
+        assertEquals(original.radialSkills(), updated.radialSkills());
+        assertEquals(original.stats(), updated.stats());
+        assertEquals(mastery, updated.getSkillProgress("aqua_water_bolt"));
+    }
+
+    @Test
     void skillProgressRanksUpAndStopsAtMaximum() {
         SkillProgress progress = SkillProgress.INITIAL.addExperience(100L);
         assertEquals(2, progress.rank());
