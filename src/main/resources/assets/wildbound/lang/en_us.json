@@ -92,5 +92,9 @@
   "wildbound.character.stat.movement_speed": "Movement speed: +%s%%",
   "wildbound.character.stat.dodge": "Dodge: +%s%%",
   "wildbound.character.stat.mana_regen": "Mana regen: %s/s",
-  "wildbound.character.stat.stamina_regen": "Stamina regen: %s/s"
+  "wildbound.character.stat.stamina_regen": "Stamina regen: %s/s",
+  "wildbound.skills.attribute_points_short": "AP %s",
+  "wildbound.skills.mastery_max": "MAX",
+  "wildbound.skills.mastery_xp": "%s/%s XP",
+  "wildbound.skills.mastery_rank": "R%s"
 }
