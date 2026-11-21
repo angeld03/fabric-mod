@@ -73,6 +73,6 @@ public final class ResourceService {
                         value, p.stamina(), p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats())
                 : new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), p.experience(),
                         p.totalExperience(), p.attributePoints(), p.skillPoints(), p.attributes(),
-                        p.mana(), value, p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats());
+                        p.mana(), value, p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress());
     }
 }
