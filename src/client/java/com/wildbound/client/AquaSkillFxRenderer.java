@@ -82,7 +82,7 @@ public final class AquaSkillFxRenderer {
 
         Vec3 camera = context.levelState().cameraRenderState.pos;
         long now = mc.level.getGameTime();
-        float partial = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
+        float partial = 0.5f;
 
         for (Effect effect : EFFECTS.values()) {
             double distanceSqr = effect.position.distanceToSqr(camera);
