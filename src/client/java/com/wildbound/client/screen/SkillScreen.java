@@ -746,7 +746,7 @@ public final class SkillScreen extends Screen {
                         + "  ·  " + tr("wildbound.mastery.open_hint");
                 if (!compact) {
                     int barX = x;
-                    int barY = detailY + 18;
+                    int barY = detailY + 26;
                     int barW = Math.max(30, w - margin * 2 - 16);
                     float rankProgress = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
                             ? 1f : (float) mastery.experience() / Math.max(1L, mastery.experienceRequired());
