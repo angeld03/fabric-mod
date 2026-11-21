@@ -916,8 +916,7 @@ public final class AquaSkillExecutors {
     // ============================================================
 
     private static Vec3 look(ServerPlayer player) {
-        Vec3 look = player.getLookAngle();
-        return look.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : look.normalize();
+        return SkillAimContext.direction(player);
     }
 
     private static Vec3 side(Vec3 look) {
