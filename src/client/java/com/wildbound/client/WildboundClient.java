@@ -187,7 +187,8 @@ public class WildboundClient implements ClientModInitializer {
         if (!ClientPlayNetworking.canSend(ActivateSkillPayload.TYPE)) return false;
         // Do not send a request the server is guaranteed to reject.
         if (SkillActivationService.getClientCooldown(skillId) > 0f) return false;
-        ClientPlayNetworking.send(new ActivateSkillPayload(skillId));
+        var aim = player.getLookAngle().normalize();
+        ClientPlayNetworking.send(new ActivateSkillPayload(skillId, aim.x, aim.y, aim.z));
         return true;
     }
 
