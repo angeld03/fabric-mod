@@ -186,8 +186,12 @@ public final class RpgCommands {
                         .executes(ctx -> {
                             ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
                             PlayerRpgProfile p = PlayerRpgProvider.getOrCreate(target);
-                            send(ctx.getSource(), "Skills (" + p.unlockedSkills().size() + "): "
-                                    + String.join(", ", p.unlockedSkills()));
+                            String details = p.unlockedSkills().stream()
+                                    .map(id -> id + " [R" + p.getSkillProgress(id).rank() + " "
+                                            + p.getSkillProgress(id).experience() + "/"
+                                            + p.getSkillProgress(id).experienceRequired() + " XP]")
+                                    .collect(java.util.stream.Collectors.joining(", "));
+                            send(ctx.getSource(), "Skills (" + p.unlockedSkills().size() + "): " + details);
                             return 1;
                         })));
         root.then(skill);
