@@ -3,98 +3,118 @@ package com.wildbound.client;
 import com.wildbound.network.SkillCameraAimPayload;
 
 /**
- * Client-side cinematic camera system.
+ * Client-side cinematic camera clips.
  *
- * <p>Replaces the old broken absolute-angle approach. Now uses RELATIVE offsets
- * from the player's view with proper easing curves (keyframe animation), so the
- * camera always starts from neutral and returns to neutral smoothly — no more
- * violent jumps to world angles.</p>
+ * <p>Every command is a relative offset from the vanilla camera rotation. Clips
+ * have an explicit settle phase: a focus or impact can be felt, then the view
+ * returns to neutral instead of leaving the player permanently tilted.</p>
  */
 public final class SkillCameraAim {
     private static final int MODE_SMOOTH = 0;
     private static final int MODE_PUNCH = 1;
     private static final int MODE_SHAKE_KICK = 2;
     private static final int MODE_HOLD = 3;
+    private static final int MIN_RETURN_TICKS = 4;
 
-    // Active clip state
-    private static float fromYaw = 0f, fromPitch = 0f;
-    private static float toYaw = 0f, toPitch = 0f;
-    private static int elapsed = 0, duration = 0;
+    private static float fromYaw;
+    private static float fromPitch;
+    private static float targetYaw;
+    private static float targetPitch;
+    private static float currentYaw;
+    private static float currentPitch;
+
+    private static int elapsed;
+    private static int duration;
+    private static int returnDuration;
     private static int mode = MODE_SMOOTH;
-    private static float intensity = 1f;
-    private static boolean active = false;
-
-    // Current output offsets (read by the Camera mixin)
-    private static float currentYaw = 0f;
-    private static float currentPitch = 0f;
+    private static boolean active;
 
     private SkillCameraAim() {
     }
 
-    /** Start a new camera clip from a payload. Relative offsets, eased. */
+    /** Starts a new relative camera clip, chaining from the current offset. */
     public static void play(SkillCameraAimPayload payload) {
-        // Start the clip from wherever the camera currently is (smooth chaining).
         fromYaw = currentYaw;
         fromPitch = currentPitch;
-        toYaw = payload.yawOffset();
-        toPitch = payload.pitchOffset();
+
+        // Scale once when the clip is received. Multiplying the live output on
+        // every tick caused low-intensity clips to decay exponentially.
+        float intensity = payload.intensity();
+        targetYaw = clamp(payload.yawOffset() * intensity, -12f, 12f);
+        targetPitch = clamp(payload.pitchOffset() * intensity, -12f, 12f);
+
         duration = Math.max(1, payload.durationTicks());
+        returnDuration = Math.max(MIN_RETURN_TICKS, Math.min(12, duration));
         mode = payload.mode();
-        intensity = payload.intensity();
         elapsed = 0;
         active = true;
     }
 
-    /** Advance the animation one client tick. */
+    /** Advances the cinematic clip once per client tick. */
     public static void tick() {
         if (!active) return;
 
         elapsed++;
         float t = Math.min(1f, elapsed / (float) duration);
-        float eased = ease(t, mode);
 
-        currentYaw = fromYaw + (toYaw - fromYaw) * eased;
-        currentPitch = fromPitch + (toPitch - fromPitch) * eased;
+        if (mode == MODE_SHAKE_KICK) {
+            // A damped impulse. Any previous camera offset is gently absorbed
+            // while the new kick rings out and returns to zero.
+            float impulse = (float) (Math.sin(t * Math.PI * 3.0) * Math.exp(-4.0 * t));
+            float settle = 1f - smoothstep(t);
+            currentYaw = fromYaw * settle + targetYaw * impulse;
+            currentPitch = fromPitch * settle + targetPitch * impulse;
+        } else if (elapsed <= duration) {
+            float eased = ease(t, mode);
+            currentYaw = lerp(fromYaw, targetYaw, eased);
+            currentPitch = lerp(fromPitch, targetPitch, eased);
+        } else {
+            float returnT = Math.min(1f, (elapsed - duration) / (float) returnDuration);
+            float settle = smoothstep(returnT);
+            currentYaw = targetYaw * (1f - settle);
+            currentPitch = targetPitch * (1f - settle);
+        }
 
-        // Apply intensity scaling.
-        currentYaw *= intensity;
-        currentPitch *= intensity;
-
-        if (elapsed >= duration) {
+        if (elapsed >= duration + returnDuration) {
+            currentYaw = 0f;
+            currentPitch = 0f;
             active = false;
         }
     }
 
-    /** Easing functions. */
-    private static float ease(float t, int mode) {
-        switch (mode) {
-            case MODE_PUNCH: {
-                // Fast attack (t^0.35), slow ease-out. Great for impact hits.
-                if (t < 0.35f) {
-                    float p = t / 0.35f;
-                    return (float) Math.pow(p, 0.35);
-                } else {
-                    float p = (t - 0.35f) / 0.65f;
-                    return 1f - (float) Math.pow(1f - p, 2.2);
+    private static float ease(float t, int curve) {
+        return switch (curve) {
+            case MODE_PUNCH -> {
+                // Fast camera response, then a soft arrival at the focus point.
+                if (t < 0.32f) {
+                    float p = t / 0.32f;
+                    yield 1f - (float) Math.pow(1f - p, 3.2);
                 }
+                float p = (t - 0.32f) / 0.68f;
+                yield 1f - (float) Math.pow(1f - p, 2.4);
             }
-            case MODE_SHAKE_KICK: {
-                // Damped sine wave: snaps out then oscillates back to zero.
-                float decay = (float) Math.exp(-4.0 * t);
-                return (float) (Math.sin(t * Math.PI * 3.0) * decay);
+            case MODE_HOLD -> {
+                if (t < 0.22f) yield smoothstep(t / 0.22f);
+                if (t < 0.78f) yield 1f;
+                yield 1f - smoothstep((t - 0.78f) / 0.22f);
             }
-            case MODE_HOLD: {
-                // Linear ramp up, hold, then release.
-                if (t < 0.25f) return t / 0.25f;
-                if (t < 0.75f) return 1f;
-                return 1f - (t - 0.75f) / 0.25f;
-            }
-            case MODE_SMOOTH:
-            default: {
-                // Smoothstep: buttery ease in-out (3t² - 2t³).
-                return t * t * (3f - 2f * t);
-            }
-        }
+            case MODE_SHAKE_KICK -> (float) (Math.sin(t * Math.PI * 3.0) * Math.exp(-4.0 * t));
+            case MODE_SMOOTH -> smoothstep(t);
+            default -> smoothstep(t);
+        };
+    }
+
+    private static float smoothstep(float t) {
+        float x = clamp(t, 0f, 1f);
+        return x * x * (3f - 2f * x);
+    }
+
+    private static float lerp(float from, float to, float amount) {
+        return from + (to - from) * amount;
+    }
+
+    private static float clamp(float value, float min, float max) {
+        return Math.max(min, Math.min(max, value));
     }
 
     public static float yawOffset() {
@@ -110,10 +130,10 @@ public final class SkillCameraAim {
     }
 
     public static void reset() {
-        fromYaw = toYaw = currentYaw = 0f;
-        fromPitch = toPitch = currentPitch = 0f;
-        elapsed = duration = 0;
+        fromYaw = fromPitch = targetYaw = targetPitch = 0f;
+        currentYaw = currentPitch = 0f;
+        elapsed = duration = returnDuration = 0;
+        mode = MODE_SMOOTH;
         active = false;
-        intensity = 1f;
     }
 }
