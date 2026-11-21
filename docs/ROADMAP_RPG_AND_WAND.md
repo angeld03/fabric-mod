@@ -256,3 +256,13 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - Se corrigió el ciclo de vida de los efectos de carga Water Bolt: se elimina una llamada duplicada al reset en JOIN y se resetea también al desconectar.
 
 **Validación pendiente:** estos cambios son una revisión de código y de recursos JSON; no se han podido compilar ni ver dentro del cliente Minecraft. La composición compacta requiere comprobación a distintas resoluciones.
+
+
+### P5 — Vista de maestría por habilidad
+
+- Nueva pantalla de solo lectura `SkillMasteryScreen`, accesible desde el árbol de habilidades al pulsar **M** con una habilidad desbloqueada enfocada.
+- Muestra rango actual/máximo, XP del rango, barra de progreso, XP total, porcentaje de dominio y número/lista de mejoras registradas.
+- La pantalla usa el perfil sincronizado del jugador; no concede XP ni mejoras desde el cliente.
+- Textos localizados en español e inglés.
+
+**Límite funcional:** el sistema de datos ya almacena IDs de mejoras, pero todavía no existe un catálogo completo de mejoras desbloqueables para cada habilidad. La pantalla muestra las mejoras registradas y explica cuando aún no hay ninguna. No se han inventado upgrades que no estén implementados.
