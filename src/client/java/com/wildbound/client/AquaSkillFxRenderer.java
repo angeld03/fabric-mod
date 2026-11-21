@@ -89,8 +89,12 @@ public final class AquaSkillFxRenderer {
 
         Vec3 camera = context.levelState().cameraRenderState.pos;
         long now = mc.level.getGameTime();
+        int visibleEffects = 0;
+        for (Effect effect : EFFECTS.values()) {
+            if (renderAnchor(mc, effect).distanceToSqr(camera) <= MAX_DISTANCE_SQR) visibleEffects++;
+        }
         int sharedBudget = Math.max(220, Math.min(MAX_QUADS_PER_EFFECT,
-                MAX_QUADS_PER_FRAME / Math.max(1, EFFECTS.size())));
+                MAX_QUADS_PER_FRAME / Math.max(1, visibleEffects)));
         for (Effect effect : EFFECTS.values()) {
             Vec3 anchor = renderAnchor(mc, effect);
             double distanceSqr = anchor.distanceToSqr(camera);
