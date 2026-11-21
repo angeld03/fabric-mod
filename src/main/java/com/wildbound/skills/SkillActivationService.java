@@ -67,7 +67,7 @@ public final class SkillActivationService {
         long now = player.level().getGameTime();
         Map<String, Long> playerCooldowns = COOLDOWNS.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         Long lastUse = playerCooldowns.get(skillId);
-        float cooldown = executor.getCooldown(definition, profile);
+        float cooldown = getMasteryCooldown(executor.getCooldown(definition, profile), profile, skillId);
         if (lastUse != null) {
             long elapsedTicks = now - lastUse;
             float elapsedSeconds = elapsedTicks / 20f;
@@ -77,7 +77,7 @@ public final class SkillActivationService {
         }
 
         // Check resource costs
-        float manaCost = executor.getManaCost(definition, profile);
+        float manaCost = getMasteryManaCost(executor.getManaCost(definition, profile), profile, skillId);
         float staminaCost = executor.getStaminaCost(definition, profile);
         if (manaCost > 0 && !ResourceService.canAfford(player, ResourceType.MANA, manaCost)) {
             return ActivationResult.fail("not_enough_mana", 0f);
@@ -157,6 +157,20 @@ public final class SkillActivationService {
         currentChargeLevel = 0f;
     }
 
+    /** Small universal mastery rewards for skills without a bespoke specialization tree. */
+    private static float getMasteryCooldown(float baseCooldown, PlayerRpgProfile profile, String skillId) {
+        int rank = profile.getSkillProgress(skillId).rank();
+        float reduction = Math.min(0.0675f, Math.max(0, rank - 1) * 0.0075f);
+        return Math.max(0.25f, baseCooldown * (1f - reduction));
+    }
+
+    private static float getMasteryManaCost(float baseCost, PlayerRpgProfile profile, String skillId) {
+        if (baseCost <= 0f || "aqua_water_bolt".equals(skillId)) return baseCost;
+        int rank = profile.getSkillProgress(skillId).rank();
+        float reduction = Math.min(0.09f, Math.max(0, rank - 1) * 0.01f);
+        return Math.max(0.1f, baseCost * (1f - reduction));
+    }
+
     public static float getRemainingCooldown(ServerPlayer player, String skillId) {
         Map<String, Long> playerCooldowns = COOLDOWNS.get(player.getUUID());
         if (playerCooldowns == null) return 0f;
@@ -167,7 +181,7 @@ public final class SkillActivationService {
         PlayerRpgProfile profile = PlayerRpgProvider.getOrCreate(player);
         SkillDefinition definition = SkillRegistry.get(skillId).orElse(null);
         if (definition == null) return 0f;
-        float cooldown = executor.getCooldown(definition, profile);
+        float cooldown = getMasteryCooldown(executor.getCooldown(definition, profile), profile, skillId);
         long elapsedTicks = player.level().getGameTime() - lastUse;
         float remaining = cooldown - (elapsedTicks / 20f);
         return Math.max(0f, remaining);
