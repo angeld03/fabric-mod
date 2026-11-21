@@ -70,11 +70,21 @@ public final class AquaSkillExecutors {
 
                 float charge = SkillActivationService.getChargeLevel();
                 float chargeMult = 1.0f + charge;
-                int skillRank = profile.getSkillProgress(def.id()).rank();
-                float masteryDamageMultiplier = 1.0f + (skillRank - 1) * 0.025f;
+                var mastery = profile.getSkillProgress(def.id());
+                int skillRank = mastery.rank();
+                boolean hydrostaticCore = mastery.upgrades().contains("hydrostatic_core");
+                boolean frostbiteCurrent = mastery.upgrades().contains("frostbite_current");
+                boolean tidalPiercer = mastery.upgrades().contains("tidal_piercer");
+                float masteryDamageMultiplier = 1.0f + (skillRank - 1) * 0.025f
+                        + (hydrostaticCore ? 0.10f : 0f);
+                double rangeMasteryMultiplier = tidalPiercer ? 1.18 : 1.0;
 
                 // Each lance: [range, damage, burst size, shaft thickness]
-                double[] lanceRanges  = { 10.0 * chargeMult, 16.0 * chargeMult, 24.0 * chargeMult };
+                double[] lanceRanges  = {
+                        10.0 * chargeMult * rangeMasteryMultiplier,
+                        16.0 * chargeMult * rangeMasteryMultiplier,
+                        24.0 * chargeMult * rangeMasteryMultiplier
+                };
                 int[]    lanceDamage  = { 8, 12, 18 };
                 int[]    lanceBursts  = { 22, 36, 54 };
                 double[] lanceWidth   = { 0.55, 0.8, 1.1 };
@@ -177,6 +187,11 @@ public final class AquaSkillExecutors {
                                 e -> e != player && e.isAlive())) {
                             float d = dmg + profile.level() * 0.5f;
                             SkillActivationService.damageEntity(target, player, d);
+                            if (frostbiteCurrent) {
+                                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0), player);
+                                particle(level, ParticleTypes.SNOWFLAKE,
+                                        target.position().add(0, target.getBbHeight() * 0.65, 0), 8, 0.25, 0.3);
+                            }
                             SkillActivationService.applyKnockback(target, player.position(), 1.8f + li * 0.3f);
                             spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) d);
                         }
