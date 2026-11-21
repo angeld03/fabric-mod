@@ -228,3 +228,21 @@ Esta fase es feedback de carga con partículas/cámara; todavía no anima los hu
 - El HUD ya existente continúa mostrando nivel, XP, salud, maná y stamina.
 
 Pendiente para completar P5: pantalla de atributos con inversión y preview de estadísticas derivadas, pantalla/ficha de personaje, y una vista detallada de mejoras de cada habilidad.
+
+
+### P1/P2 — Corrección adicional de sincronización y conservación
+
+- El codec binario de sincronización del attachment (`RpgDataCodec`) no incluía el mapa nuevo de maestría. Se amplió para serializar/deserializar rangos, XP, maestría y mejoras, con límites defensivos en cantidades de entradas.
+- Se revisaron y actualizaron los constructores de perfil en XP, atributos, regeneración/consumo de recursos y comandos administrativos para conservar el mapa de progreso individual. Sin esta corrección, esas operaciones habrían reiniciado el progreso de habilidad al reconstruir el perfil.
+
+### P5 — Ficha del personaje y asignación de atributos
+
+Se ha añadido una primera pantalla de personaje, accesible con **J**:
+- Muestra nivel, XP actual y total, puntos de atributo.
+- Lista los cinco atributos y su valor.
+- Muestra estadísticas derivadas (vida, maná, stamina, poder, defensas, crítico, movilidad y regeneración).
+- El botón `+` solicita gastar un punto de atributo; el servidor valida el límite y los puntos disponibles mediante `AttributeService`.
+- Incluye etiqueta del control en inglés y español.
+- La pantalla de habilidades permite abrir la ficha con J y muestra rango/XP de la habilidad seleccionada.
+
+**Pendiente:** no se ha añadido todavía una pantalla de respec; la asignación individual es de un punto por clic. La respuesta de aceptación llega por el mensaje del servidor y el attachment sincronizado actualiza la pantalla. Validar visualmente el layout en resoluciones pequeñas y grandes.
