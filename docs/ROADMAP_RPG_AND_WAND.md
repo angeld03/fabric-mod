@@ -342,3 +342,12 @@ La maestría ya no es solo un contador ni una ventaja exclusiva de Water Bolt:
 ### P2 — Reglas de maestría extraídas y cubiertas por pruebas
 
 Se centralizaron las fórmulas de XP por tier/carga, reducción de cooldown y eficiencia de maná en `SkillMasteryRules`. Esto permite verificar balance y límites sin instanciar un mundo de Minecraft. Se añadieron pruebas para rango 1/10, límites superiores, curvas personalizadas de Water Bolt, cargas inválidas y parámetros fuera de rango.
+
+
+### P1 — Robustez numérica de las reglas de maestría
+
+- Las fórmulas de `SkillMasteryRules` rechazan entradas no finitas (`NaN` / `Infinity`) y mantienen límites seguros para rangos, cooldowns, costes de maná y XP.
+- `SkillProgress` sanea la lista de mejoras con deduplicación estable, descarta valores nulos/vacíos o IDs demasiado largos y limita el total almacenado.
+- Se añadieron pruebas específicas para entradas no finitas y para concesiones de XP que cruzan varios rangos en una sola operación.
+
+**Validación pendiente:** las pruebas están añadidas al proyecto, pero no se ha confirmado su ejecución mediante Gradle. La validación final debe hacerse también en una sesión real de Minecraft.
