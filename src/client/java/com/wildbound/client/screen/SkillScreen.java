@@ -740,7 +740,18 @@ public final class SkillScreen extends Screen {
                 String xp = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
                         ? tr("wildbound.skills.mastery_max")
                         : tr("wildbound.skills.mastery_xp", mastery.experience(), mastery.experienceRequired());
-                stateText = tr("wildbound.skills.mastery_rank", mastery.rank()) + "  " + xp;
+                stateText = tr("wildbound.skills.mastery_rank", mastery.rank()) + "  " + xp
+                        + "  ·  " + tr("wildbound.skills.mastery_percent", Math.round(mastery.mastery()))
+                        + "  ·  " + tr("wildbound.skills.upgrade_count", mastery.upgrades().size());
+                if (!compact) {
+                    int barX = x;
+                    int barY = detailY + 18;
+                    int barW = Math.max(30, w - margin * 2 - 16);
+                    float rankProgress = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
+                            ? 1f : (float) mastery.experience() / Math.max(1L, mastery.experienceRequired());
+                    drawBar(g, barX, barY, barW, 5, rankProgress,
+                            0xFFB7F7FF, 0xFF39B9D6, 0xFF12617D, skillPanelTime);
+                }
             } else {
                 stateText = state == READY ? tr("wildbound.skills.state_ready")
                         : tr("wildbound.skills.state_locked");
