@@ -323,3 +323,17 @@ Durante la ampliación del hechizo se detectó que una entidad podía permanecer
 ### P5 — Feedback inmediato de maestría
 
 Cuando una activación válida hace subir de rango una habilidad, el servidor muestra una notificación de subida de maestría. En Water Bolt también se anuncia cada mejora al cruzar los rangos 3, 6 y 9. Los mensajes están localizados en español e inglés y se emiten únicamente después de que el servicio de progresión haya guardado el nuevo perfil.
+
+
+### P1/P2 — Maestría útil para todo el catálogo
+
+La maestría ya no es solo un contador ni una ventaja exclusiva de Water Bolt:
+- Todas las habilidades desbloqueadas obtienen XP al completar una ejecución válida en servidor.
+- La concesión escala con el nivel requerido de la habilidad: 10 XP base, hasta 18 XP adicionales por tier y hasta 5 XP por carga completa.
+- Todas las habilidades obtienen una reducción de cooldown de hasta 6,75% en rango 10.
+- Todas salvo Water Bolt obtienen además una reducción de coste de maná de hasta 9% en rango 10. Water Bolt conserva su escalado de coste específico.
+- Water Bolt mantiene sus tres hitos funcionales: Núcleo hidrostático, Corriente glacial y Perforador de mareas.
+- El progreso persistido sanea IDs vacíos, duplicados o excesivamente largos y limita el catálogo de mejoras por habilidad a 64 entradas.
+- Se añadieron pruebas para progresión de varios rangos con una sola concesión y saneamiento de datos de mejoras.
+
+**Balance inicial:** son bonificaciones moderadas y universales para dar valor inmediato al rango de cualquier habilidad. Queda pendiente ajustar porcentajes tras pruebas reales de combate y añadir especializaciones ramificadas por habilidad. No se declara compilación o prueba en Minecraft.
