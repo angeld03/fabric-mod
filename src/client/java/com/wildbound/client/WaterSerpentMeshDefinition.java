@@ -31,7 +31,6 @@ public record WaterSerpentMeshDefinition(
         TailFluke tailFluke
 ) {
     public static final String RESOURCE = "/assets/wildbound/fx/leviathan_water_serpent.json";
-    private static final WaterSerpentMeshDefinition DEFAULT = defaults();
 
     public WaterSerpentMeshDefinition {
         longitudinalSegments = clamp(longitudinalSegments, 48, 220);
@@ -164,6 +163,8 @@ public record WaterSerpentMeshDefinition(
 
     private static final TailFluke DEFAULT_TAIL =
             new TailFluke(0, 0.37f, -8.16f, 1.05f, 0.68f, -0.70f);
+
+    private static final WaterSerpentMeshDefinition DEFAULT = defaults();
 
     private static WaterSerpentMeshDefinition defaults() {
         return new WaterSerpentMeshDefinition(168, 28, 0.62f, 0.22f, 1.12f,
