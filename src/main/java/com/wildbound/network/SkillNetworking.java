@@ -2,6 +2,8 @@ package com.wildbound.network;
 
 import com.wildbound.network.SkillCameraAimPayload;
 import com.wildbound.network.SkillChargePayload;
+import com.wildbound.attributes.AttributeService;
+import com.wildbound.attributes.RpgAttribute;
 import com.wildbound.skills.SkillActivationService;
 import com.wildbound.skills.SkillProgressionService;
 import com.wildbound.skills.SkillRadialService;
@@ -29,6 +31,7 @@ public final class SkillNetworking {
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraShakePayload.TYPE, SkillCameraShakePayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraAimPayload.TYPE, SkillCameraAimPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(SkillChargePayload.TYPE, SkillChargePayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(AttributeUpgradePayload.TYPE, AttributeUpgradePayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(UnlockSkillPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
@@ -88,5 +91,21 @@ public final class SkillNetworking {
                 SkillActivationService.activateWithCharge(player, payload.skillId(), payload.chargeLevel());
             });
         });
+        ServerPlayNetworking.registerGlobalReceiver(AttributeUpgradePayload.TYPE, (payload, context) -> {
+            ServerPlayer player = context.player();
+            context.server().execute(() -> {
+                if (player.hasDisconnected()) return;
+                try {
+                    RpgAttribute attribute = RpgAttribute.valueOf(payload.attribute().toUpperCase(java.util.Locale.ROOT));
+                    boolean success = AttributeService.increaseAttribute(player, attribute, 1);
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal(success
+                            ? "§aAtributo mejorado: " + attribute.name()
+                            : "§cNo se pudo mejorar el atributo (puntos insuficientes o límite alcanzado)."));
+                } catch (IllegalArgumentException exception) {
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§cAtributo desconocido."));
+                }
+            });
+        });
+
     }
 }
