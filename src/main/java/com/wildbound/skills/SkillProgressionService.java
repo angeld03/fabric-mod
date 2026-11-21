@@ -51,6 +51,14 @@ public final class SkillProgressionService {
         if (!profile.hasSkill(skillId)) return SkillProgressResult.NO_CHANGE;
         SkillProgress before = profile.getSkillProgress(skillId);
         SkillProgress after = before.addExperience(amount);
+
+        // Water Bolt mastery milestones unlock permanent, server-owned
+        // specializations. The upgrades are granted once and survive relogs.
+        if ("aqua_water_bolt".equals(skillId)) {
+            if (after.rank() >= 3) after = after.withUpgrade("hydrostatic_core");
+            if (after.rank() >= 6) after = after.withUpgrade("frostbite_current");
+            if (after.rank() >= 9) after = after.withUpgrade("tidal_piercer");
+        }
         if (after.equals(before)) return SkillProgressResult.NO_CHANGE;
         RpgPersistenceManager.save(player, profile.withSkillProgress(skillId, after));
         return new SkillProgressResult(true, before.rank(), after.rank(), amount,
