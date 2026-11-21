@@ -276,7 +276,7 @@ public final class RpgHud {
         int titleX = x + (bannerW - font.width(title)) / 2;
         gradientText(g, font, title, titleX, y + 7,
                 lerpColor(GOLD_LIGHT, 0xFFFFFFFF, pulse * 0.45f), 0xFF56DFFF);
-        String level = Component.translatable("wildbound.hud.level", ANIMATION.levelUpTo).getString();
+        String level = Component.translatable("wildbound.hud.level_transition", ANIMATION.levelUpFrom, ANIMATION.levelUpTo).getString();
         int levelX = x + (bannerW - font.width(level)) / 2;
         g.text(font, level, levelX, y + 20, alpha(TEXT, opacity), true);
 
