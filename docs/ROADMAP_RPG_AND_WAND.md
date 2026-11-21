@@ -266,3 +266,14 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - Textos localizados en español e inglés.
 
 **Límite funcional:** el sistema de datos ya almacena IDs de mejoras, pero todavía no existe un catálogo completo de mejoras desbloqueables para cada habilidad. La pantalla muestra las mejoras registradas y explica cuando aún no hay ninguna. No se han inventado upgrades que no estén implementados.
+
+
+### P5 — Rediseño visual de la pantalla de maestría
+
+- Se ha sustituido la tarjeta plana por un panel de alto contraste con marco doble, acentos cian/oro y fondo con aurora azul-violeta.
+- Se añadieron animaciones de entrada, barrido luminoso superior, progreso de XP animado, brillo móvil, pulsación de métricas, partículas ambientales y destellos de borde.
+- El rango tiene emblema de cristal animado; XP total, dominio y mejoras se presentan en tarjetas separadas con etiquetas compactas y color propio.
+- El subtítulo y las etiquetas de métricas ya están localizados en español e inglés.
+- Se mantienen los datos reales del attachment del jugador; el diseño no inventa mejoras ni altera el progreso del servidor.
+
+**Validación:** los dos JSON de idioma se han parseado correctamente. GitHub Actions ha terminado en fallo, pero el job no expone pasos ni logs descargables (el endpoint de logs devuelve BlobNotFound); por tanto no se declara compilación confirmada ni prueba visual dentro de Minecraft.
