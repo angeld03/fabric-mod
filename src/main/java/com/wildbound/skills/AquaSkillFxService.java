@@ -24,7 +24,7 @@ public final class AquaSkillFxService {
 
         int duration = duration(skillId);
         Vec3 origin = caster.position().add(0.0, 0.15, 0.0);
-        Vec3 look = caster.getLookAngle().normalize();
+        Vec3 look = SkillAimContext.direction(caster);
         long id = NEXT_ID.getAndIncrement();
         long seed = ThreadLocalRandom.current().nextLong();
 
