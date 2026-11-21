@@ -262,7 +262,7 @@ public final class SkillScreen extends Screen {
         g.text(font, level, x + 13, pillY + 4, GOLD_LIGHT, false);
 
         // Available points on the right; pulses while there is something to spend.
-        String points = tr("wildbound.skills.points", profile.skillPoints());
+        String points = tr("wildbound.skills.points", profile.skillPoints()) + "  ·  AP " + profile.attributePoints();
         int pointsW = font.width(points) + 12;
         int pointsX = x + width - 13 - (headerH > 34 ? 14 : 11) - pointsW;
         boolean hasPoints = profile.skillPoints() > 0;
@@ -733,10 +733,18 @@ public final class SkillScreen extends Screen {
                         w - margin * 2 - 14, DIM);
             }
 
-            String stateText = state == UNLOCKED ? tr("wildbound.skills.state_unlocked")
-                    : state == READY ? tr("wildbound.skills.state_ready")
-                    : tr("wildbound.skills.state_locked");
-            g.text(font, stateText, w - margin - 7 - font.width(stateText), detailY, color, true);
+            String stateText;
+            if (state == UNLOCKED) {
+                var mastery = profile.getSkillProgress(focused.id());
+                String xp = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
+                        ? "MAX" : mastery.experience() + "/" + mastery.experienceRequired() + " XP";
+                stateText = "R" + mastery.rank() + "  " + xp;
+            } else {
+                stateText = state == READY ? tr("wildbound.skills.state_ready")
+                        : tr("wildbound.skills.state_locked");
+            }
+            String fittedState = fit(stateText, w - margin * 2 - 18);
+            g.text(font, fittedState, w - margin - 7 - font.width(fittedState), detailY, color, true);
         } else {
             String hint = tr("wildbound.skills.hint");
             g.text(font, fit(hint, w - margin * 2 - 16), x, detailY, MUTED, false);
