@@ -2,6 +2,34 @@
 
 > Documento vivo de implementación. Cada fase debe cerrarse con cambios pequeños, preview del resultado, pruebas y un commit identificable. No integrar en `angeld03/motor-rpg` hasta que el bloque esté revisado y validado.
 
+
+## Registro de ejecución autónoma
+
+### P0.1 — Instrumentación inicial publicada
+
+Cambios añadidos en la rama de trabajo:
+- `PlayerRpgInitializer` inspecciona `hasAttached(PROFILE)` antes de llamar al gestor que inicializa el perfil. Registra si llega un attachment, si el UUID corresponde, la versión del esquema y un resumen de progresión.
+- En desconexión registra una instantánea del perfil en memoria. El log advierte expresamente que esto no demuestra que el archivo de jugador ya se haya escrito en disco.
+- `/wildbound debug attachment` muestra el estado actual del attachment sin llamar a `getOrCreate`, evitando ocultar el caso en que el perfil no estaba inicializado.
+- `PersistenceTest` ahora usa perfiles no triviales y comprueba todos los campos principales en el round-trip del Codec, la migración y la validación de datos inválidos/ranuras asociadas a habilidades bloqueadas.
+
+**Cómo ejecutar la comprobación en un mundo de pruebas (solo operador):**
+1. Entrar con el mod actualizado y ejecutar `/wildbound debug attachment`.
+2. Cambiar datos de prueba, por ejemplo `/wildbound xp add @s 500`, y volver a consultar el attachment.
+3. Salir completamente del mundo/servidor y volver a entrar.
+4. Ejecutar otra vez `/wildbound debug attachment` y comparar con las líneas `RPG profile join` y `RPG profile disconnect snapshot` del log.
+
+Interpretación:
+- `source=missing-or-new` en un jugador que ya tenía progreso indica que el attachment no llegó presente al JOIN; es una pista para investigar registro, lectura del NBT y carga.
+- `source=restored` con valores correctos demuestra que el perfil llegó a la sesión; si luego desaparecen cambios, hay que seguir el camino de las escrituras.
+- Un UUID incorrecto produce `uuid-mismatch-reinitialized`; no se debe borrar ni sobrescribir manualmente ningún playerdata para probarlo.
+
+**Estado:** instrumentación y tests actualizados en código; no se ha confirmado aún una prueba de reinicio en un mundo real. GitHub Actions ha informado jobs fallidos sin pasos ejecutados ni logs descargables, por lo que la compilación del commit aún no tiene una validación CI interpretable.
+
+### P3.0 — Dirección visual conceptual de la Water Wand
+
+Se ha generado una preview conceptual para orientar el rediseño: bastón de madera oscura tallada, runas luminosas cian, herrajes plata/oro, corona de metal angular y gran cristal acuático facetado con gotas y anillos de agua. La imagen es una referencia artística, **no** un modelo Blockbench ni una textura importable. La geometría y atlas UV se implementarán como un asset cúbico independiente cuando la validación del código vuelva a estar operativa.
+
 ## Estado de la auditoría
 
 Rama funcional auditada: `angeld03/motor-rpg` en `8c3b769c87b7852cfe52c990b9f5584f99038632`.
