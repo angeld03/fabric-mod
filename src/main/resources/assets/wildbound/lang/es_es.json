@@ -98,5 +98,15 @@
   "wildbound.skills.mastery_xp": "%s/%s XP",
   "wildbound.skills.mastery_rank": "R%s",
   "wildbound.skills.mastery_percent": "Maestría %s%%",
-  "wildbound.skills.upgrade_count": "Mejoras %s"
+  "wildbound.skills.upgrade_count": "Mejoras %s",
+  "wildbound.mastery.title": "MAESTRÍA DE HABILIDAD",
+  "wildbound.mastery.missing": "No se encuentra esta habilidad.",
+  "wildbound.mastery.rank": "RANGO %s / %s",
+  "wildbound.mastery.total_xp": "Experiencia total: %s XP",
+  "wildbound.mastery.mastery": "Dominio: %s%%",
+  "wildbound.mastery.upgrades": "MEJORAS REGISTRADAS: %s",
+  "wildbound.mastery.no_upgrades": "Todavía no hay mejoras desbloqueadas para esta habilidad.",
+  "wildbound.mastery.back": "M / ESC · Volver",
+  "wildbound.mastery.open_hint": "M · Detalles",
+  "wildbound.mastery.select_unlocked": "Selecciona una habilidad desbloqueada para ver su maestría."
 }
