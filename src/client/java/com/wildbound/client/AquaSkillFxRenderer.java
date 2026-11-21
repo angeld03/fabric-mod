@@ -115,7 +115,8 @@ public final class AquaSkillFxRenderer {
             Vec3 relative = anchor.subtract(camera);
             PoseStack pose = context.poseStack();
             pose.pushPose();
-            pose.translate(relative.x, relative.y + 0.68, relative.z);
+            float verticalOffset = usesEyeOrigin(effect.skillId) ? 0.0f : 0.68f;
+            pose.translate(relative.x, relative.y + verticalOffset, relative.z);
             Vec3 direction = effect.direction;
             if (!isWorldAligned(effect.skillId)) {
                 // Local +Z is the spell forward axis. Match it to the supplied camera direction.
@@ -132,6 +133,12 @@ public final class AquaSkillFxRenderer {
             );
             pose.popPose();
         }
+    }
+
+    private static boolean usesEyeOrigin(String skillId) {
+        return skillId.equals("aqua_water_bolt")
+                || skillId.equals("aqua_aqua_whip")
+                || skillId.equals("aqua_pressure_lance");
     }
 
     private static boolean isWorldAligned(String skillId) {
@@ -634,7 +641,7 @@ public final class AquaSkillFxRenderer {
                                    WaterSerpentMeshDefinition definition, float t,
                                    float phase, float travel, float summon) {
             float tailWeight = (float) Math.pow(1.0f - t, 1.45);
-            float wave = phase * 1.45f - t * 8.2f;
+            float wave = phase * definition.waveFrequency() - t * (float) (Math.PI * 2.4f);
             float x = point.x() + (float) Math.sin(wave) * definition.lateralSway() * tailWeight * summon;
             float y = point.y() * (0.28f + 0.72f * summon)
                     + (float) Math.sin(wave * 0.78f + 0.7f) * definition.verticalSway() * tailWeight * summon;
