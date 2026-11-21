@@ -75,7 +75,7 @@ public final class AquaSkillFxRenderer {
         Vec3 camera = mc.gameRenderer.getMainCamera().position();
         EFFECTS.values().removeIf(effect ->
                 now - effect.startTick > effect.duration + 8
-                        || effect.position.distanceToSqr(camera) > MAX_DISTANCE_SQR * 1.8);
+                        || renderAnchor(mc, effect).distanceToSqr(camera) > MAX_DISTANCE_SQR * 1.8);
     }
 
     public static void reset() {
