@@ -170,3 +170,20 @@ Cada acción se entregará como un bloque independiente:
 6. **Commit** — hash corto y enlace al diff/PR.
 
 No se fusionará automáticamente a `angeld03/motor-rpg`. Una fase no se dará por terminada solo porque se haya subido el código: deberá tener pruebas y una validación visual/jugable cuando corresponda.
+
+
+### P1 — Primera implementación de maestría publicada
+
+Se añadió una primera capa persistente de progresión por habilidad:
+- Nuevo `SkillProgress`: rango 1–10, XP actual, XP total, maestría 0–100 y lista de mejoras desbloqueadas.
+- El perfil RPG sube a esquema 3 y añade el mapa `skill_progress`.
+- La migración inicializa con rango 1 las habilidades que ya estaban desbloqueadas, sin retirar habilidades ni cambiar los puntos del jugador.
+- Cada activación que completa correctamente su ejecutor en el servidor concede 10 XP de maestría; una activación cargada puede conceder hasta 15. Fallos por cooldown, recursos o excepción no conceden XP.
+- El listado administrativo de habilidades muestra rango y XP.
+- Water Bolt recibe una mejora inicial controlada: hasta 22.5% de daño adicional al rango 10 y reducción de coste de maná de 8 a un mínimo de 5.
+
+**Pruebas añadidas:** round-trip del codec de maestría, migración de perfiles antiguos, subida de rango y límite máximo.
+
+**Balance provisional:** la curva usa 100 XP por rango actual (100 para R1→R2, 200 para R2→R3, etc.). Es una primera curva funcional para validar; el balance definitivo se ajustará en P2. La maestría es un valor de progresión informativo por ahora; los efectos directos están limitados a Water Bolt para no inventar comportamiento en 179 definiciones que aún no tienen ejecutor jugable.
+
+**Pendiente de validación:** CI sigue marcando fallos con jobs sin pasos ni logs disponibles. No se declara compilado ni probado dentro de Minecraft. El esquema 3 debe validarse con perfiles reales de versiones anteriores antes de distribuir el JAR.
