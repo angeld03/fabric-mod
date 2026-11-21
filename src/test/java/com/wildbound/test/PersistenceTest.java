@@ -9,6 +9,9 @@ import com.wildbound.persistence.RpgDataMigration;
 import com.wildbound.player.AttributeContainer;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerStatistics;
+import com.wildbound.player.SkillProgress;
+
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -41,6 +44,54 @@ class PersistenceTest {
         PlayerRpgProfile decoded = PlayerRpgProfile.CODEC.parse(JsonOps.INSTANCE, json).result().orElseThrow();
 
         assertEquals(original, decoded);
+    }
+
+    @Test
+    void skillMasteryRoundTripAndLegacyMigrationPreserveProgress() {
+        SkillProgress mastery = new SkillProgress(4, 125L, 725L, 36.25f,
+                List.of("aqua_range_1", "aqua_efficiency_1"));
+        PlayerRpgProfile original = new PlayerRpgProfile(
+                PlayerRpgProfile.CURRENT_SCHEMA,
+                UUID.randomUUID().toString(),
+                25, 75L, 2_500L, 8, 3,
+                new AttributeContainer(10, 10, 10, 10, 10),
+                80f, 35f,
+                List.of("aqua_water_bolt"),
+                List.of("emerald_vale"),
+                List.of("aqua_water_bolt", "", "", "", ""),
+                PlayerStatistics.EMPTY,
+                Map.of("aqua_water_bolt", mastery)
+        );
+
+        JsonElement json = PlayerRpgProfile.CODEC.encodeStart(JsonOps.INSTANCE, original)
+                .result().orElseThrow();
+        PlayerRpgProfile decoded = PlayerRpgProfile.CODEC.parse(JsonOps.INSTANCE, json)
+                .result().orElseThrow();
+        assertEquals(mastery, decoded.getSkillProgress("aqua_water_bolt"));
+
+        PlayerRpgProfile legacy = new PlayerRpgProfile(
+                PlayerRpgProfile.CURRENT_SCHEMA - 1, original.uuid(), original.level(),
+                original.experience(), original.totalExperience(), original.attributePoints(),
+                original.skillPoints(), original.attributes(), original.mana(), original.stamina(),
+                original.unlockedSkills(), original.unlockedRealms(), original.radialSkills(),
+                original.stats()
+        );
+        PlayerRpgProfile migrated = RpgDataMigration.migrate(legacy);
+        assertEquals(SkillProgress.INITIAL, migrated.getSkillProgress("aqua_water_bolt"));
+        assertEquals(original.unlockedSkills(), migrated.unlockedSkills());
+    }
+
+    @Test
+    void skillProgressRanksUpAndStopsAtMaximum() {
+        SkillProgress progress = SkillProgress.INITIAL.addExperience(100L);
+        assertEquals(2, progress.rank());
+        assertEquals(0L, progress.experience());
+
+        SkillProgress capped = new SkillProgress(SkillProgress.MAX_RANK, 0L, 900L, 99f, List.of())
+                .addExperience(500L);
+        assertEquals(SkillProgress.MAX_RANK, capped.rank());
+        assertEquals(0L, capped.experience());
+        assertEquals(900L, capped.totalExperience());
     }
 
     @Test
