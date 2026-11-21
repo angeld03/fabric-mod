@@ -288,3 +288,14 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - El HUD conserva su halo/pulso del medallón y el brillo de XP durante la subida.
 
 **Validación pendiente:** revisar la aparición real en cliente, especialmente cuando se ganan varios niveles en una sola concesión de XP y en resoluciones bajas.
+
+
+### P5 — Anuncio cinematográfico de subida de nivel
+
+- El HUD detecta el cambio de nivel en el attachment sincronizado y muestra un banner temporal en la zona superior-central.
+- La animación combina entrada/desvanecimiento, transición del número de nivel anterior al nuevo, gradiente dorado-cian, halo pulsante y destellos laterales.
+- Muestra los puntos de atributo y habilidad ganados en la concesión de XP.
+- El texto está localizado en español e inglés y usa únicamente las recompensas ya guardadas por el servidor.
+- Se conserva el pulso del medallón de nivel y el efecto de ganancia de XP de la placa superior izquierda.
+
+**Pendiente de prueba:** verificar en Minecraft una subida normal, varias subidas de nivel en una única concesión y resoluciones bajas. No se ha confirmado todavía una compilación Gradle de esta revisión.
