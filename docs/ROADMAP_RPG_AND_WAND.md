@@ -187,3 +187,16 @@ Se añadió una primera capa persistente de progresión por habilidad:
 **Balance provisional:** la curva usa 100 XP por rango actual (100 para R1→R2, 200 para R2→R3, etc.). Es una primera curva funcional para validar; el balance definitivo se ajustará en P2. La maestría es un valor de progresión informativo por ahora; los efectos directos están limitados a Water Bolt para no inventar comportamiento en 179 definiciones que aún no tienen ejecutor jugable.
 
 **Pendiente de validación:** CI sigue marcando fallos con jobs sin pasos ni logs disponibles. No se declara compilado ni probado dentro de Minecraft. El esquema 3 debe validarse con perfiles reales de versiones anteriores antes de distribuir el JAR.
+
+
+### P2 — Auditoría y primera corrección de progresión
+
+Hallazgo importante durante la integración de P1: varios servicios reconstruían el perfil con el constructor antiguo al conceder XP, gastar puntos de atributo, regenerar recursos o usar comandos administrativos. Al añadir el mapa de maestría, esas reconstrucciones habrían eliminado silenciosamente el progreso de habilidades. Se corrigieron las copias en `ExperienceService`, `AttributeService`, `ResourceService` y `RpgCommands` para conservar `skillProgress`.
+
+Además:
+- Se corrigió el cálculo del XP concedido para evitar overflow de `long` al alcanzar el máximo.
+- El XP total acumulado ahora satura en `Long.MAX_VALUE` en lugar de desbordarse.
+- La curva de personaje tenía un tope de 5.000.000 XP por nivel, que provocaba que se aplanara antes del nivel 70 y dejara de escalar durante los últimos niveles. El límite de seguridad se elevó a 50.000.000 y se añadió una prueba para comprobar que la curva sigue creciendo hasta el nivel 89.
+- Se ampliaron pruebas de recompensas acumuladas por subir varios niveles y de hitos de puntos de habilidad.
+
+**Pendiente:** revisar todos los eventos que conceden XP/actualizan estadísticas y ejecutar tests/build con Java 25. No se afirma todavía que P2 esté cerrado ni que el balance esté aprobado.
