@@ -29,6 +29,7 @@ public final class AquaSkillFxRenderer {
             Identifier.fromNamespaceAndPath("wildbound", "textures/misc/aqua_water_flow.png");
     private static final int MAX_EFFECTS = 24;
     private static final int MAX_QUADS_PER_EFFECT = 2_600;
+    private static final int MAX_QUADS_PER_FRAME = 16_000;
     private static final double MAX_DISTANCE_SQR = 80.0 * 80.0;
     private static final Map<Long, Effect> EFFECTS = new LinkedHashMap<>();
 
@@ -88,6 +89,8 @@ public final class AquaSkillFxRenderer {
 
         Vec3 camera = context.levelState().cameraRenderState.pos;
         long now = mc.level.getGameTime();
+        int sharedBudget = Math.max(220, Math.min(MAX_QUADS_PER_EFFECT,
+                MAX_QUADS_PER_FRAME / Math.max(1, EFFECTS.size())));
         for (Effect effect : EFFECTS.values()) {
             Vec3 anchor = renderAnchor(mc, effect);
             double distanceSqr = anchor.distanceToSqr(camera);
@@ -98,7 +101,7 @@ public final class AquaSkillFxRenderer {
             float fadeIn = smooth(clamp(age / 4.5f, 0f, 1f));
             float fadeOut = effect.stopping
                     ? clamp(1f - Math.max(0f, age - effect.duration + 4f) / 4f, 0f, 1f)
-                    : clamp((1f - progress) * 5.0f, 0.16f, 1f);
+                    : 1f - smooth(clamp((progress - 0.82f) / 0.18f, 0f, 1f));
             float alpha = fadeIn * fadeOut;
             if (alpha <= 0.015f) continue;
 
@@ -108,17 +111,26 @@ public final class AquaSkillFxRenderer {
             pose.pushPose();
             pose.translate(relative.x, relative.y + 0.68, relative.z);
             Vec3 direction = effect.direction;
-            pose.rotate(new Quaternionf().rotationY((float) -Math.atan2(direction.x, direction.z)));
-            pose.rotate(new Quaternionf().rotationX((float) Math.atan2(direction.y,
-                    Math.sqrt(direction.x * direction.x + direction.z * direction.z))));
+            if (!isWorldAligned(effect.skillId)) {
+                pose.rotate(new Quaternionf().rotationY((float) -Math.atan2(direction.x, direction.z)));
+                pose.rotate(new Quaternionf().rotationX((float) Math.atan2(direction.y,
+                        Math.sqrt(direction.x * direction.x + direction.z * direction.z))));
+            }
+            int effectBudget = Math.max(160, (int) (sharedBudget * lod));
 
             context.submitNodeCollector().submitCustomGeometry(
                     pose,
                     RenderTypes.entityTranslucent(WATER_TEXTURE),
-                    (matrix, buffer) -> draw(effect, age, progress, alpha, lod, matrix, buffer)
+                    (matrix, buffer) -> draw(effect, age, progress, alpha, lod, effectBudget, matrix, buffer)
             );
             pose.popPose();
         }
+    }
+
+    private static boolean isWorldAligned(String skillId) {
+        return skillId.equals("aqua_healing_stream")
+                || skillId.equals("aqua_bubble_shield")
+                || skillId.equals("aqua_whirlpool");
     }
 
     private static Vec3 renderAnchor(Minecraft mc, Effect effect) {
@@ -132,8 +144,8 @@ public final class AquaSkillFxRenderer {
     }
 
     private static void draw(Effect effect, float age, float progress, float alpha, float lod,
-                             PoseStack.Pose pose, VertexConsumer buffer) {
-        Mesh mesh = new Mesh(pose, buffer, alpha, Math.max(260, (int) (MAX_QUADS_PER_EFFECT * lod)),
+                             int quadBudget, PoseStack.Pose pose, VertexConsumer buffer) {
+        Mesh mesh = new Mesh(pose, buffer, alpha, quadBudget,
                 age * 0.105f, effect.seed);
 
         switch (effect.skillId) {
