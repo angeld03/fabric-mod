@@ -32,7 +32,7 @@ public final class PlayerRpgInitializer {
             Wildbound.LOGGER.info(
                     "RPG profile join: player={} uuid={} source={} schemaBefore={} schemaAfter={} " +
                             "level={} xp={} skillPoints={} attributePoints={} unlockedSkills={} unlockedRealms={}",
-                    player.getGameProfile().name(),
+                    player.getName().getString(),
                     player.getUUID(),
                     loadSource,
                     storedSchema,
@@ -52,7 +52,7 @@ public final class PlayerRpgInitializer {
             if (profile == null) {
                 Wildbound.LOGGER.warn(
                         "RPG profile disconnect: no attachment present for player={} uuid={}",
-                        player.getGameProfile().name(),
+                        player.getName().getString(),
                         player.getUUID()
                 );
                 return;
@@ -63,7 +63,7 @@ public final class PlayerRpgInitializer {
             Wildbound.LOGGER.info(
                     "RPG profile disconnect snapshot: player={} uuid={} schema={} level={} xp={} " +
                             "skillPoints={} attributePoints={} unlockedSkills={} unlockedRealms={}",
-                    player.getGameProfile().name(),
+                    player.getName().getString(),
                     player.getUUID(),
                     profile.schemaVersion(),
                     profile.level(),
