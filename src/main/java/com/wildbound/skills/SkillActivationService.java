@@ -67,7 +67,7 @@ public final class SkillActivationService {
         long now = player.level().getGameTime();
         Map<String, Long> playerCooldowns = COOLDOWNS.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         Long lastUse = playerCooldowns.get(skillId);
-        float cooldown = getMasteryCooldown(executor.getCooldown(definition, profile), profile, skillId);
+        float cooldown = SkillMasteryRules.cooldown(executor.getCooldown(definition, profile), profile.getSkillProgress(skillId).rank());
         if (lastUse != null) {
             long elapsedTicks = now - lastUse;
             float elapsedSeconds = elapsedTicks / 20f;
@@ -77,7 +77,7 @@ public final class SkillActivationService {
         }
 
         // Check resource costs
-        float manaCost = getMasteryManaCost(executor.getManaCost(definition, profile), profile, skillId);
+        float manaCost = SkillMasteryRules.manaCost(executor.getManaCost(definition, profile), profile.getSkillProgress(skillId).rank(), "aqua_water_bolt".equals(skillId));
         float staminaCost = executor.getStaminaCost(definition, profile);
         if (manaCost > 0 && !ResourceService.canAfford(player, ResourceType.MANA, manaCost)) {
             return ActivationResult.fail("not_enough_mana", 0f);
@@ -106,8 +106,7 @@ public final class SkillActivationService {
         // Higher-tier abilities grant more mastery XP, while a fully charged
         // cast earns a modest bonus. This rewards meaningful progression
         // without making low-tier casts the fastest mastery farm.
-        long masteryXp = 10L + Math.min(18L, definition.requiredLevel() / 3L)
-                + Math.round(getChargeLevel() * 5f);
+        long masteryXp = SkillMasteryRules.experienceAward(definition.requiredLevel(), getChargeLevel());
         SkillProgressionService.SkillProgressResult masteryResult =
                 SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
         if (masteryResult.changed() && masteryResult.rank() > masteryResult.previousRank()) {
@@ -159,20 +158,6 @@ public final class SkillActivationService {
     /** Clears the charge level after execution. */
     public static void clearChargeLevel() {
         currentChargeLevel = 0f;
-    }
-
-    /** Small universal mastery rewards for skills without a bespoke specialization tree. */
-    private static float getMasteryCooldown(float baseCooldown, PlayerRpgProfile profile, String skillId) {
-        int rank = profile.getSkillProgress(skillId).rank();
-        float reduction = Math.min(0.0675f, Math.max(0, rank - 1) * 0.0075f);
-        return Math.max(0.25f, baseCooldown * (1f - reduction));
-    }
-
-    private static float getMasteryManaCost(float baseCost, PlayerRpgProfile profile, String skillId) {
-        if (baseCost <= 0f || "aqua_water_bolt".equals(skillId)) return baseCost;
-        int rank = profile.getSkillProgress(skillId).rank();
-        float reduction = Math.min(0.09f, Math.max(0, rank - 1) * 0.01f);
-        return Math.max(0.1f, baseCost * (1f - reduction));
     }
 
     public static float getRemainingCooldown(ServerPlayer player, String skillId) {
