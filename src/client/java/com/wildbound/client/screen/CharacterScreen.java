@@ -25,7 +25,7 @@ public final class CharacterScreen extends Screen {
     private final int[] buttonH = new int[ATTRIBUTES.length];
 
     public CharacterScreen() {
-        super(Component.literal("WILDBOUND — Character"));
+        super(Component.translatable("wildbound.character.title"));
     }
 
     @Override
@@ -40,32 +40,32 @@ public final class CharacterScreen extends Screen {
         g.fill(0, 0, w, h, 0xE908101B);
         g.fill(12, 12, w - 12, h - 12, 0xF01B2A3B);
         g.fill(12, 12, w - 12, 14, 0xFFFFD479);
-        g.text(font, "CHARACTER", 24, 23, 0xFFFFE6A8, true);
+        g.text(font, tr("wildbound.character.title").toUpperCase(java.util.Locale.ROOT), 24, 23, 0xFFFFE6A8, true);
 
         PlayerRpgProfile profile = minecraft.player == null ? null
                 : minecraft.player.getAttached(RpgAttachments.PROFILE);
         if (profile == null) {
-            g.text(font, "Esperando datos del personaje...", 24, 52, 0xFFFFFFFF, false);
+            g.text(font, tr("wildbound.character.waiting"), 24, 52, 0xFFFFFFFF, false);
             return;
         }
 
-        g.text(font, "LEVEL " + profile.level(), 24, 43, 0xFFFFFFFF, true);
-        g.text(font, "XP " + profile.experience() + "  |  TOTAL " + profile.totalExperience(),
+        g.text(font, tr("wildbound.character.level", profile.level()), 24, 43, 0xFFFFFFFF, true);
+        g.text(font, tr("wildbound.character.xp", profile.experience(), profile.totalExperience()),
                 24, 57, 0xFF9FB7CF, false);
-        g.text(font, "PUNTOS DE ATRIBUTO DISPONIBLES: " + profile.attributePoints(),
+        g.text(font, tr("wildbound.character.attribute_points", profile.attributePoints()),
                 24, 78, profile.attributePoints() > 0 ? 0xFFFFD479 : 0xFF9FB7CF, true);
 
         int left = 24;
         int top = 108;
         int rowHeight = 29;
-        g.text(font, "ATRIBUTOS", left, top - 15, 0xFF8EDBFF, true);
+        g.text(font, tr("wildbound.character.attributes"), left, top - 15, 0xFF8EDBFF, true);
         for (int i = 0; i < ATTRIBUTES.length; i++) {
             RpgAttribute attribute = ATTRIBUTES[i];
             int y = top + i * rowHeight;
             int value = profile.attributes().get(attribute);
             g.fill(left, y, left + 245, y + 23, 0xAA0A1421);
             g.fill(left, y, left + 2, y + 23, 0xFF4A9BCB);
-            g.text(font, attribute.name(), left + 9, y + 7, 0xFFEAF4FF, true);
+            g.text(font, tr("wildbound.attribute." + attribute.id()), left + 9, y + 7, 0xFFEAF4FF, true);
             String valueText = String.valueOf(value);
             g.text(font, valueText, left + 168, y + 7, 0xFFFFD479, true);
 
@@ -83,27 +83,27 @@ public final class CharacterScreen extends Screen {
 
         DerivedStats stats = DerivedStatsCalculator.calculate(profile);
         int sx = left + 285;
-        g.text(font, "ESTADÍSTICAS DERIVADAS", sx, top - 15, 0xFF8EDBFF, true);
+        g.text(font, tr("wildbound.character.derived_stats"), sx, top - 15, 0xFF8EDBFF, true);
         String[] lines = {
-                "Vida máxima: " + fmt(stats.maxHealth()),
-                "Maná máximo: " + fmt(stats.maxMana()),
-                "Stamina máxima: " + fmt(stats.maxStamina()),
-                "Poder cuerpo a cuerpo: " + fmt(stats.meleePower()),
-                "Poder mágico: " + fmt(stats.spellPower()),
-                "Defensa física: " + fmt(stats.physicalDefense()),
-                "Defensa mágica: " + fmt(stats.magicDefense()),
-                "Prob. crítico: " + fmt(stats.criticalChance() * 100f) + "%",
-                "Daño crítico: x" + fmt(stats.criticalDamage()),
-                "Velocidad: +" + fmt(stats.movementSpeedBonus() * 100f) + "%",
-                "Esquiva: +" + fmt(stats.dodgeBonus() * 100f) + "%",
-                "Reg. maná: " + fmt(stats.manaRegeneration()) + "/s",
-                "Reg. stamina: " + fmt(stats.staminaRegeneration()) + "/s"
+                tr("wildbound.character.stat.max_health", fmt(stats.maxHealth())),
+                tr("wildbound.character.stat.max_mana", fmt(stats.maxMana())),
+                tr("wildbound.character.stat.max_stamina", fmt(stats.maxStamina())),
+                tr("wildbound.character.stat.melee_power", fmt(stats.meleePower())),
+                tr("wildbound.character.stat.spell_power", fmt(stats.spellPower())),
+                tr("wildbound.character.stat.physical_defense", fmt(stats.physicalDefense())),
+                tr("wildbound.character.stat.magic_defense", fmt(stats.magicDefense())),
+                tr("wildbound.character.stat.critical_chance", fmt(stats.criticalChance() * 100f)),
+                tr("wildbound.character.stat.critical_damage", fmt(stats.criticalDamage())),
+                tr("wildbound.character.stat.movement_speed", fmt(stats.movementSpeedBonus() * 100f)),
+                tr("wildbound.character.stat.dodge", fmt(stats.dodgeBonus() * 100f)),
+                tr("wildbound.character.stat.mana_regen", fmt(stats.manaRegeneration())),
+                tr("wildbound.character.stat.stamina_regen", fmt(stats.staminaRegeneration()))
         };
         for (int i = 0; i < lines.length; i++) {
             g.text(font, lines[i], sx, top + i * 15, 0xFFD1DEEC, false);
         }
 
-        g.text(font, "Pulsa + para gastar un punto. ESC para cerrar. (Límite: " + WildboundConfig.maxAttribute + ")",
+        g.text(font, tr("wildbound.character.footer", WildboundConfig.maxAttribute),
                 24, h - 28, 0xFF8D9EB2, false);
     }
 
@@ -138,6 +138,10 @@ public final class CharacterScreen extends Screen {
 
     private static boolean inside(double mx, double my, int x, int y, int w, int h) {
         return mx >= x && my >= y && mx < x + w && my < y + h;
+    }
+
+    private static String tr(String key, Object... args) {
+        return Component.translatable(key, args).getString();
     }
 
     private static String fmt(float value) {
