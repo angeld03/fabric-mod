@@ -155,13 +155,13 @@ public class WildboundClient implements ClientModInitializer {
             SkillCameraAim.reset();
             WaterBoltIdlePresentation.reset();
             WaterBoltChargePresentation.reset();
-            WaterBoltChargePresentation.reset();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             RadialSkillState.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
             WaterBoltIdlePresentation.reset();
+            WaterBoltChargePresentation.reset();
         });
     }
 
