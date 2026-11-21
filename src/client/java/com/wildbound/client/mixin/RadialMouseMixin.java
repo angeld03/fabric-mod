@@ -63,7 +63,8 @@ public class RadialMouseMixin {
             if (SkillChargeState.isCharging()) {
                 float level = SkillChargeState.stop();
                 if (canCast && level > 0f) {
-                    ClientPlayNetworking.send(new SkillChargePayload(skillId, level));
+                    var aim = player.getLookAngle().normalize();
+                    ClientPlayNetworking.send(new SkillChargePayload(skillId, level, aim.x, aim.y, aim.z));
                 }
                 callback.cancel(); // suppress vanilla use/item on release
             }
