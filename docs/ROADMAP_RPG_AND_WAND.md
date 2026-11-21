@@ -387,3 +387,16 @@ Se añadió una capa de geometría volumétrica reconstruida en cada tick de ani
 Se centralizaron siete primitivas de geometría: tubo, elipsoide, cinta, espiral, embudo, superficie de ola y toroide. La revisión estática confirma que las diez habilidades invocan su geometría correspondiente.
 
 **Límites importantes:** estas superficies son aproximaciones geométricas de partículas, no triángulos/quad meshes reales con normales, UV, materiales transparentes, refracción o interpolación de huesos. La versión de renderer dedicada sigue pendiente. La densidad es alta y necesita medir FPS, paquetes y carga del servidor en mundo real; no se declara rendimiento validado. No se ha ejecutado Gradle ni se ha probado dentro de Minecraft.
+
+
+### P4 — Primer renderer cliente de geometría para Agua (Minecraft 26.3)
+
+Se inicia la migración desde las superficies muestreadas como partículas a geometría procedural cliente:
+- Nuevo payload compacto `AquaSkillFxPayload`: acción, ID de efecto, UUID del lanzador, skill ID, origen, dirección, duración y semilla. El protocolo reserva acciones START/UPDATE/STOP; no transmite vértices.
+- `AquaSkillFxService` emite el evento START solo después de que el ejecutor del servidor haya terminado correctamente y lo envía a jugadores de la misma dimensión dentro de 72 bloques.
+- `AquaSkillFxRenderer` mantiene efectos temporales en cliente, con límite de 24 efectos, caducidad automática, culling a 80 bloques y tres niveles de detalle.
+- Las diez habilidades de Agua tienen generadores procedurales diferentes: doble lanza tubular, envolvente elipsoidal/helicoidal, cinta de látigo, escudo esférico, frente de ola, túnel de dash, embudo, lanza de presión, toroides expansivos y leviatán segmentado.
+- Se retiraron las 19 llamadas a muestreo de mallas del servidor para evitar el envío de cientos/miles de partículas por tick. Las partículas de impacto/feedback que no pertenecían a esas superficies siguen en sus ejecutores.
+- El renderer se conecta mediante `LevelRenderEvents.COLLECT_SUBMITS` y `SubmitNodeCollector.submitCustomGeometry`, usando el pipeline diferido de Minecraft 26.x.
+
+**Límites actuales y honestidad:** esta primera pasada dibuja una estructura de alambre luminosa mediante segmentos de línea; todavía no es una superficie sólida de triángulos con normales/UV/refracción ni una animación esquelética. El protocolo ya reserva UPDATE/STOP, pero el servicio servidor actual emite START y el cliente deja caducar cada efecto por duración; el seguimiento de entidades en movimiento y STOP explícito quedan para la siguiente iteración. El detalle visual, el comportamiento con OIT/shaderpacks y el rendimiento necesitan validación en cliente. No se ha ejecutado Gradle ni se ha probado dentro de Minecraft.
