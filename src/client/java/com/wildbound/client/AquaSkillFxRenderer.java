@@ -5,7 +5,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.wildbound.network.AquaSkillFxPayload;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.Vec3;
@@ -106,8 +105,8 @@ public final class AquaSkillFxRenderer {
             pose.translate(relative.x, relative.y, relative.z);
             Vec3 direction = effect.direction;
             pose.translate(0.0, 0.65, 0.0);
-            pose.mulPose(com.mojang.math.Axis.YP.rotation((float) -Math.atan2(direction.x, direction.z)));
-            pose.mulPose(com.mojang.math.Axis.XP.rotation((float) Math.atan2(direction.y,
+            pose.mulPose(new org.joml.Quaternionf().rotationY((float) -Math.atan2(direction.x, direction.z)));
+            pose.mulPose(new org.joml.Quaternionf().rotationX((float) Math.atan2(direction.y,
                     Math.sqrt(direction.x * direction.x + direction.z * direction.z))));
 
             RenderType type = RenderTypes.lines();
@@ -229,8 +228,8 @@ public final class AquaSkillFxRenderer {
             if (emitted + 2 > budget) return;
             int a = (int)(Math.max(0.0f, Math.min(1.0f, alpha)) * 225);
             int r = (color >> 16) & 255, g = (color >> 8) & 255, b = color & 255;
-            out.addVertex(pose, ax, ay, az).setColor(r, g, b, a).setLineWidth(2.2f);
-            out.addVertex(pose, bx, by, bz).setColor(r, g, b, a).setLineWidth(2.2f);
+            out.addVertex(pose, ax, ay, az).setColor(r, g, b, a).setNormal(0.0f, 1.0f, 0.0f).setLineWidth(2.2f);
+            out.addVertex(pose, bx, by, bz).setColor(r, g, b, a).setNormal(0.0f, 1.0f, 0.0f).setLineWidth(2.2f);
             emitted += 2;
         }
 
