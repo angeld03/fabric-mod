@@ -70,6 +70,8 @@ public final class AquaSkillExecutors {
 
                 float charge = SkillActivationService.getChargeLevel();
                 float chargeMult = 1.0f + charge;
+                int skillRank = profile.getSkillProgress(def.id()).rank();
+                float masteryDamageMultiplier = 1.0f + (skillRank - 1) * 0.025f;
 
                 // Each lance: [range, damage, burst size, shaft thickness]
                 double[] lanceRanges  = { 10.0 * chargeMult, 16.0 * chargeMult, 24.0 * chargeMult };
@@ -108,7 +110,7 @@ public final class AquaSkillExecutors {
                     final int li = lanceIndex;
                     int startTick = CHARGE_TICKS + lanceIndex * LANCE_CYCLE;
                     double range = lanceRanges[li];
-                    int dmg = (int) (lanceDamage[li] * chargeMult);
+                    int dmg = Math.round(lanceDamage[li] * chargeMult * masteryDamageMultiplier);
                     int burst = lanceBursts[li];
                     double shaft = lanceWidth[li];
 
