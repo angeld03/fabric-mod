@@ -299,3 +299,15 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - Se conserva el pulso del medallón de nivel y el efecto de ganancia de XP de la placa superior izquierda.
 
 **Pendiente de prueba:** verificar en Minecraft una subida normal, varias subidas de nivel en una única concesión y resoluciones bajas. No se ha confirmado todavía una compilación Gradle de esta revisión.
+
+
+### P1 — Water Bolt: mejoras reales de maestría
+
+Se ha conectado el progreso individual a tres hitos permanentes del Water Bolt:
+- **Rango 3 — Núcleo hidrostático:** +10% de daño adicional, acumulable con el escalado normal por rango.
+- **Rango 6 — Corriente glacial:** los impactos directos aplican Lentitud durante 60 ticks y generan partículas de escarcha.
+- **Rango 9 — Perforador de mareas:** +18% de alcance a las tres lanzas del hechizo.
+
+Los hitos se registran en `SkillProgress.upgrades` desde el servicio del servidor, una sola vez, y se conservan en el perfil/codec existente. La pantalla de maestría presenta ahora nombres localizados en español e inglés en lugar de IDs técnicos. No se ha añadido una interfaz de elección todavía: estos tres hitos se desbloquean automáticamente al alcanzar sus rangos.
+
+**Validación pendiente:** no se ha ejecutado Gradle ni una sesión real de Minecraft. Revisar el efecto de Lentitud en jefes/inmunidades y el balance del daño/alcance en combate.
