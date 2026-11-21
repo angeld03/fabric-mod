@@ -351,3 +351,19 @@ Se centralizaron las fórmulas de XP por tier/carga, reducción de cooldown y ef
 - Se añadieron pruebas específicas para entradas no finitas y para concesiones de XP que cruzan varios rangos en una sola operación.
 
 **Validación pendiente:** las pruebas están añadidas al proyecto, pero no se ha confirmado su ejecución mediante Gradle. La validación final debe hacerse también en una sesión real de Minecraft.
+
+
+### P4 — Auditoría funcional y cinematográfica del elemento Agua
+
+Se revisaron los diez IDs del catálogo Agua frente a sus ejecutores registrados. Los diez tienen un ejecutor y AquaSkillExecutors.registerAll() está conectado al inicializador; el scheduler de efectos también está registrado en el tick del servidor.
+
+Correcciones aplicadas en esta pasada:
+- **Healing Stream:** los pulsos curan al lanzador y a entidades aliadas vivas dentro de un radio de 5 bloques; los efectos de curación aparecen sobre cada aliado realmente curado.
+- **Aqua Whip:** el daño y el retroceso siguen el arco del látigo durante sus ticks visuales, en vez de resolverse instantáneamente antes de dibujarlo.
+- **Aqua Dash:** el jugador recorre la trayectoria durante 12 ticks; los impactos se producen al cruzar enemigos y la llegada culmina con una onda de agua.
+- **Pressure Lance:** se añadió compresión previa y un frente de energía progresivo; los objetivos reciben daño cuando el frente los alcanza, no antes de que aparezca el haz.
+- **Leviathan's Wrath:** la cabeza del espíritu marino tiene una silueta más legible (bóveda, hocico, mandíbula, ojos y cresta) conectada al cuerpo segmentado.
+- **Tsunami / Leviathan / efectos de agua:** se sustituyeron partículas de ceniza, humo, fuego de alma, portal y explosión por lenguaje visual acuático de salpicadura, burbujas y chispas.
+- Las diez habilidades de Agua ahora tienen descripciones específicas que explican su efecto real, en lugar de la plantilla genérica por tier.
+
+**Límites y validación pendiente:** estas son animaciones construidas con partículas y eventos del servidor; no equivalen todavía a modelos 3D animados con huesos ni a una cinemática de renderer dedicada. No se ha ejecutado Gradle ni se ha validado dentro de Minecraft. Probar especialmente curación de aliados en equipos, desplazamiento del dash en servidores con latencia, colisiones del látigo y Pressure Lance, densidad de partículas en multijugador y la lectura de la definitiva.
