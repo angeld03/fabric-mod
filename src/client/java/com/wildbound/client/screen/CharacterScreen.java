@@ -74,7 +74,7 @@ public final class CharacterScreen extends Screen {
             buttonY[i] = y + 3;
             buttonW[i] = 28;
             buttonH[i] = 17;
-            boolean enabled = profile.attributePoints() > 0 && value < 100;
+            boolean enabled = profile.attributePoints() > 0 && value < WildboundConfig.maxAttribute;
             int color = enabled ? (inside(mouseX, mouseY, bx, y + 3, 28, 17)
                     ? 0xFF477DA0 : 0xFF274C68) : 0xFF303A45;
             g.fill(bx, y + 3, bx + 28, y + 20, color);
