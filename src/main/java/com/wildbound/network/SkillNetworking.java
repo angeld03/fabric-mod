@@ -30,6 +30,7 @@ public final class SkillNetworking {
         PayloadTypeRegistry.clientboundPlay().register(RadialSkillsResultPayload.TYPE, RadialSkillsResultPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraShakePayload.TYPE, SkillCameraShakePayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraAimPayload.TYPE, SkillCameraAimPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(AquaSkillFxPayload.TYPE, AquaSkillFxPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(SkillChargePayload.TYPE, SkillChargePayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(AttributeUpgradePayload.TYPE, AttributeUpgradePayload.CODEC);
 
