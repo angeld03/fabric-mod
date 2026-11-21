@@ -98,5 +98,15 @@
   "wildbound.skills.mastery_xp": "%s/%s XP",
   "wildbound.skills.mastery_rank": "R%s",
   "wildbound.skills.mastery_percent": "Mastery %s%%",
-  "wildbound.skills.upgrade_count": "Upgrades %s"
+  "wildbound.skills.upgrade_count": "Upgrades %s",
+  "wildbound.mastery.title": "SKILL MASTERY",
+  "wildbound.mastery.missing": "This skill could not be found.",
+  "wildbound.mastery.rank": "RANK %s / %s",
+  "wildbound.mastery.total_xp": "Total experience: %s XP",
+  "wildbound.mastery.mastery": "Mastery: %s%%",
+  "wildbound.mastery.upgrades": "REGISTERED UPGRADES: %s",
+  "wildbound.mastery.no_upgrades": "No upgrades have been unlocked for this skill yet.",
+  "wildbound.mastery.back": "M / ESC · Back",
+  "wildbound.mastery.open_hint": "M · Details",
+  "wildbound.mastery.select_unlocked": "Select an unlocked skill to view its mastery."
 }
