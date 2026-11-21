@@ -201,22 +201,25 @@ public final class AquaSkillFxRenderer {
     // ---------------------------------------------------------------------
     private static void healingStream(Mesh m, float age, float p) {
         float t = age * 0.075f;
+        float build = 0.32f + 0.68f * smooth(clamp(p * 2.7f, 0f, 1f));
         float pulse = 1f + 0.08f * (float) Math.sin(t * 2.2f);
-        m.ellipsoid(0, 0.78f, 0, 1.12f * pulse, 1.48f, 1.12f * pulse,
-                24, 13, t, 0x087FCB, 48);
-        m.ellipsoid(0, 0.82f, 0, 0.86f, 1.27f, 0.86f,
-                22, 12, -t * 1.2f, 0x2ECFFF, 74);
+        float radius = build * pulse;
+        float height = 0.65f + build * 0.83f;
+        m.ellipsoid(0, 0.78f * build, 0, 1.12f * radius, height, 1.12f * radius,
+                24, 13, t, 0x087FCB, 52);
+        m.ellipsoid(0, 0.82f * build, 0, 0.86f * radius, height * 0.86f, 0.86f * radius,
+                22, 12, -t * 1.2f, 0x2ECFFF, 82);
         for (int strand = 0; strand < 3; strand++) {
-            m.spiralRibbon(0, -0.45f, 0, 0.78f + strand * 0.08f,
-                    2.65f, 42, 0.19f, t + strand * 2.1f, 0x69EFFF, 150);
+            m.spiralRibbon(0, -0.45f * build, 0, (0.78f + strand * 0.08f) * radius,
+                    2.65f * build, 42, 0.19f * radius, t + strand * 2.1f, 0x69EFFF, 155);
         }
         for (int ring = 0; ring < 4; ring++) {
-            float y = -0.35f + ring * 0.73f;
-            float radius = 0.9f + (float) Math.sin(t + ring) * 0.11f;
-            m.rippleRing(0, y, 0, radius, 0.12f, 36, t + ring, 0xB8FFFF, 100);
+            float y = (-0.35f + ring * 0.73f) * build;
+            float ringRadius = (0.9f + (float) Math.sin(t + ring) * 0.11f) * radius;
+            m.rippleRing(0, y, 0, ringRadius, 0.12f * radius, 36, t + ring, 0xB8FFFF, 110);
         }
-        m.floatingDrops(0, 0.35f, 0, 1.0f, 1.55f, 12, t, 0xB6F8FF);
-        m.crownSplash(0, 0.1f, 0, 1.05f, t, 0xA9FAFF);
+        m.floatingDrops(0, 0.35f * build, 0, 1.0f * radius, 1.55f * build, 12, t, 0xB6F8FF);
+        m.crownSplash(0, 0.1f * build, 0, 1.05f * radius, t, 0xA9FAFF);
     }
 
     // ---------------------------------------------------------------------
@@ -242,19 +245,26 @@ public final class AquaSkillFxRenderer {
     // ---------------------------------------------------------------------
     private static void bubbleShield(Mesh m, float age, float p) {
         float t = age * 0.075f;
+        // The shield condenses around the caster, then blooms outward into a sphere.
+        float expansion = 0.34f + 0.66f * smooth(clamp(p * 3.2f, 0f, 1f));
         float pulse = 1f + 0.06f * (float) Math.sin(t * 1.8f);
-        m.ellipsoid(0, 0.72f, 0, 1.45f * pulse, 1.78f * pulse, 1.45f * pulse,
-                26, 16, t, 0x087BC5, 45);
-        m.ellipsoid(0, 0.72f, 0, 1.29f, 1.63f, 1.29f,
-                24, 14, -t * 1.3f, 0x44DAFF, 52);
-        m.ellipsoid(0, 0.72f, 0, 1.08f, 1.43f, 1.08f,
-                20, 12, t * 0.7f, 0xA9F8FF, 25);
+        float scale = expansion * pulse;
+        float centerY = 0.72f * expansion;
+        m.ellipsoid(0, centerY, 0, 1.45f * scale, 1.78f * scale, 1.45f * scale,
+                26, 16, t, 0x087BC5, 48);
+        m.ellipsoid(0, centerY, 0, 1.29f * scale, 1.63f * scale, 1.29f * scale,
+                24, 14, -t * 1.3f, 0x44DAFF, 62);
+        m.ellipsoid(0, centerY, 0, 1.08f * scale, 1.43f * scale, 1.08f * scale,
+                20, 12, t * 0.7f, 0xA9F8FF, 30);
         for (int i = 0; i < 5; i++) {
             float latitude = -0.95f + i * 0.47f;
-            m.sphericalBand(0, 0.72f, 0, 1.48f, latitude, 1.43f,
-                    48, t + i * 1.2f, 0xB9FFFF, 115);
+            m.sphericalBand(0, centerY, 0, 1.48f * scale, latitude, 1.43f * scale,
+                    48, t + i * 1.2f, 0xB9FFFF, 125);
         }
-        m.floatingDrops(0, 0.75f, 0, 1.55f, 1.68f, 10, t, 0xC8FFFF);
+        m.floatingDrops(0, centerY, 0, 1.55f * scale, 1.68f * scale, 10, t, 0xC8FFFF);
+        if (p > 0.14f && p < 0.32f) {
+            m.rippleRing(0, 0.12f, 0, 1.8f * expansion, 0.16f, 40, -t, 0xE5FFFF, 185);
+        }
     }
 
     // ---------------------------------------------------------------------
@@ -355,6 +365,7 @@ public final class AquaSkillFxRenderer {
         float t = age * 0.10f;
         float travel = smooth(p) * 7.2f;
         float sway = (float) Math.sin(t * 1.65f) * 0.42f;
+        float jawOpen = 0.12f + 0.10f * (0.5f + 0.5f * (float) Math.sin(t * 2.8f));
         // Muscular neck and segmented serpentine trunk, overlapping into one silhouette.
         m.tube(new Vec3(0, 0.92, -4.5), new Vec3(sway * 0.4, 1.1, 1.35 + travel),
                 0.63f, 28, 16, t, 0x075EA8, 144);
@@ -373,8 +384,13 @@ public final class AquaSkillFxRenderer {
                 22, 13, t, 0x087CC4, 180);
         m.ellipsoid(sway, 0.91f, 2.74f + travel, 0.72f, 0.29f, 0.72f,
                 18, 10, -t, 0x22B8E5, 185);
-        m.ellipsoid(sway, 0.62f, 2.44f + travel, 0.78f, 0.20f, 0.72f,
-                18, 9, t, 0x07528F, 170);
+        m.ellipsoid(sway, 0.68f - jawOpen, 2.44f + travel, 0.78f, 0.20f, 0.72f,
+                18, 9, t, 0x07528F, 178);
+        // Deep mouth cavity and cyan throat flash between the moving jaws.
+        m.ellipsoid(sway, 0.80f - jawOpen * 0.45f, 2.80f + travel, 0.47f, 0.075f, 0.40f,
+                14, 7, -t, 0x012F57, 168);
+        m.ellipsoid(sway, 0.79f - jawOpen * 0.35f, 2.86f + travel, 0.31f, 0.035f, 0.30f,
+                12, 6, t * 1.5f, 0x7EEDFF, 195);
         m.fin(sway - 0.55f, 1.95f, 2.0f + travel, -0.9f, 1.55f, 0.1f, 0x0A69AF, 172);
         m.fin(sway + 0.55f, 1.95f, 2.0f + travel, 0.9f, 1.55f, 0.1f, 0x0A69AF, 172);
         m.fin(sway, 2.05f, 2.55f + travel, 0, 1.0f, -1.15f, 0x48DDF5, 185);
