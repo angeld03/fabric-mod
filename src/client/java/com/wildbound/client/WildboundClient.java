@@ -2,9 +2,11 @@ package com.wildbound.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.wildbound.client.hud.RpgHud;
+import com.wildbound.client.screen.CharacterScreen;
 import com.wildbound.client.screen.SkillRadialMenu;
 import com.wildbound.client.screen.SkillScreen;
 import com.wildbound.network.ActivateSkillPayload;
+import com.wildbound.network.AquaSkillFxPayload;
 import com.wildbound.network.RadialSkillsResultPayload;
 import com.wildbound.network.SkillActivateResultPayload;
 import com.wildbound.network.SkillCameraAimPayload;
@@ -25,6 +27,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 
 public class WildboundClient implements ClientModInitializer {
+    public static final KeyMapping OPEN_CHARACTER = new KeyMapping(
+            "key.wildbound.character", InputConstants.KEY_J, KeyMapping.Category.MISC);
     public static final KeyMapping OPEN_SKILLS = new KeyMapping(
             "key.wildbound.skills", InputConstants.KEY_H, KeyMapping.Category.MISC);
     public static final KeyMapping OPEN_RADIAL = new KeyMapping(
@@ -45,11 +49,20 @@ public class WildboundClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         RpgHud.register();
+        AquaSkillFxRenderer.register();
 
+        KeyMappingHelper.registerKeyMapping(OPEN_CHARACTER);
         KeyMappingHelper.registerKeyMapping(OPEN_SKILLS);
         KeyMappingHelper.registerKeyMapping(OPEN_RADIAL);
         KeyMappingHelper.registerKeyMapping(USE_SELECTED_SKILL);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (OPEN_CHARACTER.consumeClick()) {
+                if (client.gui.screen() instanceof CharacterScreen screen) {
+                    screen.onClose();
+                } else if (client.gui.screen() == null && client.player != null) {
+                    client.setScreenAndShow(new CharacterScreen());
+                }
+            }
             while (OPEN_SKILLS.consumeClick()) {
                 if (client.gui.screen() instanceof SkillScreen screen) {
                     screen.onClose();
@@ -79,8 +92,11 @@ public class WildboundClient implements ClientModInitializer {
                 if (client.gui.screen() != null || client.player == null) continue;
                 useSelectedRadialSkill(client.player);
             }
-            // Decay cinematic camera aim each client tick.
+            // Decay cinematic camera aim and update the Water Bolt's quiet idle FX.
             SkillCameraAim.tick();
+            AquaSkillFxRenderer.tick();
+            WaterBoltIdlePresentation.tick(client);
+            WaterBoltChargePresentation.tick(client);
         });
 
         ClientPlayNetworking.registerGlobalReceiver(SkillUnlockResultPayload.TYPE, (payload, context) ->
@@ -112,6 +128,9 @@ public class WildboundClient implements ClientModInitializer {
         ClientPlayNetworking.registerGlobalReceiver(SkillCameraAimPayload.TYPE, (payload, context) ->
                 context.client().execute(() -> SkillCameraAim.play(payload)));
 
+        ClientPlayNetworking.registerGlobalReceiver(AquaSkillFxPayload.TYPE, (payload, context) ->
+                context.client().execute(() -> AquaSkillFxRenderer.accept(payload)));
+
         ClientPlayNetworking.registerGlobalReceiver(RadialSkillsResultPayload.TYPE, (payload, context) ->
                 context.client().execute(() -> {
                     PlayerRpgProfile profile = context.client().player == null ? null
@@ -138,13 +157,19 @@ public class WildboundClient implements ClientModInitializer {
         // connection it came from.
         ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
             RadialSkillState.reset();
+            AquaSkillFxRenderer.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
+            WaterBoltIdlePresentation.reset();
+            WaterBoltChargePresentation.reset();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             RadialSkillState.reset();
+            AquaSkillFxRenderer.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
+            WaterBoltIdlePresentation.reset();
+            WaterBoltChargePresentation.reset();
         });
     }
 
@@ -162,7 +187,8 @@ public class WildboundClient implements ClientModInitializer {
         if (!ClientPlayNetworking.canSend(ActivateSkillPayload.TYPE)) return false;
         // Do not send a request the server is guaranteed to reject.
         if (SkillActivationService.getClientCooldown(skillId) > 0f) return false;
-        ClientPlayNetworking.send(new ActivateSkillPayload(skillId));
+        var aim = player.getLookAngle().normalize();
+        ClientPlayNetworking.send(new ActivateSkillPayload(skillId, aim.x, aim.y, aim.z));
         return true;
     }
 

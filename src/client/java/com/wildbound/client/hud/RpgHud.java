@@ -131,6 +131,7 @@ public final class RpgHud {
 
         renderPlaque(g, mc.font, profile);
         renderVitals(g, mc.font, player, profile, stats);
+        renderLevelUpBanner(g, mc.font, profile);
     }
 
     // ------------------------------------------------------------------
@@ -247,6 +248,56 @@ public final class RpgHud {
         g.text(font, pts, pillX + 9, y + 4, GOLD_LIGHT, true);
     }
 
+    /** Cinematic but compact level-up announcement, driven by the synced profile change. */
+    private static void renderLevelUpBanner(GuiGraphicsExtractor g, Font font, PlayerRpgProfile profile) {
+        float strength = ANIMATION.levelUp;
+        if (strength <= 0.01f) return;
+
+        float fadeIn = clamp01((1f - strength) * 7f);
+        float fadeOut = clamp01(strength * 4.5f);
+        float opacity = Math.min(fadeIn, fadeOut);
+        float pulse = 0.5f + 0.5f * (float) Math.sin(ANIMATION.time * 5.5f);
+        int screenW = g.guiWidth();
+        int bannerW = Math.min(270, screenW - 20);
+        int bannerH = 43;
+        int x = (screenW - bannerW) / 2;
+        int y = 72 - Math.round((1f - fadeIn) * 12f);
+
+        int goldGlow = alpha(GOLD_LIGHT, Math.round(0x45 * opacity * (0.65f + pulse * 0.35f)));
+        g.fill(x - 3, y - 3, x + bannerW + 3, y + bannerH + 3, goldGlow);
+        g.fill(x - 1, y - 1, x + bannerW + 1, y + bannerH + 1, alpha(GOLD_DEEP, Math.round(255f * opacity)));
+        g.fill(x, y, x + bannerW, y + bannerH, alpha(0xFF101A2A, Math.round(240f * opacity)));
+        g.fillGradient(x + 1, y + 1, x + bannerW - 1, y + 3,
+                alpha(GOLD_LIGHT, Math.round(255f * opacity)), alpha(0xFF55DFFF, Math.round(255f * opacity)));
+        g.fill(x + 1, y + bannerH - 2, x + bannerW - 1, y + bannerH - 1,
+                alpha(0xFF55DFFF, Math.round(140f * opacity)));
+
+        String title = Component.translatable("wildbound.hud.level_up").getString();
+        int titleX = x + (bannerW - font.width(title)) / 2;
+        gradientText(g, font, title, titleX, y + 7,
+                lerpColor(GOLD_LIGHT, 0xFFFFFFFF, pulse * 0.45f), 0xFF56DFFF);
+        String level = Component.translatable("wildbound.hud.level_transition", ANIMATION.levelUpFrom, ANIMATION.levelUpTo).getString();
+        int levelX = x + (bannerW - font.width(level)) / 2;
+        g.text(font, level, levelX, y + 20, alpha(TEXT, Math.round(255f * opacity)), true);
+
+        String rewards = Component.translatable("wildbound.hud.level_rewards",
+                ANIMATION.levelUpAttributePoints, ANIMATION.levelUpSkillPoints).getString();
+        if (font.width(rewards) <= bannerW - 12) {
+            int rewardX = x + (bannerW - font.width(rewards)) / 2;
+            g.text(font, rewards, rewardX, y + 32, alpha(MUTED, Math.round(255f * opacity)), false);
+        }
+
+        // Tiny animated starbursts on both ends of the plaque.
+        for (int i = 0; i < 4; i++) {
+            float phase = ANIMATION.time * 4f + i * 1.57f;
+            int sy = y + 9 + Math.round((0.5f + 0.5f * (float) Math.sin(phase)) * 21f);
+            int size = 1 + (int) (pulse * 2f);
+            int sx = i % 2 == 0 ? x + 7 + i * 3 : x + bannerW - 8 - (i - 1) * 3;
+            g.fill(sx - size, sy, sx + size + 1, sy + 1, alpha(GOLD_LIGHT, Math.round(255f * opacity)));
+            g.fill(sx, sy - size, sx + 1, sy + size + 1, alpha(0xFF8CEEFF, Math.round(255f * opacity)));
+        }
+    }
+
     // ------------------------------------------------------------------
     // Bottom vitals
     // ------------------------------------------------------------------
@@ -336,8 +387,14 @@ public final class RpgHud {
         private float healing;
         private float levelUp;
         private float xpGain;
+        private int levelUpFrom;
+        private int levelUpTo;
+        private int levelUpAttributePoints;
+        private int levelUpSkillPoints;
 
         private int lastLevel = -1;
+        private int lastAttributePoints = -1;
+        private int lastSkillPoints = -1;
         private long lastExperience = -1L;
         private float lastHealth;
 
@@ -373,11 +430,23 @@ public final class RpgHud {
                 healing = 0f;
                 levelUp = 0f;
                 xpGain = 0f;
+                levelUpFrom = profile.level();
+                levelUpTo = profile.level();
+                levelUpAttributePoints = 0;
+                levelUpSkillPoints = 0;
             } else {
                 time += dt;
                 if (healthTarget < lastHealth - 0.001f) damage = 1f;
                 if (healthTarget > lastHealth + 0.001f) healing = 1f;
-                if (profile.level() > lastLevel) levelUp = 1f;
+                if (profile.level() > lastLevel) {
+                    levelUp = 1f;
+                    levelUpFrom = lastLevel;
+                    levelUpTo = profile.level();
+                    levelUpAttributePoints = lastAttributePoints < 0 ? 0
+                            : Math.max(0, profile.attributePoints() - lastAttributePoints);
+                    levelUpSkillPoints = lastSkillPoints < 0 ? 0
+                            : Math.max(0, profile.skillPoints() - lastSkillPoints);
+                }
                 if (profile.experience() > lastExperience || profile.level() > lastLevel) xpGain = 1f;
 
                 health = approach(health, healthTarget, 14f, dt);
@@ -390,6 +459,8 @@ public final class RpgHud {
 
             lastLevel = profile.level();
             lastExperience = profile.experience();
+            lastAttributePoints = profile.attributePoints();
+            lastSkillPoints = profile.skillPoints();
             lastHealth = healthTarget;
 
             damage = Math.max(0f, damage - dt * 2.2f);

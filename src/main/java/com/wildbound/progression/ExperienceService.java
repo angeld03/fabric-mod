@@ -37,11 +37,12 @@ public final class ExperienceService {
     public static LevelUpResult grantExperience(ServerPlayer player, long amount, ExperienceSource source) {
         if (amount <= 0L) return LevelUpResult.NONE;
         PlayerRpgProfile profile = RpgPersistenceManager.load(player);
-        long gained = Math.min(amount, Long.MAX_VALUE - profile.experience() - 1);
+        long gained = Math.min(amount, Long.MAX_VALUE - profile.experience());
         if (gained <= 0L) return LevelUpResult.NONE;
 
         long experience = profile.experience() + gained;
-        long total = profile.totalExperience() + gained;
+        long total = gained > Long.MAX_VALUE - profile.totalExperience()
+                ? Long.MAX_VALUE : profile.totalExperience() + gained;
         int level = profile.level();
         long consumed = 0L;
 
@@ -69,7 +70,7 @@ public final class ExperienceService {
         PlayerRpgProfile updated = new PlayerRpgProfile(
                 profile.schemaVersion(), profile.uuid(), level, experience, total,
                 attributePoints, skillPoints, profile.attributes(), profile.mana(), profile.stamina(),
-                profile.unlockedSkills(), profile.unlockedRealms(), profile.radialSkills(), profile.stats());
+                profile.unlockedSkills(), profile.unlockedRealms(), profile.radialSkills(), profile.stats(), profile.skillProgress());
         RpgPersistenceManager.save(player, updated);
 
         RpgProgressionEvents.EXPERIENCE_GAINED.invoker().onExperienceGained(player, gained, source);
@@ -95,6 +96,6 @@ public final class ExperienceService {
     private static PlayerRpgProfile copyWithExperience(PlayerRpgProfile p, long experience, long total) {
         return new PlayerRpgProfile(p.schemaVersion(), p.uuid(), p.level(), experience, total,
                 p.attributePoints(), p.skillPoints(), p.attributes(), p.mana(), p.stamina(),
-                p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats());
+                p.unlockedSkills(), p.unlockedRealms(), p.radialSkills(), p.stats(), p.skillProgress());
     }
 }

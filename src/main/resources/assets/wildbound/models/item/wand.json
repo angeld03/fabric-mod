@@ -7,323 +7,2511 @@
     "gold": "minecraft:block/gold_block",
     "crystal": "minecraft:block/beacon",
     "core": "minecraft:block/sea_lantern",
-    "particle": "minecraft:block/diamond_block"
+    "particle": "minecraft:block/diamond_block",
+    "silver": "minecraft:block/iron_block",
+    "aqua": "minecraft:block/diamond_block",
+    "aqua_dark": "minecraft:block/prismarine_bricks"
   },
   "elements": [
     {
       "name": "pomo_punta_oro",
-      "from": [7.25, 0, 7.25],
-      "to": [8.75, 0.75, 8.75],
+      "from": [
+        7.25,
+        0,
+        7.25
+      ],
+      "to": [
+        8.75,
+        0.75,
+        8.75
+      ],
       "faces": {
-        "north": {"uv": [2, 2, 14, 8], "texture": "#gold"},
-        "east": {"uv": [2, 2, 14, 8], "texture": "#gold"},
-        "south": {"uv": [2, 2, 14, 8], "texture": "#gold"},
-        "west": {"uv": [2, 2, 14, 8], "texture": "#gold"},
-        "up": {"uv": [2, 2, 14, 14], "texture": "#gold"},
-        "down": {"uv": [2, 2, 14, 14], "texture": "#gold"}
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            8
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            14,
+            8
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            8
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            14,
+            8
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "pomo_anillo_inferior",
-      "from": [6.8, 0.75, 6.8],
-      "to": [9.2, 1.5, 9.2],
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 1.125, 8]},
+      "from": [
+        6.8,
+        0.75,
+        6.8
+      ],
+      "to": [
+        9.2,
+        1.5,
+        9.2
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          1.125,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [1, 4, 15, 10], "texture": "#gold"},
-        "east": {"uv": [1, 4, 15, 10], "texture": "#gold"},
-        "south": {"uv": [1, 4, 15, 10], "texture": "#gold"},
-        "west": {"uv": [1, 4, 15, 10], "texture": "#gold"},
-        "up": {"uv": [1, 1, 15, 15], "texture": "#gold"},
-        "down": {"uv": [1, 1, 15, 15], "texture": "#gold"}
+        "north": {
+          "uv": [
+            1,
+            4,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            1,
+            4,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            1,
+            4,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            1,
+            4,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "pomo_anillo_base",
-      "from": [7, 1.5, 7],
-      "to": [9, 2.1, 9],
+      "from": [
+        7,
+        1.5,
+        7
+      ],
+      "to": [
+        9,
+        2.1,
+        9
+      ],
       "faces": {
-        "north": {"uv": [2, 6, 14, 11], "texture": "#gold"},
-        "east": {"uv": [2, 6, 14, 11], "texture": "#gold"},
-        "south": {"uv": [2, 6, 14, 11], "texture": "#gold"},
-        "west": {"uv": [2, 6, 14, 11], "texture": "#gold"},
-        "up": {"uv": [2, 2, 14, 14], "texture": "#gold"},
-        "down": {"uv": [2, 2, 14, 14], "texture": "#gold"}
+        "north": {
+          "uv": [
+            2,
+            6,
+            14,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            2,
+            6,
+            14,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            2,
+            6,
+            14,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            2,
+            6,
+            14,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "mango_seccion_1",
-      "from": [7.35, 2.1, 7.35],
-      "to": [8.65, 5.5, 8.65],
+      "from": [
+        7.35,
+        2.1,
+        7.35
+      ],
+      "to": [
+        8.65,
+        5.5,
+        8.65
+      ],
       "faces": {
-        "north": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "east": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "south": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "west": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "up": {"uv": [4, 4, 12, 12], "texture": "#wood_top"},
-        "down": {"uv": [4, 4, 12, 12], "texture": "#wood_top"}
+        "north": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        }
       }
     },
     {
       "name": "anillo_agarre_1",
-      "from": [7.15, 5.5, 7.15],
-      "to": [8.85, 6, 8.85],
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 5.75, 8]},
+      "from": [
+        7.15,
+        5.5,
+        7.15
+      ],
+      "to": [
+        8.85,
+        6,
+        8.85
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          5.75,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "east": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "south": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "west": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "up": {"uv": [3, 3, 13, 13], "texture": "#gold"},
-        "down": {"uv": [3, 3, 13, 13], "texture": "#gold"}
+        "north": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "mango_seccion_2",
-      "from": [7.4, 6, 7.4],
-      "to": [8.6, 10, 8.6],
+      "from": [
+        7.4,
+        6,
+        7.4
+      ],
+      "to": [
+        8.6,
+        10,
+        8.6
+      ],
       "faces": {
-        "north": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "east": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "south": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "west": {"uv": [4, 0, 12, 16], "texture": "#wood"},
-        "up": {"uv": [4, 4, 12, 12], "texture": "#wood_top"},
-        "down": {"uv": [4, 4, 12, 12], "texture": "#wood_top"}
+        "north": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "east": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "south": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "west": {
+          "uv": [
+            4,
+            0,
+            12,
+            16
+          ],
+          "texture": "#wood"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        }
       }
     },
     {
       "name": "anillo_agarre_2",
-      "from": [7.1, 10, 7.1],
-      "to": [8.9, 10.5, 8.9],
+      "from": [
+        7.1,
+        10,
+        7.1
+      ],
+      "to": [
+        8.9,
+        10.5,
+        8.9
+      ],
       "faces": {
-        "north": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "east": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "south": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "west": {"uv": [3, 5, 13, 9], "texture": "#gold"},
-        "up": {"uv": [3, 3, 13, 13], "texture": "#gold"},
-        "down": {"uv": [3, 3, 13, 13], "texture": "#gold"}
+        "north": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            3,
+            5,
+            13,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "mango_seccion_3_cuello",
-      "from": [7.3, 10.5, 7.3],
-      "to": [8.7, 13, 8.7],
+      "from": [
+        7.3,
+        10.5,
+        7.3
+      ],
+      "to": [
+        8.7,
+        13,
+        8.7
+      ],
       "faces": {
-        "north": {"uv": [4, 2, 12, 14], "texture": "#wood"},
-        "east": {"uv": [4, 2, 12, 14], "texture": "#wood"},
-        "south": {"uv": [4, 2, 12, 14], "texture": "#wood"},
-        "west": {"uv": [4, 2, 12, 14], "texture": "#wood"},
-        "up": {"uv": [4, 4, 12, 12], "texture": "#wood_top"},
-        "down": {"uv": [4, 4, 12, 12], "texture": "#wood_top"}
+        "north": {
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ],
+          "texture": "#wood"
+        },
+        "east": {
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ],
+          "texture": "#wood"
+        },
+        "south": {
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ],
+          "texture": "#wood"
+        },
+        "west": {
+          "uv": [
+            4,
+            2,
+            12,
+            14
+          ],
+          "texture": "#wood"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#wood_top"
+        }
       }
     },
     {
       "name": "guardia_collar_inferior",
-      "from": [6.75, 13, 6.75],
-      "to": [9.25, 13.8, 9.25],
+      "from": [
+        6.75,
+        13,
+        6.75
+      ],
+      "to": [
+        9.25,
+        13.8,
+        9.25
+      ],
       "faces": {
-        "north": {"uv": [2, 3, 14, 9], "texture": "#gold"},
-        "east": {"uv": [2, 3, 14, 9], "texture": "#gold"},
-        "south": {"uv": [2, 3, 14, 9], "texture": "#gold"},
-        "west": {"uv": [2, 3, 14, 9], "texture": "#gold"},
-        "up": {"uv": [2, 2, 14, 14], "texture": "#gold"},
-        "down": {"uv": [2, 2, 14, 14], "texture": "#gold"}
+        "north": {
+          "uv": [
+            2,
+            3,
+            14,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            2,
+            3,
+            14,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            2,
+            3,
+            14,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            2,
+            3,
+            14,
+            9
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "guardia_base_octogonal",
-      "from": [6.3, 13.8, 6.3],
-      "to": [9.7, 14.8, 9.7],
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 14.3, 8]},
+      "from": [
+        6.3,
+        13.8,
+        6.3
+      ],
+      "to": [
+        9.7,
+        14.8,
+        9.7
+      ],
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          14.3,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [1, 2, 15, 10], "texture": "#gold"},
-        "east": {"uv": [1, 2, 15, 10], "texture": "#gold"},
-        "south": {"uv": [1, 2, 15, 10], "texture": "#gold"},
-        "west": {"uv": [1, 2, 15, 10], "texture": "#gold"},
-        "up": {"uv": [1, 1, 15, 15], "texture": "#gold"},
-        "down": {"uv": [1, 1, 15, 15], "texture": "#gold"}
+        "north": {
+          "uv": [
+            1,
+            2,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            1,
+            2,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            1,
+            2,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            1,
+            2,
+            15,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "guardia_copa_superior",
-      "from": [6.4, 14.2, 6.4],
-      "to": [9.6, 15.1, 9.6],
+      "from": [
+        6.4,
+        14.2,
+        6.4
+      ],
+      "to": [
+        9.6,
+        15.1,
+        9.6
+      ],
       "faces": {
-        "north": {"uv": [1, 4, 15, 11], "texture": "#gold"},
-        "east": {"uv": [1, 4, 15, 11], "texture": "#gold"},
-        "south": {"uv": [1, 4, 15, 11], "texture": "#gold"},
-        "west": {"uv": [1, 4, 15, 11], "texture": "#gold"},
-        "up": {"uv": [1, 1, 15, 15], "texture": "#gold"},
-        "down": {"uv": [1, 1, 15, 15], "texture": "#gold"}
+        "north": {
+          "uv": [
+            1,
+            4,
+            15,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            1,
+            4,
+            15,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            1,
+            4,
+            15,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            1,
+            4,
+            15,
+            11
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "garra_norte",
-      "from": [7.55, 14.8, 5.75],
-      "to": [8.45, 17.6, 6.55],
-      "rotation": {"angle": -12, "axis": "x", "origin": [8, 14.8, 6.15]},
+      "from": [
+        7.55,
+        14.8,
+        5.75
+      ],
+      "to": [
+        8.45,
+        17.6,
+        6.55
+      ],
+      "rotation": {
+        "angle": -12,
+        "axis": "x",
+        "origin": [
+          8,
+          14.8,
+          6.15
+        ]
+      },
       "faces": {
-        "north": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "east": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "south": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "west": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "up": {"uv": [4, 4, 12, 10], "texture": "#gold"},
-        "down": {"uv": [4, 4, 12, 10], "texture": "#gold"}
+        "north": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            10
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "garra_sur",
-      "from": [7.55, 14.8, 9.45],
-      "to": [8.45, 17.6, 10.25],
-      "rotation": {"angle": 12, "axis": "x", "origin": [8, 14.8, 9.85]},
+      "from": [
+        7.55,
+        14.8,
+        9.45
+      ],
+      "to": [
+        8.45,
+        17.6,
+        10.25
+      ],
+      "rotation": {
+        "angle": 12,
+        "axis": "x",
+        "origin": [
+          8,
+          14.8,
+          9.85
+        ]
+      },
       "faces": {
-        "north": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "east": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "south": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "west": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "up": {"uv": [4, 4, 12, 10], "texture": "#gold"},
-        "down": {"uv": [4, 4, 12, 10], "texture": "#gold"}
+        "north": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            10
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            10
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "garra_este",
-      "from": [9.45, 14.8, 7.55],
-      "to": [10.25, 17.6, 8.45],
-      "rotation": {"angle": -12, "axis": "z", "origin": [9.85, 14.8, 8]},
+      "from": [
+        9.45,
+        14.8,
+        7.55
+      ],
+      "to": [
+        10.25,
+        17.6,
+        8.45
+      ],
+      "rotation": {
+        "angle": -12,
+        "axis": "z",
+        "origin": [
+          9.85,
+          14.8,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "east": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "south": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "west": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "up": {"uv": [4, 4, 10, 12], "texture": "#gold"},
-        "down": {"uv": [4, 4, 10, 12], "texture": "#gold"}
+        "north": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            10,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            10,
+            12
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "garra_oeste",
-      "from": [5.75, 14.8, 7.55],
-      "to": [6.55, 17.6, 8.45],
-      "rotation": {"angle": 12, "axis": "z", "origin": [6.15, 14.8, 8]},
+      "from": [
+        5.75,
+        14.8,
+        7.55
+      ],
+      "to": [
+        6.55,
+        17.6,
+        8.45
+      ],
+      "rotation": {
+        "angle": 12,
+        "axis": "z",
+        "origin": [
+          6.15,
+          14.8,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "east": {"uv": [4, 1, 12, 15], "texture": "#gold"},
-        "south": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "west": {"uv": [4, 1, 10, 15], "texture": "#gold"},
-        "up": {"uv": [4, 4, 10, 12], "texture": "#gold"},
-        "down": {"uv": [4, 4, 10, 12], "texture": "#gold"}
+        "north": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "east": {
+          "uv": [
+            4,
+            1,
+            12,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "south": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "west": {
+          "uv": [
+            4,
+            1,
+            10,
+            15
+          ],
+          "texture": "#gold"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            10,
+            12
+          ],
+          "texture": "#gold"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            10,
+            12
+          ],
+          "texture": "#gold"
+        }
       }
     },
     {
       "name": "cristal_nucleo_interior",
-      "from": [7.15, 15.6, 7.15],
-      "to": [8.85, 19.4, 8.85],
+      "from": [
+        7.15,
+        15.6,
+        7.15
+      ],
+      "to": [
+        8.85,
+        19.4,
+        8.85
+      ],
       "shade_direction_override": "up",
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 17.5, 8]},
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          17.5,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [2, 2, 14, 14], "texture": "#core"},
-        "east": {"uv": [2, 2, 14, 14], "texture": "#core"},
-        "south": {"uv": [2, 2, 14, 14], "texture": "#core"},
-        "west": {"uv": [2, 2, 14, 14], "texture": "#core"},
-        "up": {"uv": [2, 2, 14, 14], "texture": "#core"},
-        "down": {"uv": [2, 2, 14, 14], "texture": "#core"}
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#core"
+        }
       }
     },
     {
       "name": "cristal_cuerpo_principal",
-      "from": [6.75, 15.2, 6.75],
-      "to": [9.25, 19.6, 9.25],
+      "from": [
+        6.75,
+        15.2,
+        6.75
+      ],
+      "to": [
+        9.25,
+        19.6,
+        9.25
+      ],
       "shade_direction_override": "up",
       "faces": {
-        "north": {"uv": [1, 1, 15, 15], "texture": "#crystal"},
-        "east": {"uv": [1, 1, 15, 15], "texture": "#crystal"},
-        "south": {"uv": [1, 1, 15, 15], "texture": "#crystal"},
-        "west": {"uv": [1, 1, 15, 15], "texture": "#crystal"},
-        "up": {"uv": [1, 1, 15, 15], "texture": "#crystal"},
-        "down": {"uv": [1, 1, 15, 15], "texture": "#crystal"}
+        "north": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        },
+        "down": {
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "texture": "#crystal"
+        }
       }
     },
     {
       "name": "cristal_cuerpo_rotado",
-      "from": [6.85, 15.4, 6.85],
-      "to": [9.15, 19.4, 9.15],
+      "from": [
+        6.85,
+        15.4,
+        6.85
+      ],
+      "to": [
+        9.15,
+        19.4,
+        9.15
+      ],
       "shade_direction_override": "up",
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 17.4, 8]},
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          17.4,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [2, 2, 14, 14], "texture": "#crystal"},
-        "east": {"uv": [2, 2, 14, 14], "texture": "#crystal"},
-        "south": {"uv": [2, 2, 14, 14], "texture": "#crystal"},
-        "west": {"uv": [2, 2, 14, 14], "texture": "#crystal"},
-        "up": {"uv": [2, 2, 14, 14], "texture": "#crystal"},
-        "down": {"uv": [2, 2, 14, 14], "texture": "#crystal"}
+        "north": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        },
+        "down": {
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ],
+          "texture": "#crystal"
+        }
       }
     },
     {
       "name": "cristal_punta_superior_1",
-      "from": [7.15, 19.6, 7.15],
-      "to": [8.85, 20.5, 8.85],
+      "from": [
+        7.15,
+        19.6,
+        7.15
+      ],
+      "to": [
+        8.85,
+        20.5,
+        8.85
+      ],
       "shade_direction_override": "up",
       "faces": {
-        "north": {"uv": [3, 3, 13, 13], "texture": "#crystal"},
-        "east": {"uv": [3, 3, 13, 13], "texture": "#crystal"},
-        "south": {"uv": [3, 3, 13, 13], "texture": "#crystal"},
-        "west": {"uv": [3, 3, 13, 13], "texture": "#crystal"},
-        "up": {"uv": [3, 3, 13, 13], "texture": "#crystal"},
-        "down": {"uv": [3, 3, 13, 13], "texture": "#crystal"}
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "east": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "west": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "up": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        },
+        "down": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#crystal"
+        }
       }
     },
     {
       "name": "cristal_vertice_final",
-      "from": [7.55, 20.5, 7.55],
-      "to": [8.45, 21.2, 8.45],
+      "from": [
+        7.55,
+        20.5,
+        7.55
+      ],
+      "to": [
+        8.45,
+        21.2,
+        8.45
+      ],
       "shade_direction_override": "up",
-      "rotation": {"angle": 45, "axis": "y", "origin": [8, 20.85, 8]},
+      "rotation": {
+        "angle": 45,
+        "axis": "y",
+        "origin": [
+          8,
+          20.85,
+          8
+        ]
+      },
       "faces": {
-        "north": {"uv": [4, 4, 12, 12], "texture": "#core"},
-        "east": {"uv": [4, 4, 12, 12], "texture": "#core"},
-        "south": {"uv": [4, 4, 12, 12], "texture": "#core"},
-        "west": {"uv": [4, 4, 12, 12], "texture": "#core"},
-        "up": {"uv": [4, 4, 12, 12], "texture": "#core"},
-        "down": {"uv": [4, 4, 12, 12], "texture": "#core"}
+        "north": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        },
+        "east": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        },
+        "west": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        },
+        "up": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        },
+        "down": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#core"
+        }
+      }
+    },
+    {
+      "name": "collar_ferreo_base",
+      "from": [
+        7,
+        2,
+        7
+      ],
+      "to": [
+        9,
+        2.45,
+        9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        }
+      }
+    },
+    {
+      "name": "collar_ferreo_medio",
+      "from": [
+        7,
+        8,
+        7
+      ],
+      "to": [
+        9,
+        8.35,
+        9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        }
+      }
+    },
+    {
+      "name": "collar_ferreo_cuello",
+      "from": [
+        6.8,
+        12.7,
+        6.8
+      ],
+      "to": [
+        9.2,
+        13.05,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        }
+      }
+    },
+    {
+      "name": "runa_frontal_mango",
+      "from": [
+        7.72,
+        3,
+        7.28
+      ],
+      "to": [
+        8.28,
+        5.2,
+        7.38
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
+      }
+    },
+    {
+      "name": "runa_trasera_mango",
+      "from": [
+        7.72,
+        3,
+        8.62
+      ],
+      "to": [
+        8.28,
+        5.2,
+        8.72
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
+      }
+    },
+    {
+      "name": "incrustacion_lateral_izquierda",
+      "from": [
+        7.28,
+        6.4,
+        7.72
+      ],
+      "to": [
+        7.38,
+        8,
+        8.28
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        }
+      }
+    },
+    {
+      "name": "incrustacion_lateral_derecha",
+      "from": [
+        8.62,
+        6.4,
+        7.72
+      ],
+      "to": [
+        8.72,
+        8,
+        8.28
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua_dark"
+        }
+      }
+    },
+    {
+      "name": "filo_copa_frontal",
+      "from": [
+        6.55,
+        14.1,
+        6.55
+      ],
+      "to": [
+        9.45,
+        14.35,
+        6.8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        }
+      }
+    },
+    {
+      "name": "filo_copa_trasero",
+      "from": [
+        6.55,
+        14.1,
+        9.2
+      ],
+      "to": [
+        9.45,
+        14.35,
+        9.45
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#silver"
+        }
+      }
+    },
+    {
+      "name": "gota_agua_izquierda",
+      "from": [
+        5.7,
+        17.2,
+        7.35
+      ],
+      "to": [
+        6.45,
+        18.4,
+        8
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
+      }
+    },
+    {
+      "name": "gota_agua_derecha",
+      "from": [
+        9.55,
+        17.2,
+        8
+      ],
+      "to": [
+        10.3,
+        18.4,
+        8.65
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
+      }
+    },
+    {
+      "name": "gota_agua_superior",
+      "from": [
+        7.55,
+        21,
+        6.95
+      ],
+      "to": [
+        8.45,
+        22.1,
+        7.85
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
+      }
+    },
+    {
+      "name": "nucleo_runa_central",
+      "from": [
+        7.65,
+        15.8,
+        6.55
+      ],
+      "to": [
+        8.35,
+        18.8,
+        6.7
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#aqua"
+        }
       }
     }
   ],
   "display": {
     "thirdperson_righthand": {
-      "rotation": [0, 0, 0],
-      "translation": [0, 3.5, 1.25],
-      "scale": [0.85, 0.85, 0.85]
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3.5,
+        1.25
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
     },
     "thirdperson_lefthand": {
-      "rotation": [0, 0, 0],
-      "translation": [0, 3.5, 1.25],
-      "scale": [0.85, 0.85, 0.85]
+      "rotation": [
+        0,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3.5,
+        1.25
+      ],
+      "scale": [
+        0.85,
+        0.85,
+        0.85
+      ]
     },
     "firstperson_righthand": {
-      "rotation": [-15, -10, 5],
-      "translation": [1.5, 3.2, 0.5],
-      "scale": [0.75, 0.75, 0.75]
+      "rotation": [
+        -15,
+        -10,
+        5
+      ],
+      "translation": [
+        1.5,
+        3.2,
+        0.5
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
     },
     "firstperson_lefthand": {
-      "rotation": [-15, -10, 5],
-      "translation": [1.5, 3.2, 0.5],
-      "scale": [0.75, 0.75, 0.75]
+      "rotation": [
+        -15,
+        -10,
+        5
+      ],
+      "translation": [
+        1.5,
+        3.2,
+        0.5
+      ],
+      "scale": [
+        0.75,
+        0.75,
+        0.75
+      ]
     },
     "ground": {
-      "rotation": [45, 0, 0],
-      "translation": [0, 3, 0],
-      "scale": [0.55, 0.55, 0.55]
+      "rotation": [
+        45,
+        0,
+        0
+      ],
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
     },
     "gui": {
-      "rotation": [30, 45, -35],
-      "translation": [-1.2, -1.5, 0],
-      "scale": [0.72, 0.72, 0.72]
+      "rotation": [
+        30,
+        45,
+        -35
+      ],
+      "translation": [
+        -1.2,
+        -1.5,
+        0
+      ],
+      "scale": [
+        0.72,
+        0.72,
+        0.72
+      ]
     },
     "head": {
-      "translation": [0, 14, 0]
+      "translation": [
+        0,
+        14,
+        0
+      ]
     },
     "fixed": {
-      "rotation": [0, 0, -45],
-      "translation": [-1.5, -1.5, 0],
-      "scale": [0.8, 0.8, 0.8]
+      "rotation": [
+        0,
+        0,
+        -45
+      ],
+      "translation": [
+        -1.5,
+        -1.5,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
     }
   }
 }

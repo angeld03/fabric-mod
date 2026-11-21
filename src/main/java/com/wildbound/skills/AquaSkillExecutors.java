@@ -58,7 +58,7 @@ public final class AquaSkillExecutors {
     private static void registerWaterBolt() {
         SkillActivationService.registerExecutor("aqua_water_bolt", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 2.5f; }
-            @Override public float getManaCost(SkillDefinition def, PlayerRpgProfile profile) { return 8f; }
+            @Override public float getManaCost(SkillDefinition def, PlayerRpgProfile profile) { return Math.max(5f, 8f - (profile.getSkillProgress(def.id()).rank() - 1) * 0.25f); }
 
             @Override
             public void execute(ServerPlayer player, SkillDefinition def, PlayerRpgProfile profile) {
@@ -70,9 +70,21 @@ public final class AquaSkillExecutors {
 
                 float charge = SkillActivationService.getChargeLevel();
                 float chargeMult = 1.0f + charge;
+                var mastery = profile.getSkillProgress(def.id());
+                int skillRank = mastery.rank();
+                boolean hydrostaticCore = mastery.upgrades().contains("hydrostatic_core");
+                boolean frostbiteCurrent = mastery.upgrades().contains("frostbite_current");
+                boolean tidalPiercer = mastery.upgrades().contains("tidal_piercer");
+                float masteryDamageMultiplier = 1.0f + (skillRank - 1) * 0.025f
+                        + (hydrostaticCore ? 0.10f : 0f);
+                double rangeMasteryMultiplier = tidalPiercer ? 1.18 : 1.0;
 
                 // Each lance: [range, damage, burst size, shaft thickness]
-                double[] lanceRanges  = { 10.0 * chargeMult, 16.0 * chargeMult, 24.0 * chargeMult };
+                double[] lanceRanges  = {
+                        10.0 * chargeMult * rangeMasteryMultiplier,
+                        16.0 * chargeMult * rangeMasteryMultiplier,
+                        24.0 * chargeMult * rangeMasteryMultiplier
+                };
                 int[]    lanceDamage  = { 8, 12, 18 };
                 int[]    lanceBursts  = { 22, 36, 54 };
                 double[] lanceWidth   = { 0.55, 0.8, 1.1 };
@@ -108,9 +120,12 @@ public final class AquaSkillExecutors {
                     final int li = lanceIndex;
                     int startTick = CHARGE_TICKS + lanceIndex * LANCE_CYCLE;
                     double range = lanceRanges[li];
-                    int dmg = (int) (lanceDamage[li] * chargeMult);
+                    int dmg = Math.round(lanceDamage[li] * chargeMult * masteryDamageMultiplier);
                     int burst = lanceBursts[li];
                     double shaft = lanceWidth[li];
+                    // A lance may overlap a target for several consecutive ticks.
+                    // Track UUIDs so one cast cannot deal repeated collision damage.
+                    Set<UUID> hitTargets = new HashSet<>();
 
                     // 1) FORM: the lance builds at the wand tip, segment by segment.
                     SkillScheduler.run(player, startTick, 1, FORM_TICKS, t -> {
@@ -172,9 +187,15 @@ public final class AquaSkillExecutors {
                         // Hit detection travels WITH the projectile (only once per target).
                         AABB hitBox = new AABB(head, head).inflate(shaft + 0.9);
                         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, hitBox,
-                                e -> e != player && e.isAlive())) {
+                                e -> e != player && e.isAlive() && !hitTargets.contains(e.getUUID()))) {
+                            if (!hitTargets.add(target.getUUID())) continue;
                             float d = dmg + profile.level() * 0.5f;
                             SkillActivationService.damageEntity(target, player, d);
+                            if (frostbiteCurrent) {
+                                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0), player);
+                                particle(level, ParticleTypes.SNOWFLAKE,
+                                        target.position().add(0, target.getBbHeight() * 0.65, 0), 8, 0.25, 0.3);
+                            }
                             SkillActivationService.applyKnockback(target, player.position(), 1.8f + li * 0.3f);
                             spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) d);
                         }
@@ -366,7 +387,7 @@ public final class AquaSkillExecutors {
                             double r = 2.4 * (1 - i / 60.0);
                             Vec3 p = center.add(Math.cos(a) * r, Math.sin(a) * r * 0.6, Math.sin(a) * r);
                             particle(level, ParticleTypes.BUBBLE, p, 1, 0.08, 0.05);
-                            particle(level, ParticleTypes.REVERSE_PORTAL, p, 1, 0.05, 0.02);
+                            particle(level, ParticleTypes.BUBBLE, p, 1, 0.05, 0.02);
                         }
                         SkillActivationService.playSound(level, center, SoundEvents.BEACON_DEACTIVATE, 0.8f, 1.3f);
                         SkillActivationService.playSound(level, center, SoundEvents.PLAYER_SPLASH, 0.5f, 1.6f);
@@ -410,7 +431,7 @@ public final class AquaSkillExecutors {
                         Vec3 p = center.add(side.scale(Math.cos(a) * width)).add(0, Math.sin(a) * height, 0);
                         particle(level, ParticleTypes.SPLASH, p, 1, 0.18, 0.15);
                         if (i % 3 == 0) particle(level, ParticleTypes.BUBBLE, p, 1, 0.1, 0.05);
-                        if (i % 5 == 0) particle(level, ParticleTypes.WHITE_ASH, p, 1, 0.2, 0.12);
+                        if (i % 5 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0.2, 0.12);
                     }
 
                     for (int i = 0; i < 12; i++) {
@@ -465,39 +486,54 @@ public final class AquaSkillExecutors {
                 Vec3 start = player.position();
                 double distance = Math.min(12.0, 8.5 + profile.level() * 0.15);
                 Vec3 end = safeDashEnd(level, player, start, look, distance);
+                Vec3 right = side(look);
+                Vec3 vertical = up(look);
 
                 SkillActivationService.playSound(level, start, SoundEvents.TRIDENT_RIPTIDE_1.value(), 1.0f, 1.4f);
                 SkillActivationService.playSound(level, start, SoundEvents.ENDERMAN_TELEPORT, 0.5f, 1.3f);
-
+                // The dash now travels over its animation window; hits occur as the player crosses them.
                 Set<UUID> hit = new HashSet<>();
-                double travelled = start.distanceTo(end);
-                for (double d = 0; d <= travelled; d += 0.6) {
-                    Vec3 point = start.add(look.scale(d)).add(0, 0.9, 0);
-                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
-                            new AABB(point, point).inflate(1.3), e -> e != player && e.isAlive())) {
+                final int steps = 12;
+                SkillScheduler.run(player, 0, 1, steps, step -> {
+                    if (!player.isAlive() || player.isRemoved()) return;
+                    double progress = (step + 1) / (double) steps;
+                    Vec3 pos = start.add(end.subtract(start).scale(progress));
+                    player.teleportTo(pos.x, pos.y, pos.z);
+                    if (step == steps - 1) {
+                        player.resetFallDistance();
+                        player.setDeltaMovement(Vec3.ZERO);
+                    }
+
+                    Vec3 trailCenter = pos.add(0, 0.9, 0);
+                    for (int strand = 0; strand < 3; strand++) {
+                        double angle = step * 0.9 + strand * Math.PI * 2.0 / 3.0;
+                        Vec3 ribbon = trailCenter.add(right.scale(Math.cos(angle) * 0.55))
+                                .add(vertical.scale(Math.sin(angle) * 0.55));
+                        particle(level, ParticleTypes.SPLASH, ribbon, 3, 0.08, 0.05);
+                        particle(level, ParticleTypes.BUBBLE, ribbon, 2, 0.04, 0.03);
+                    }
+                    ring(level, trailCenter, right, vertical, 0.65 + Math.sin(progress * Math.PI) * 0.25,
+                            16, ParticleTypes.BUBBLE, 0.02, 0.03);
+                    if (step % 3 == 0) {
+                        SkillActivationService.playSound(level, pos, SoundEvents.PLAYER_SPLASH, 0.35f, 1.2f + (float) progress * 0.5f);
+                    }
+
+                    AABB impactBox = new AABB(trailCenter, trailCenter).inflate(1.25, 1.2, 1.25);
+                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, impactBox,
+                            entity -> entity != player && entity.isAlive() && !hit.contains(entity.getUUID()))) {
                         if (!hit.add(target.getUUID())) continue;
                         float damage = 8f + profile.level() * 0.4f;
                         SkillActivationService.damageEntity(target, player, damage);
                         SkillActivationService.applyKnockback(target, start, 2.0f);
                         spawnDamageNumber(level, target.position().add(0, 2.2, 0), (int) damage);
+                        impactBurst(level, target.position().add(0, 1.0, 0), right, vertical, 18, 1.0);
+                        triggerScreenShake(level, target.position(), 2, 0.18f);
                     }
-                }
 
-                player.teleportTo(end.x, end.y, end.z);
-                player.resetFallDistance();
-                player.setDeltaMovement(Vec3.ZERO);
-
-                SkillScheduler.run(player, 0, 1, 12, step -> {
-                    if (player.isRemoved()) return;
-                    double progress = step / 11.0;
-                    Vec3 pos = start.add(end.subtract(start).scale(progress)).add(0, 0.9, 0);
-                    double radius = 0.75 * (1.0 - progress * 0.7);
-                    ring(level, pos, side(look), up(look), radius, 12, ParticleTypes.BUBBLE, 0.03, 0.02);
-                    if (step % 3 == 0) {
-                        ring(level, pos, side(look), up(look), radius + 0.25, 8, ParticleTypes.SPLASH, 0.03, 0.02);
-                    }
-                    if (step == 11) {
-                        impactBurst(level, end.add(0, 1.0, 0), side(look), up(look), 36, 1.8);
+                    if (step == steps - 1) {
+                        impactBurst(level, end.add(0, 1.0, 0), right, vertical, 44, 2.0);
+                        ring(level, end.add(0, 0.15, 0), new Vec3(1, 0, 0), new Vec3(0, 0, 1),
+                                2.8, 36, ParticleTypes.SPLASH, 0.08, 0.18);
                         SkillActivationService.playSound(level, end, SoundEvents.PLAYER_SPLASH, 1.0f, 1.6f);
                         SkillActivationService.playSound(level, end, SoundEvents.PLAYER_ATTACK_SWEEP, 0.5f, 1.2f);
                         triggerScreenShake(level, end, 4, 0.3f);
@@ -507,9 +543,6 @@ public final class AquaSkillExecutors {
         });
     }
 
-    // ============================================================
-    // TIER 7 - WHIRLPOOL
-    // ============================================================
     private static void registerWhirlpool() {
         SkillActivationService.registerExecutor("aqua_whirlpool", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 18f; }
@@ -572,7 +605,7 @@ public final class AquaSkillExecutors {
                             Vec3 p = center.add(Math.cos(a) * r, 0.5 + RNG.nextDouble() * 3.0, Math.sin(a) * r);
                             particle(level, ParticleTypes.SPLASH, p, 1, 0.25, 0.35);
                             particle(level, ParticleTypes.BUBBLE, p, 1, 0.15, 0.2);
-                            if (i % 5 == 0) particle(level, ParticleTypes.REVERSE_PORTAL, p, 1, 0.05, 0.05);
+                            if (i % 5 == 0) particle(level, ParticleTypes.BUBBLE, p, 1, 0.05, 0.05);
                         }
                         SkillActivationService.playSound(level, center, SoundEvents.GENERIC_SPLASH, 1.5f, 0.5f);
                         SkillActivationService.playSound(level, center, SoundEvents.CONDUIT_DEACTIVATE, 1.0f, 0.6f);
@@ -599,56 +632,70 @@ public final class AquaSkillExecutors {
                 Vec3 up = up(look);
                 Vec3 origin = player.getEyePosition().add(look.scale(1.0));
                 double range = 30.0;
-
-                SkillActivationService.playSound(level, origin, SoundEvents.TRIDENT_THROW.value(), 1.0f, 0.6f);
-                SkillActivationService.playSound(level, origin, SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 0.8f, 1.5f);
-
-                Set<UUID> hit = new HashSet<>();
                 Vec3 end = origin.add(look.scale(range));
-                AABB search = new AABB(origin, end).inflate(2.0);
-                for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, search,
-                        e -> e != player && e.isAlive())) {
-                    Vec3 center = target.position().add(0, target.getBbHeight() * 0.5, 0);
-                    Vec3 toTarget = center.subtract(origin);
-                    double projection = toTarget.dot(look);
-                    if (projection < 0 || projection > range) continue;
-                    double perpendicular = toTarget.subtract(look.scale(projection)).length();
-                    if (perpendicular > 1.6) continue;
-                    if (!hit.add(target.getUUID())) continue;
+                Set<UUID> hit = new HashSet<>();
 
-                    float damage = 24f + profile.level() * 0.9f;
-                    SkillActivationService.damageEntity(target, player, damage);
-                    SkillActivationService.applyKnockback(target, player.position(), 3.5f);
-                    spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) damage);
-                    impactBurst(level, center, side, up, 34, 1.3);
-                    triggerScreenShake(level, target.position(), 3, 0.25f);
-                }
-
-                SkillScheduler.run(player, 0, 1, 10, step -> {
+                // Pressure compresses before firing; the visible beam front and damage share one timeline.
+                SkillActivationService.playSound(level, origin, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, 0.9f, 0.55f);
+                SkillScheduler.run(player, 0, 1, 14, step -> {
                     if (player.isRemoved()) return;
-                    double visible = (step + 1) / 10.0 * range;
-                    for (double d = 0; d <= visible; d += 0.6) {
-                        Vec3 p = origin.add(look.scale(d));
-                        particle(level, ParticleTypes.BUBBLE, p, 1, 0, 0);
-                        if (((int) (d * 10)) % 3 == 0) {
-                            double a = d * 0.9;
-                            Vec3 sheath = p.add(side.scale(Math.cos(a) * 0.35)).add(up.scale(Math.sin(a) * 0.35));
-                            particle(level, ParticleTypes.SPLASH, sheath, 1, 0, 0.02);
+                    if (step < 4) {
+                        double charge = (step + 1) / 4.0;
+                        ring(level, origin, side, up, 0.25 + charge * 0.55, 20,
+                                ParticleTypes.BUBBLE, 0.015, 0.02);
+                        particle(level, ParticleTypes.ELECTRIC_SPARK, origin, 4 + step, 0.08, 0.04);
+                        if (step == 3) {
+                            SkillActivationService.playSound(level, origin, SoundEvents.TRIDENT_THROW.value(), 1.0f, 0.6f);
+                            SkillActivationService.playSound(level, origin, SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 0.8f, 1.5f);
                         }
+                        return;
                     }
-                    if (step == 9) {
-                        impactBurst(level, origin.add(look.scale(range)), side, up, 26, 1.5);
-                        SkillActivationService.playSound(level, origin, SoundEvents.GENERIC_SPLASH, 1.2f, 0.6f);
-                        triggerScreenShake(level, origin.add(look.scale(range * 0.5)), 4, 0.3f);
+
+                    double progress = (step - 3) / 10.0;
+                    double visible = progress * range;
+                    double previous = Math.max(0.0, visible - range / 10.0);
+                    Vec3 head = origin.add(look.scale(visible));
+                    for (double d = 0; d <= visible; d += 0.45) {
+                        Vec3 p = origin.add(look.scale(d));
+                        double taper = 0.22 + 0.55 * (d / Math.max(1.0, visible));
+                        double angle = d * 1.1 + step * 0.8;
+                        Vec3 sheath = p.add(side.scale(Math.cos(angle) * taper))
+                                .add(up.scale(Math.sin(angle) * taper));
+                        particle(level, ParticleTypes.SPLASH, sheath, 2, 0.025, 0.04);
+                        if (((int) (d * 10)) % 4 == 0) particle(level, ParticleTypes.BUBBLE, p, 1, 0.01, 0.02);
+                    }
+                    ring(level, head, side, up, 0.7, 20, ParticleTypes.BUBBLE, 0.025, 0.04);
+                    particle(level, ParticleTypes.ELECTRIC_SPARK, head, 8, 0.08, 0.05);
+
+                    AABB search = new AABB(origin, head).inflate(2.0);
+                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, search,
+                            entity -> entity != player && entity.isAlive() && !hit.contains(entity.getUUID()))) {
+                        Vec3 center = target.position().add(0, target.getBbHeight() * 0.5, 0);
+                        Vec3 offset = center.subtract(origin);
+                        double projection = offset.dot(look);
+                        if (projection <= previous || projection > visible) continue;
+                        if (offset.subtract(look.scale(projection)).length() > 1.6) continue;
+                        if (!hit.add(target.getUUID())) continue;
+                        float damage = 24f + profile.level() * 0.9f;
+                        SkillActivationService.damageEntity(target, player, damage);
+                        SkillActivationService.applyKnockback(target, player.position(), 3.5f);
+                        spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) damage);
+                        impactBurst(level, center, side, up, 34, 1.3);
+                        SkillActivationService.playSound(level, center, SoundEvents.GENERIC_SPLASH, 0.8f, 0.8f);
+                        triggerScreenShake(level, target.position(), 3, 0.25f);
+                    }
+
+                    if (step == 13) {
+                        impactBurst(level, end, side, up, 42, 1.8);
+                        ring(level, end, side, up, 2.2, 32, ParticleTypes.SPLASH, 0.08, 0.16);
+                        SkillActivationService.playSound(level, end, SoundEvents.GENERIC_SPLASH, 1.2f, 0.6f);
+                        triggerScreenShake(level, end, 4, 0.3f);
                     }
                 });
             }
         });
     }
 
-    // ============================================================
-    // TIER 9 - TSUNAMI
-    // ============================================================
     private static void registerTsunami() {
         SkillActivationService.registerExecutor("aqua_tsunami", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 30f; }
@@ -683,7 +730,7 @@ public final class AquaSkillExecutors {
                             Vec3 p = center.add(Math.cos(a) * r, y, Math.sin(a) * r);
                             particle(level, ParticleTypes.SPLASH, p, 1, 0.22, 0.22);
                             if (i % 3 == 0) particle(level, ParticleTypes.BUBBLE, p, 1, 0.1, 0.1);
-                            if (i % 6 == 0) particle(level, ParticleTypes.WHITE_ASH, p, 1, 0.22, 0.18);
+                            if (i % 6 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0.22, 0.18);
                         }
                     }
 
@@ -714,7 +761,7 @@ public final class AquaSkillExecutors {
                             Vec3 p = center.add(Math.cos(a) * r, 0.5 + RNG.nextDouble() * 5.0, Math.sin(a) * r);
                             particle(level, ParticleTypes.SPLASH, p, 1, 0.3, 0.45);
                             particle(level, ParticleTypes.BUBBLE, p, 1, 0.2, 0.3);
-                            if (i % 4 == 0) particle(level, ParticleTypes.WHITE_ASH, p, 1, 0.3, 0.25);
+                            if (i % 4 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0.3, 0.25);
                         }
                         SkillActivationService.playSound(level, center, SoundEvents.GENERIC_SPLASH, 2.0f, 0.4f);
                         SkillActivationService.playSound(level, center, SoundEvents.CONDUIT_DEACTIVATE, 1.2f, 0.5f);
@@ -778,7 +825,27 @@ public final class AquaSkillExecutors {
                         if (i % 3 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0.03, 0.02);
                     }
                     particle(level, ParticleTypes.ELECTRIC_SPARK, head, 6, 0.5, 0.25);
-                    particle(level, ParticleTypes.SOUL_FIRE_FLAME, head, 3, 0.2, 0);
+                    particle(level, ParticleTypes.ELECTRIC_SPARK, head, 3, 0.2, 0);
+
+                    // Distinct leviathan head silhouette: armored brow, snout, jaw and paired eyes.
+                    ring(level, head, side, up, 0.9, 18, ParticleTypes.BUBBLE, 0.025, 0.03);
+                    Vec3 snout = head.add(look.scale(0.72));
+                    ring(level, snout, side, up, 0.42, 12, ParticleTypes.SPLASH, 0.02, 0.03);
+                    Vec3 jaw = head.subtract(look.scale(0.08)).subtract(up.scale(0.34));
+                    for (int jawPoint = 0; jawPoint < 5; jawPoint++) {
+                        Vec3 tooth = jaw.add(side.scale((jawPoint - 2) * 0.17));
+                        particle(level, ParticleTypes.BUBBLE, tooth, 1, 0.01, 0.01);
+                    }
+                    for (int eyeSide : new int[]{-1, 1}) {
+                        Vec3 eye = head.add(side.scale(eyeSide * 0.48)).add(up.scale(0.22));
+                        particle(level, ParticleTypes.ELECTRIC_SPARK, eye, 2, 0.015, 0.01);
+                    }
+                    for (int crest = 0; crest < 3; crest++) {
+                        Vec3 fin = head.subtract(look.scale(crest * 0.28))
+                                .add(up.scale(0.72 - crest * 0.12))
+                                .add(side.scale(Math.sin(step * 0.25 + crest) * 0.12));
+                        particle(level, ParticleTypes.SPLASH, fin, 3, 0.04, 0.03);
+                    }
 
                     for (int segment = 1; segment <= 7; segment++) {
                         double back = step - segment * 1.4;
@@ -820,9 +887,9 @@ public final class AquaSkillExecutors {
                         }
                         for (int i = 0; i < 60; i++) {
                             Vec3 p = end.add(RNG.nextGaussian() * 5, RNG.nextDouble() * 6, RNG.nextGaussian() * 5);
-                            particle(level, ParticleTypes.WHITE_ASH, p, 1, 0.5, 0.35);
-                            if (i % 6 == 0) particle(level, ParticleTypes.EXPLOSION, p, 1, 0, 0);
-                            if (i % 4 == 0) particle(level, ParticleTypes.LARGE_SMOKE, p, 1, 0.4, 0.2);
+                            particle(level, ParticleTypes.SPLASH, p, 1, 0.5, 0.35);
+                            if (i % 6 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0, 0);
+                            if (i % 4 == 0) particle(level, ParticleTypes.SPLASH, p, 1, 0.4, 0.2);
                         }
                         for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
                                 new AABB(end.x - 9, end.y - 5, end.z - 9,
@@ -849,8 +916,7 @@ public final class AquaSkillExecutors {
     // ============================================================
 
     private static Vec3 look(ServerPlayer player) {
-        Vec3 look = player.getLookAngle();
-        return look.lengthSqr() < 1.0E-6 ? new Vec3(0, 0, 1) : look.normalize();
+        return SkillAimContext.direction(player);
     }
 
     private static Vec3 side(Vec3 look) {
@@ -877,6 +943,119 @@ public final class AquaSkillExecutors {
         }
     }
 
+    /**
+     * Particle-mesh primitives. Each sample is a vertex of a deliberately dense
+     * 3D surface; animated samples are rebuilt each server tick to create moving
+     * silhouettes without spawning persistent entities or client-only render state.
+     */
+    private static void tubeMesh(ServerLevel level, Vec3 start, Vec3 end, double radius,
+                                 int rings, int sides, SimpleParticleType type) {
+        Vec3 axis = end.subtract(start);
+        double length = axis.length();
+        if (length < 1.0E-4) return;
+        Vec3 forward = axis.scale(1.0 / length);
+        Vec3 u = side(forward);
+        Vec3 v = up(forward);
+        for (int ringIndex = 0; ringIndex <= rings; ringIndex++) {
+            double t = ringIndex / (double) rings;
+            double taper = 0.22 + 0.78 * Math.sin(Math.PI * t * 0.5);
+            Vec3 center = start.add(axis.scale(t));
+            for (int sideIndex = 0; sideIndex < sides; sideIndex++) {
+                double angle = sideIndex * Math.PI * 2.0 / sides + t * 2.2;
+                Vec3 vertex = center.add(u.scale(Math.cos(angle) * radius * taper))
+                        .add(v.scale(Math.sin(angle) * radius * taper));
+                particle(level, type, vertex, 1, 0.006, 0.004);
+            }
+        }
+    }
+
+    private static void ellipsoidMesh(ServerLevel level, Vec3 center, double rx, double ry, double rz,
+                                      int points, SimpleParticleType type) {
+        double golden = Math.PI * (3.0 - Math.sqrt(5.0));
+        for (int i = 0; i < points; i++) {
+            double y = 1.0 - 2.0 * (i + 0.5) / points;
+            double radius = Math.sqrt(Math.max(0.0, 1.0 - y * y));
+            double angle = i * golden;
+            Vec3 vertex = center.add(Math.cos(angle) * radius * rx, y * ry,
+                    Math.sin(angle) * radius * rz);
+            particle(level, type, vertex, 1, 0.004, 0.003);
+        }
+    }
+
+    private static void ribbonMesh(ServerLevel level, Vec3 start, Vec3 end, Vec3 side, Vec3 up,
+                                   double halfWidth, int lengthSegments, int widthSegments,
+                                   SimpleParticleType type) {
+        Vec3 axis = end.subtract(start);
+        for (int i = 0; i <= lengthSegments; i++) {
+            double t = i / (double) lengthSegments;
+            Vec3 center = start.add(axis.scale(t));
+            double wave = Math.sin(t * Math.PI * 3.0) * halfWidth * 0.22;
+            for (int j = 0; j <= widthSegments; j++) {
+                double across = (j / (double) widthSegments) * 2.0 - 1.0;
+                Vec3 vertex = center.add(side.scale(across * halfWidth))
+                        .add(up.scale(wave * (1.0 - Math.abs(across))));
+                particle(level, type, vertex, 1, 0.004, 0.003);
+            }
+        }
+    }
+
+    private static void spiralMesh(ServerLevel level, Vec3 center, double radius, double height,
+                                   int strands, double phase, int segments, SimpleParticleType type) {
+        for (int strand = 0; strand < strands; strand++) {
+            for (int i = 0; i <= segments; i++) {
+                double t = i / (double) segments;
+                double angle = phase + t * Math.PI * 4.0 + strand * Math.PI * 2.0 / strands;
+                double r = radius * (0.38 + t * 0.62);
+                Vec3 vertex = center.add(Math.cos(angle) * r, t * height, Math.sin(angle) * r);
+                particle(level, type, vertex, 1, 0.004, 0.002);
+            }
+        }
+    }
+
+    private static void funnelMesh(ServerLevel level, Vec3 center, double radius, double height,
+                                   double phase, int levels, int points, SimpleParticleType type) {
+        for (int layer = 0; layer < levels; layer++) {
+            double t = layer / (double) Math.max(1, levels - 1);
+            double r = radius * (1.0 - t * 0.88);
+            double y = t * height;
+            for (int i = 0; i < points; i++) {
+                double angle = i * Math.PI * 2.0 / points + phase + t * 3.0;
+                Vec3 vertex = center.add(Math.cos(angle) * r, y, Math.sin(angle) * r);
+                particle(level, type, vertex, 1, 0.003, 0.002);
+            }
+        }
+    }
+
+    private static void waveMesh(ServerLevel level, Vec3 center, Vec3 side, Vec3 up,
+                                 double width, double height, double phase,
+                                 int acrossSegments, int heightSegments, SimpleParticleType type) {
+        for (int x = 0; x <= acrossSegments; x++) {
+            double across = x / (double) acrossSegments * 2.0 - 1.0;
+            double crest = Math.max(0.0, 1.0 - across * across);
+            for (int y = 0; y <= heightSegments; y++) {
+                double vertical = y / (double) heightSegments;
+                double curl = Math.sin(vertical * Math.PI * 1.25 + phase + across * 2.0);
+                Vec3 vertex = center.add(side.scale(across * width))
+                        .add(up.scale(crest * height * vertical + curl * 0.18));
+                particle(level, type, vertex, 1, 0.005, 0.003);
+            }
+        }
+    }
+
+    private static void torusMesh(ServerLevel level, Vec3 center, double majorRadius, double minorRadius,
+                                  int majorSegments, int minorSegments, SimpleParticleType type) {
+        for (int i = 0; i < majorSegments; i++) {
+            double a = i * Math.PI * 2.0 / majorSegments;
+            for (int j = 0; j < minorSegments; j++) {
+                double b = j * Math.PI * 2.0 / minorSegments;
+                double r = majorRadius + Math.cos(b) * minorRadius;
+                Vec3 vertex = center.add(Math.cos(a) * r, Math.sin(b) * minorRadius,
+                        Math.sin(a) * r);
+                particle(level, type, vertex, 1, 0.003, 0.002);
+            }
+        }
+    }
+
     private static void sphere(ServerLevel level, Vec3 center, double radius, int points,
                                SimpleParticleType type, double speed) {
         for (int i = 0; i < points; i++) {
@@ -898,9 +1077,9 @@ public final class AquaSkillExecutors {
             Vec3 pos = center.add(u.scale(Math.cos(angle) * r)).add(v.scale(Math.sin(angle) * r));
             particle(level, ParticleTypes.SPLASH, pos, 1, 0.12, 0.35);
             particle(level, ParticleTypes.BUBBLE, pos, 1, 0.08, 0.2);
-            if (i % 5 == 0) particle(level, ParticleTypes.SOUL_FIRE_FLAME, pos, 1, 0, 0);
+            if (i % 5 == 0) particle(level, ParticleTypes.ELECTRIC_SPARK, pos, 1, 0, 0);
         }
-        particle(level, ParticleTypes.WHITE_ASH, center, Math.max(6, points / 3), 0.45, 0.15);
+        particle(level, ParticleTypes.SPLASH, center, Math.max(6, points / 3), 0.45, 0.15);
     }
 
     private static LivingEntity firstTarget(ServerLevel level, ServerPlayer player, Vec3 pos, double radius) {

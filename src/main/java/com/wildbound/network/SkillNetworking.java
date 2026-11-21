@@ -2,13 +2,17 @@ package com.wildbound.network;
 
 import com.wildbound.network.SkillCameraAimPayload;
 import com.wildbound.network.SkillChargePayload;
+import com.wildbound.attributes.AttributeService;
+import com.wildbound.attributes.RpgAttribute;
 import com.wildbound.skills.SkillActivationService;
+import com.wildbound.skills.SkillAimContext;
 import com.wildbound.skills.SkillProgressionService;
 import com.wildbound.skills.SkillRadialService;
 import com.wildbound.skills.SkillUnlockResult;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Registers the skill menu packets. Unlocks and activations stay
@@ -28,7 +32,9 @@ public final class SkillNetworking {
         PayloadTypeRegistry.clientboundPlay().register(RadialSkillsResultPayload.TYPE, RadialSkillsResultPayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraShakePayload.TYPE, SkillCameraShakePayload.CODEC);
         PayloadTypeRegistry.clientboundPlay().register(SkillCameraAimPayload.TYPE, SkillCameraAimPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(AquaSkillFxPayload.TYPE, AquaSkillFxPayload.CODEC);
         PayloadTypeRegistry.serverboundPlay().register(SkillChargePayload.TYPE, SkillChargePayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(AttributeUpgradePayload.TYPE, AttributeUpgradePayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(UnlockSkillPayload.TYPE, (payload, context) -> {
             ServerPlayer player = context.player();
@@ -46,11 +52,15 @@ public final class SkillNetworking {
             ServerPlayer player = context.player();
             context.server().execute(() -> {
                 if (player.hasDisconnected()) return;
-                var result = SkillActivationService.activate(player, payload.skillId());
-                if (ServerPlayNetworking.canSend(player, SkillActivateResultPayload.TYPE)) {
-                    ServerPlayNetworking.send(player, new SkillActivateResultPayload(
-                            payload.skillId(), result.success(), result.reason(), result.cooldownRemaining()));
-                }
+                SkillAimContext.withAim(player,
+                        new Vec3(payload.aimX(), payload.aimY(), payload.aimZ()), () -> {
+                            var result = SkillActivationService.activate(player, payload.skillId());
+                            if (ServerPlayNetworking.canSend(player, SkillActivateResultPayload.TYPE)) {
+                                ServerPlayNetworking.send(player, new SkillActivateResultPayload(
+                                        payload.skillId(), result.success(), result.reason(), result.cooldownRemaining()));
+                            }
+                            return null;
+                        });
             });
         });
 
@@ -85,8 +95,28 @@ public final class SkillNetworking {
             ServerPlayer player = context.player();
             context.server().execute(() -> {
                 if (player.hasDisconnected()) return;
-                SkillActivationService.activateWithCharge(player, payload.skillId(), payload.chargeLevel());
+                SkillAimContext.withAim(player,
+                        new Vec3(payload.aimX(), payload.aimY(), payload.aimZ()), () -> {
+                            SkillActivationService.activateWithCharge(player, payload.skillId(), payload.chargeLevel());
+                            return null;
+                        });
             });
         });
+        ServerPlayNetworking.registerGlobalReceiver(AttributeUpgradePayload.TYPE, (payload, context) -> {
+            ServerPlayer player = context.player();
+            context.server().execute(() -> {
+                if (player.hasDisconnected()) return;
+                try {
+                    RpgAttribute attribute = RpgAttribute.valueOf(payload.attribute().toUpperCase(java.util.Locale.ROOT));
+                    boolean success = AttributeService.increaseAttribute(player, attribute, 1);
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal(success
+                            ? "§aAtributo mejorado: " + attribute.name()
+                            : "§cNo se pudo mejorar el atributo (puntos insuficientes o límite alcanzado)."));
+                } catch (IllegalArgumentException exception) {
+                    player.sendSystemMessage(net.minecraft.network.chat.Component.literal("§cAtributo desconocido."));
+                }
+            });
+        });
+
     }
 }

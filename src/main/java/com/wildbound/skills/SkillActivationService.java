@@ -67,7 +67,7 @@ public final class SkillActivationService {
         long now = player.level().getGameTime();
         Map<String, Long> playerCooldowns = COOLDOWNS.computeIfAbsent(player.getUUID(), k -> new HashMap<>());
         Long lastUse = playerCooldowns.get(skillId);
-        float cooldown = executor.getCooldown(definition, profile);
+        float cooldown = SkillMasteryRules.cooldown(executor.getCooldown(definition, profile), profile.getSkillProgress(skillId).rank());
         if (lastUse != null) {
             long elapsedTicks = now - lastUse;
             float elapsedSeconds = elapsedTicks / 20f;
@@ -77,7 +77,7 @@ public final class SkillActivationService {
         }
 
         // Check resource costs
-        float manaCost = executor.getManaCost(definition, profile);
+        float manaCost = SkillMasteryRules.manaCost(executor.getManaCost(definition, profile), profile.getSkillProgress(skillId).rank(), "aqua_water_bolt".equals(skillId));
         float staminaCost = executor.getStaminaCost(definition, profile);
         if (manaCost > 0 && !ResourceService.canAfford(player, ResourceType.MANA, manaCost)) {
             return ActivationResult.fail("not_enough_mana", 0f);
@@ -99,6 +99,37 @@ public final class SkillActivationService {
             if (staminaCost > 0) ResourceService.restore(player, ResourceType.STAMINA, staminaCost);
             Wildbound.LOGGER.error("Skill executor failed for {}", skillId, exception);
             return ActivationResult.fail("execution_failed", 0f);
+        }
+
+        // Broadcast one compact cosmetic event after the authoritative executor succeeds.
+        // The client builds the water geometry locally; no mesh vertices cross the network.
+        AquaSkillFxService.start(player, skillId);
+
+        // Only a completed server-side execution grants mastery experience.
+        // Cooldown, resource and executor failures return before this point.
+        // Higher-tier abilities grant more mastery XP, while a fully charged
+        // cast earns a modest bonus. This rewards meaningful progression
+        // without making low-tier casts the fastest mastery farm.
+        long masteryXp = SkillMasteryRules.experienceAward(definition.requiredLevel(), getChargeLevel());
+        SkillProgressionService.SkillProgressResult masteryResult =
+                SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
+        if (masteryResult.changed() && masteryResult.rank() > masteryResult.previousRank()) {
+            player.displayClientMessage(Component.translatable(
+                    "wildbound.skill.mastery_rank_up", definition.name(), masteryResult.rank()), true);
+            if ("aqua_water_bolt".equals(skillId)) {
+                if (masteryResult.previousRank() < 3 && masteryResult.rank() >= 3) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.hydrostatic_core")));
+                }
+                if (masteryResult.previousRank() < 6 && masteryResult.rank() >= 6) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.frostbite_current")));
+                }
+                if (masteryResult.previousRank() < 9 && masteryResult.rank() >= 9) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.tidal_piercer")));
+                }
+            }
         }
 
         // Update cooldown
@@ -143,7 +174,7 @@ public final class SkillActivationService {
         PlayerRpgProfile profile = PlayerRpgProvider.getOrCreate(player);
         SkillDefinition definition = SkillRegistry.get(skillId).orElse(null);
         if (definition == null) return 0f;
-        float cooldown = executor.getCooldown(definition, profile);
+        float cooldown = getMasteryCooldown(executor.getCooldown(definition, profile), profile, skillId);
         long elapsedTicks = player.level().getGameTime() - lastUse;
         float remaining = cooldown - (elapsedTicks / 20f);
         return Math.max(0f, remaining);
@@ -194,7 +225,7 @@ public final class SkillActivationService {
         // Entity#getLookAngle is the authoritative view direction. Recomputing
         // it by hand is easy to get wrong (a swapped X/Z axis makes every
         // projectile fly 90 degrees away from the crosshair).
-        return player.getLookAngle();
+        return SkillAimContext.direction(player);
     }
 
     protected static Optional<LivingEntity> getTargetEntity(ServerPlayer player, double range) {

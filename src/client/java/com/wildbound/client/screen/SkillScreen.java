@@ -3,6 +3,7 @@ package com.wildbound.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.wildbound.Wildbound;
 import com.wildbound.client.RadialSkillState;
+import com.wildbound.client.screen.CharacterScreen;
 import com.wildbound.client.WildboundClient;
 import com.wildbound.network.RadialSkillsResultPayload;
 import com.wildbound.network.SkillUnlockResultPayload;
@@ -262,7 +263,7 @@ public final class SkillScreen extends Screen {
         g.text(font, level, x + 13, pillY + 4, GOLD_LIGHT, false);
 
         // Available points on the right; pulses while there is something to spend.
-        String points = tr("wildbound.skills.points", profile.skillPoints());
+        String points = tr("wildbound.skills.points", profile.skillPoints()) + "  ·  " + tr("wildbound.skills.attribute_points_short", profile.attributePoints());
         int pointsW = font.width(points) + 12;
         int pointsX = x + width - 13 - (headerH > 34 ? 14 : 11) - pointsW;
         boolean hasPoints = profile.skillPoints() > 0;
@@ -733,10 +734,31 @@ public final class SkillScreen extends Screen {
                         w - margin * 2 - 14, DIM);
             }
 
-            String stateText = state == UNLOCKED ? tr("wildbound.skills.state_unlocked")
-                    : state == READY ? tr("wildbound.skills.state_ready")
-                    : tr("wildbound.skills.state_locked");
-            g.text(font, stateText, w - margin - 7 - font.width(stateText), detailY, color, true);
+            String stateText;
+            if (state == UNLOCKED) {
+                var mastery = profile.getSkillProgress(focused.id());
+                String xp = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
+                        ? tr("wildbound.skills.mastery_max")
+                        : tr("wildbound.skills.mastery_xp", mastery.experience(), mastery.experienceRequired());
+                stateText = tr("wildbound.skills.mastery_rank", mastery.rank()) + "  " + xp
+                        + "  ·  " + tr("wildbound.skills.mastery_percent", Math.round(mastery.mastery()))
+                        + "  ·  " + tr("wildbound.skills.upgrade_count", mastery.upgrades().size())
+                        + "  ·  " + tr("wildbound.mastery.open_hint");
+                if (!compact) {
+                    int barX = x;
+                    int barY = detailY + 26;
+                    int barW = Math.max(30, w - margin * 2 - 16);
+                    float rankProgress = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
+                            ? 1f : (float) mastery.experience() / Math.max(1L, mastery.experienceRequired());
+                    drawBar(g, barX, barY, barW, 5, rankProgress,
+                            0xFFB7F7FF, 0xFF39B9D6, 0xFF12617D, skillPanelTime);
+                }
+            } else {
+                stateText = state == READY ? tr("wildbound.skills.state_ready")
+                        : tr("wildbound.skills.state_locked");
+            }
+            String fittedState = fit(stateText, w - margin * 2 - 18);
+            g.text(font, fittedState, w - margin - 7 - font.width(fittedState), detailY, color, true);
         } else {
             String hint = tr("wildbound.skills.hint");
             g.text(font, fit(hint, w - margin * 2 - 16), x, detailY, MUTED, false);
@@ -994,6 +1016,22 @@ public final class SkillScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
+        if (WildboundClient.OPEN_CHARACTER.matches(event)) {
+            Minecraft.getInstance().setScreenAndShow(new CharacterScreen());
+            return true;
+        }
+        if (event.key() == InputConstants.KEY_M) {
+            SkillElement selected = SkillCatalog.all().isEmpty() ? null
+                    : SkillCatalog.all().get(selectedElement);
+            SkillDefinition focused = focusedSkillDefinition(selected);
+            PlayerRpgProfile current = profile();
+            if (focused != null && current.hasSkill(focused.id())) {
+                Minecraft.getInstance().setScreenAndShow(new SkillMasteryScreen(focused.id()));
+            } else {
+                showToast(tr("wildbound.mastery.select_unlocked"), 0xFFFF9AA6);
+            }
+            return true;
+        }
         if (WildboundClient.OPEN_SKILLS.matches(event) || event.key() == InputConstants.KEY_ESCAPE) {
             while (WildboundClient.OPEN_SKILLS.consumeClick()) {
             }

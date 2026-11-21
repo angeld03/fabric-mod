@@ -45,6 +45,13 @@ public final class SkillChargeState {
         return skillId;
     }
 
+    /** Smooth 0..1 charge fraction for client-side visual feedback. */
+    public static float chargeProgress() {
+        if (!charging) return 0f;
+        return Math.max(0f, Math.min(1f, (System.currentTimeMillis() - startTime)
+                / (float) fullChargeMillis()));
+    }
+
     /** Call on disconnect / screen open to abort any in-progress charge. */
     public static void reset() {
         charging = false;
