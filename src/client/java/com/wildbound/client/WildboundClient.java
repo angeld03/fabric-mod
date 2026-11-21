@@ -2,6 +2,7 @@ package com.wildbound.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.wildbound.client.hud.RpgHud;
+import com.wildbound.client.screen.CharacterScreen;
 import com.wildbound.client.screen.SkillRadialMenu;
 import com.wildbound.client.screen.SkillScreen;
 import com.wildbound.network.ActivateSkillPayload;
@@ -25,6 +26,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 
 public class WildboundClient implements ClientModInitializer {
+    public static final KeyMapping OPEN_CHARACTER = new KeyMapping(
+            "key.wildbound.character", InputConstants.KEY_J, KeyMapping.Category.MISC);
     public static final KeyMapping OPEN_SKILLS = new KeyMapping(
             "key.wildbound.skills", InputConstants.KEY_H, KeyMapping.Category.MISC);
     public static final KeyMapping OPEN_RADIAL = new KeyMapping(
@@ -46,10 +49,18 @@ public class WildboundClient implements ClientModInitializer {
     public void onInitializeClient() {
         RpgHud.register();
 
+        KeyMappingHelper.registerKeyMapping(OPEN_CHARACTER);
         KeyMappingHelper.registerKeyMapping(OPEN_SKILLS);
         KeyMappingHelper.registerKeyMapping(OPEN_RADIAL);
         KeyMappingHelper.registerKeyMapping(USE_SELECTED_SKILL);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (OPEN_CHARACTER.consumeClick()) {
+                if (client.gui.screen() instanceof CharacterScreen screen) {
+                    screen.onClose();
+                } else if (client.gui.screen() == null && client.player != null) {
+                    client.setScreenAndShow(new CharacterScreen());
+                }
+            }
             while (OPEN_SKILLS.consumeClick()) {
                 if (client.gui.screen() instanceof SkillScreen screen) {
                     screen.onClose();
