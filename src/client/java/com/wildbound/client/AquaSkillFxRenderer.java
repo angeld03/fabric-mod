@@ -89,6 +89,7 @@ public final class AquaSkillFxRenderer {
 
         Vec3 camera = context.levelState().cameraRenderState.pos;
         long now = mc.level.getGameTime();
+        float partialTick = mc.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         int visibleEffects = 0;
         for (Effect effect : EFFECTS.values()) {
             if (renderAnchor(mc, effect).distanceToSqr(camera) <= MAX_DISTANCE_SQR) visibleEffects++;
@@ -100,7 +101,7 @@ public final class AquaSkillFxRenderer {
             double distanceSqr = anchor.distanceToSqr(camera);
             if (distanceSqr > MAX_DISTANCE_SQR) continue;
 
-            float age = (float) (now - effect.startTick) + 0.5f;
+            float age = (float) (now - effect.startTick) + partialTick;
             float progress = clamp(age / effect.duration, 0f, 1f);
             float fadeIn = smooth(clamp(age / 4.5f, 0f, 1f));
             float fadeOut = effect.stopping
