@@ -120,6 +120,18 @@ public final class SkillCatalog {
     }
 
     private static void add(String id, String name, String alias, int primary, int secondary, String... skillNames) {
+        String[] descriptions = id.equals("aqua") ? new String[] {
+                "Concentra agua en tres lanzas sucesivas que atraviesan el campo y estallan al alcanzar su alcance.",
+                "Invoca una corriente restauradora que cura al lanzador y a sus aliados cercanos durante varios pulsos.",
+                "Extiende un látigo líquido en un arco frontal que golpea a los enemigos alcanzados.",
+                "Crea una esfera de burbujas protectoras que concede absorción y resistencia durante 8 segundos.",
+                "Desata una ola frontal que avanza, ensancha su cresta y derriba a los enemigos a su paso.",
+                "Se transforma en una corriente veloz que atraviesa el espacio, daña a los enemigos en la trayectoria y culmina en una explosión de agua.",
+                "Abre un remolino persistente que atrae y erosiona a los enemigos atrapados en su radio.",
+                "Comprime agua a presión y dispara una lanza perforante de largo alcance que impacta a lo largo de su recorrido.",
+                "Expande un anillo de tsunami desde el punto de invocación, golpeando y lanzando por los aires a los enemigos.",
+                "Invoca el espíritu de un leviatán acuático que serpentea hacia delante y culmina en una devastadora ruptura de marea."
+        } : TIER_DESCRIPTIONS;
         List<SkillDefinition> skills = new ArrayList<>(skillNames.length);
         for (int i = 0; i < skillNames.length; i++) {
             String skillName = skillNames[i];
@@ -131,7 +143,7 @@ public final class SkillCatalog {
             SkillDefinition definition = new SkillDefinition(
                     skillId,
                     skillName,
-                    TIER_DESCRIPTIONS[i].formatted(name),
+                    descriptions[i].formatted(name),
                     TIER_LEVELS[i],
                     "",
                     TIER_COSTS[i],
