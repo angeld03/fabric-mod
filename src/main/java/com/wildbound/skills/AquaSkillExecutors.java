@@ -159,6 +159,8 @@ public final class AquaSkillExecutors {
                         double progress = (f + 1) / (double) FLIGHT_TICKS; // 0..1 eased below
                         double eased = progress * progress * (3 - 2 * progress); // smoothstep
                         Vec3 head = origin.add(look.scale(eased * range));
+                        tubeMesh(level, origin, head, shaft * 0.42, 7, 10, ParticleTypes.SPLASH);
+                        tubeMesh(level, origin, head, shaft * 0.20, 5, 8, ParticleTypes.BUBBLE);
 
                         // Dense tapered wake: newest at head, older fades behind.
                         for (int s = 0; s < TRAIL_LEN; s++) {
@@ -255,6 +257,8 @@ public final class AquaSkillExecutors {
                     if (!player.isAlive() || player.isRemoved()) return;
                     Vec3 base = player.position();
                     double t = step * 0.42;
+                    ellipsoidMesh(level, base.add(0, 1.0, 0), 1.15, 1.85, 1.15, 72, ParticleTypes.BUBBLE);
+                    spiralMesh(level, base.add(0, 0.15, 0), 1.25, 2.5, 2, t, 28, ParticleTypes.ENCHANT);
 
                     for (int column = 0; column < 2; column++) {
                         for (int i = 0; i < 8; i++) {
@@ -332,6 +336,9 @@ public final class AquaSkillExecutors {
                     Vec3 tip = origin.add(look.scale(reach))
                             .add(side.scale(swing))
                             .add(up.scale(Math.cos(progress * Math.PI) * 0.45));
+                    ribbonMesh(level, origin, tip, side, up, 0.12 + Math.sin(progress * Math.PI) * 0.20,
+                            10, 5, ParticleTypes.SPLASH);
+                    tubeMesh(level, origin, tip, 0.07, 8, 6, ParticleTypes.BUBBLE);
 
                     for (int i = 0; i < 4; i++) {
                         Vec3 segment = tip.subtract(look.scale(i * 0.35));
@@ -375,6 +382,8 @@ public final class AquaSkillExecutors {
                     double radius = 1.65 + Math.sin(t) * 0.12;
 
                     sphere(level, center, radius, 30, ParticleTypes.BUBBLE, 0.01);
+                    ellipsoidMesh(level, center, radius, radius * 1.08, radius, 112, ParticleTypes.SPLASH);
+                    spiralMesh(level, center, radius * 0.92, radius * 1.75, 3, t, 22, ParticleTypes.ENCHANT);
                     if (step % 2 == 0) sphere(level, center, radius + 0.35, 18, ParticleTypes.SPLASH, 0.01);
                     if (step % 5 == 0) {
                         ring(level, player.position().add(0, 0.15, 0), new Vec3(1, 0, 0), new Vec3(0, 0, 1),
@@ -425,6 +434,8 @@ public final class AquaSkillExecutors {
                     Vec3 center = origin.add(look.scale(progress * travel));
                     double width = 2.2 + Math.sin(progress * Math.PI) * 2.4;
                     double height = 1.2 + Math.sin(progress * Math.PI) * 1.7;
+                    waveMesh(level, center, side, up(look), width, height, progress * Math.PI * 2,
+                            9, 12, ParticleTypes.SPLASH);
 
                     for (int i = 0; i < 26; i++) {
                         double a = i / 25.0 * Math.PI;
@@ -505,6 +516,8 @@ public final class AquaSkillExecutors {
                     }
 
                     Vec3 trailCenter = pos.add(0, 0.9, 0);
+                    tubeMesh(level, start.add(0, 0.9, 0), trailCenter, 0.72, 6, 10, ParticleTypes.SPLASH);
+                    spiralMesh(level, trailCenter, 0.62, 1.6, 3, step * 0.9, 18, ParticleTypes.BUBBLE);
                     for (int strand = 0; strand < 3; strand++) {
                         double angle = step * 0.9 + strand * Math.PI * 2.0 / 3.0;
                         Vec3 ribbon = trailCenter.add(right.scale(Math.cos(angle) * 0.55))
@@ -561,6 +574,8 @@ public final class AquaSkillExecutors {
                 SkillScheduler.run(player, 0, 4, steps, step -> {
                     if (player.isRemoved()) return;
                     double t = step * 0.24;
+                    spiralMesh(level, center, 5.5, 4.2, 4, t, 44, ParticleTypes.SPLASH);
+                    funnelMesh(level, center, 5.2, 3.8, t, 5, 28, ParticleTypes.BUBBLE);
 
                     for (int arm = 0; arm < 3; arm++) {
                         for (int i = 0; i < 18; i++) {
@@ -655,6 +670,8 @@ public final class AquaSkillExecutors {
                     double visible = progress * range;
                     double previous = Math.max(0.0, visible - range / 10.0);
                     Vec3 head = origin.add(look.scale(visible));
+                    tubeMesh(level, origin, head, 0.30, 9, 10, ParticleTypes.SPLASH);
+                    tubeMesh(level, origin, head, 0.12, 7, 8, ParticleTypes.BUBBLE);
                     for (double d = 0; d <= visible; d += 0.45) {
                         Vec3 p = origin.add(look.scale(d));
                         double taper = 0.22 + 0.55 * (d / Math.max(1.0, visible));
@@ -719,6 +736,9 @@ public final class AquaSkillExecutors {
                     if (player.isRemoved()) return;
                     double radius = 1.0 + step * 0.45;
                     double waveHeight = 1.4 + Math.sin(step / (double) steps * Math.PI) * 2.6;
+                    torusMesh(level, center, radius, waveHeight * 0.34, 96, 7, ParticleTypes.SPLASH);
+                    torusMesh(level, center.add(0, waveHeight * 0.42, 0), radius * 0.78,
+                            waveHeight * 0.18, 72, 5, ParticleTypes.BUBBLE);
 
                     for (int ringIndex = 0; ringIndex < 2; ringIndex++) {
                         double r = radius - ringIndex * 0.9;
@@ -827,6 +847,7 @@ public final class AquaSkillExecutors {
                     particle(level, ParticleTypes.ELECTRIC_SPARK, head, 6, 0.5, 0.25);
                     particle(level, ParticleTypes.ELECTRIC_SPARK, head, 3, 0.2, 0);
 
+                    ellipsoidMesh(level, head, 1.25, 0.92, 1.05, 84, ParticleTypes.SPLASH);
                     // Distinct leviathan head silhouette: armored brow, snout, jaw and paired eyes.
                     ring(level, head, side, up, 0.9, 18, ParticleTypes.BUBBLE, 0.025, 0.03);
                     Vec3 snout = head.add(look.scale(0.72));
@@ -855,6 +876,7 @@ public final class AquaSkillExecutors {
                                 .add(side.scale(Math.sin(back * 0.45) * 1.6))
                                 .add(0, Math.sin(back * 0.3) * 0.8, 0);
                         double radius = 1.35 * (1.0 - segment / 9.0);
+                        ellipsoidMesh(level, body, radius, radius * 0.82, radius, 26, ParticleTypes.SPLASH);
                         ring(level, body, side, up, radius, 10, ParticleTypes.BUBBLE, 0.04, 0.02);
                         if (segment % 2 == 0) {
                             ring(level, body, side, up, radius * 0.65, 8, ParticleTypes.SPLASH, 0, 0.02);
@@ -941,6 +963,119 @@ public final class AquaSkillExecutors {
             double angle = i * Math.PI * 2 / points;
             Vec3 pos = center.add(u.scale(Math.cos(angle) * radius)).add(v.scale(Math.sin(angle) * radius));
             particle(level, type, pos, 1, spread, speed);
+        }
+    }
+
+    /**
+     * Particle-mesh primitives. Each sample is a vertex of a deliberately dense
+     * 3D surface; animated samples are rebuilt each server tick to create moving
+     * silhouettes without spawning persistent entities or client-only render state.
+     */
+    private static void tubeMesh(ServerLevel level, Vec3 start, Vec3 end, double radius,
+                                 int rings, int sides, SimpleParticleType type) {
+        Vec3 axis = end.subtract(start);
+        double length = axis.length();
+        if (length < 1.0E-4) return;
+        Vec3 forward = axis.scale(1.0 / length);
+        Vec3 u = side(forward);
+        Vec3 v = up(forward);
+        for (int ringIndex = 0; ringIndex <= rings; ringIndex++) {
+            double t = ringIndex / (double) rings;
+            double taper = 0.22 + 0.78 * Math.sin(Math.PI * t * 0.5);
+            Vec3 center = start.add(axis.scale(t));
+            for (int sideIndex = 0; sideIndex < sides; sideIndex++) {
+                double angle = sideIndex * Math.PI * 2.0 / sides + t * 2.2;
+                Vec3 vertex = center.add(u.scale(Math.cos(angle) * radius * taper))
+                        .add(v.scale(Math.sin(angle) * radius * taper));
+                particle(level, type, vertex, 1, 0.006, 0.004);
+            }
+        }
+    }
+
+    private static void ellipsoidMesh(ServerLevel level, Vec3 center, double rx, double ry, double rz,
+                                      int points, SimpleParticleType type) {
+        double golden = Math.PI * (3.0 - Math.sqrt(5.0));
+        for (int i = 0; i < points; i++) {
+            double y = 1.0 - 2.0 * (i + 0.5) / points;
+            double radius = Math.sqrt(Math.max(0.0, 1.0 - y * y));
+            double angle = i * golden;
+            Vec3 vertex = center.add(Math.cos(angle) * radius * rx, y * ry,
+                    Math.sin(angle) * radius * rz);
+            particle(level, type, vertex, 1, 0.004, 0.003);
+        }
+    }
+
+    private static void ribbonMesh(ServerLevel level, Vec3 start, Vec3 end, Vec3 side, Vec3 up,
+                                   double halfWidth, int lengthSegments, int widthSegments,
+                                   SimpleParticleType type) {
+        Vec3 axis = end.subtract(start);
+        for (int i = 0; i <= lengthSegments; i++) {
+            double t = i / (double) lengthSegments;
+            Vec3 center = start.add(axis.scale(t));
+            double wave = Math.sin(t * Math.PI * 3.0) * halfWidth * 0.22;
+            for (int j = 0; j <= widthSegments; j++) {
+                double across = (j / (double) widthSegments) * 2.0 - 1.0;
+                Vec3 vertex = center.add(side.scale(across * halfWidth))
+                        .add(up.scale(wave * (1.0 - Math.abs(across))));
+                particle(level, type, vertex, 1, 0.004, 0.003);
+            }
+        }
+    }
+
+    private static void spiralMesh(ServerLevel level, Vec3 center, double radius, double height,
+                                   int strands, double phase, int segments, SimpleParticleType type) {
+        for (int strand = 0; strand < strands; strand++) {
+            for (int i = 0; i <= segments; i++) {
+                double t = i / (double) segments;
+                double angle = phase + t * Math.PI * 4.0 + strand * Math.PI * 2.0 / strands;
+                double r = radius * (0.38 + t * 0.62);
+                Vec3 vertex = center.add(Math.cos(angle) * r, t * height, Math.sin(angle) * r);
+                particle(level, type, vertex, 1, 0.004, 0.002);
+            }
+        }
+    }
+
+    private static void funnelMesh(ServerLevel level, Vec3 center, double radius, double height,
+                                   double phase, int levels, int points, SimpleParticleType type) {
+        for (int layer = 0; layer < levels; layer++) {
+            double t = layer / (double) Math.max(1, levels - 1);
+            double r = radius * (1.0 - t * 0.88);
+            double y = t * height;
+            for (int i = 0; i < points; i++) {
+                double angle = i * Math.PI * 2.0 / points + phase + t * 3.0;
+                Vec3 vertex = center.add(Math.cos(angle) * r, y, Math.sin(angle) * r);
+                particle(level, type, vertex, 1, 0.003, 0.002);
+            }
+        }
+    }
+
+    private static void waveMesh(ServerLevel level, Vec3 center, Vec3 side, Vec3 up,
+                                 double width, double height, double phase,
+                                 int acrossSegments, int heightSegments, SimpleParticleType type) {
+        for (int x = 0; x <= acrossSegments; x++) {
+            double across = x / (double) acrossSegments * 2.0 - 1.0;
+            double crest = Math.max(0.0, 1.0 - across * across);
+            for (int y = 0; y <= heightSegments; y++) {
+                double vertical = y / (double) heightSegments;
+                double curl = Math.sin(vertical * Math.PI * 1.25 + phase + across * 2.0);
+                Vec3 vertex = center.add(side.scale(across * width))
+                        .add(up.scale(crest * height * vertical + curl * 0.18));
+                particle(level, type, vertex, 1, 0.005, 0.003);
+            }
+        }
+    }
+
+    private static void torusMesh(ServerLevel level, Vec3 center, double majorRadius, double minorRadius,
+                                  int majorSegments, int minorSegments, SimpleParticleType type) {
+        for (int i = 0; i < majorSegments; i++) {
+            double a = i * Math.PI * 2.0 / majorSegments;
+            for (int j = 0; j < minorSegments; j++) {
+                double b = j * Math.PI * 2.0 / minorSegments;
+                double r = majorRadius + Math.cos(b) * minorRadius;
+                Vec3 vertex = center.add(Math.cos(a) * r, Math.sin(b) * minorRadius,
+                        Math.sin(a) * r);
+                particle(level, type, vertex, 1, 0.003, 0.002);
+            }
         }
     }
 
