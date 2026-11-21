@@ -254,18 +254,23 @@ public final class RpgCommands {
             ServerPlayer player = ctx.getSource().getPlayerOrException();
             boolean attached = player.hasAttached(RpgAttachments.PROFILE);
             PlayerRpgProfile profile = player.getAttached(RpgAttachments.PROFILE);
+            RpgWorldProfilesData durableData = RpgWorldProfilesData.get(player.getServer());
+            PlayerRpgProfile durableProfile = durableData == null ? null
+                    : durableData.getProfile(player.getUUID().toString());
             if (profile == null) {
-                send(ctx.getSource(), "Attachment present=false | profile has not been initialized");
+                send(ctx.getSource(), "Attachment present=false"
+                        + " | durable copy=" + (durableProfile != null)
+                        + " | durable level=" + (durableProfile == null ? "missing" : durableProfile.level())
+                        + " | durable XP=" + (durableProfile == null ? "missing" : durableProfile.totalExperience()));
                 return 1;
             }
 
             boolean uuidMatches = player.getUUID().toString().equals(profile.uuid());
-            RpgWorldProfilesData durableData = RpgWorldProfilesData.get(player.getServer());
-            PlayerRpgProfile durableProfile = durableData == null ? null : durableData.getProfile(player.getUUID().toString());
             send(ctx.getSource(), "Attachment present=" + attached
                     + " | UUID matches=" + uuidMatches
                     + " | durable copy=" + (durableProfile != null)
                     + " | durable level=" + (durableProfile == null ? "missing" : durableProfile.level())
+                    + " | durable XP=" + (durableProfile == null ? "missing" : durableProfile.totalExperience())
                     + " | schema=" + profile.schemaVersion()
                     + " | level=" + profile.level()
                     + " | XP=" + profile.experience()
