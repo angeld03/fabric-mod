@@ -115,5 +115,8 @@
   "wildbound.mastery.no_upgrades": "Todavía no hay mejoras desbloqueadas para esta habilidad.",
   "wildbound.mastery.back": "M / ESC · Volver",
   "wildbound.mastery.open_hint": "M · Detalles",
-  "wildbound.mastery.select_unlocked": "Selecciona una habilidad desbloqueada para ver su maestría."
+  "wildbound.mastery.select_unlocked": "Selecciona una habilidad desbloqueada para ver su maestría.",
+  "wildbound.mastery.upgrade.hydrostatic_core": "Núcleo hidrostático",
+  "wildbound.mastery.upgrade.frostbite_current": "Corriente glacial",
+  "wildbound.mastery.upgrade.tidal_piercer": "Perforador de mareas"
 }
