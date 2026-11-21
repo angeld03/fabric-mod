@@ -65,5 +65,6 @@
   "wildbound.radial.cleared": "Slot %s cleared",
   "wildbound.radial.already_assigned": "%s is already in slot %s",
   "wildbound.radial.slot_already_empty": "Slot %s is already empty",
-  "wildbound.radial.empty_slot": "Slot %s is empty"
+  "wildbound.radial.empty_slot": "Slot %s is empty",
+  "key.wildbound.character": "Open character sheet"
 }
