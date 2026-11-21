@@ -104,7 +104,26 @@ public final class SkillActivationService {
         // Only a completed server-side execution grants mastery experience.
         // Cooldown, resource and executor failures return before this point.
         long masteryXp = 10L + Math.round(getChargeLevel() * 5f);
-        SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
+        SkillProgressionService.SkillProgressResult masteryResult =
+                SkillProgressionService.grantUseExperience(player, skillId, masteryXp);
+        if (masteryResult.changed() && masteryResult.rank() > masteryResult.previousRank()) {
+            player.displayClientMessage(Component.translatable(
+                    "wildbound.skill.mastery_rank_up", definition.name(), masteryResult.rank()), true);
+            if ("aqua_water_bolt".equals(skillId)) {
+                if (masteryResult.previousRank() < 3 && masteryResult.rank() >= 3) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.hydrostatic_core")));
+                }
+                if (masteryResult.previousRank() < 6 && masteryResult.rank() >= 6) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.frostbite_current")));
+                }
+                if (masteryResult.previousRank() < 9 && masteryResult.rank() >= 9) {
+                    player.sendSystemMessage(Component.translatable("wildbound.skill.upgrade_unlocked",
+                            Component.translatable("wildbound.mastery.upgrade.tidal_piercer")));
+                }
+            }
+        }
 
         // Update cooldown
         playerCooldowns.put(skillId, now);
