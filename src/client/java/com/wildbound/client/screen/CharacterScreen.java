@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.wildbound.attributes.DerivedStats;
 import com.wildbound.attributes.DerivedStatsCalculator;
 import com.wildbound.attributes.RpgAttribute;
+import com.wildbound.core.WildboundConfig;
 import com.wildbound.client.WildboundClient;
 import com.wildbound.network.AttributeUpgradePayload;
 import com.wildbound.player.PlayerRpgProfile;
@@ -102,7 +103,7 @@ public final class CharacterScreen extends Screen {
             g.text(font, lines[i], sx, top + i * 15, 0xFFD1DEEC, false);
         }
 
-        g.text(font, "Pulsa + para gastar un punto. ESC para cerrar. (Límite de atributo: 100)",
+        g.text(font, "Pulsa + para gastar un punto. ESC para cerrar. (Límite: " + WildboundConfig.maxAttribute + ")",
                 24, h - 28, 0xFF8D9EB2, false);
     }
 
@@ -118,7 +119,7 @@ public final class CharacterScreen extends Screen {
 
         for (int i = 0; i < ATTRIBUTES.length; i++) {
             if (inside(event.x(), event.y(), buttonX[i], buttonY[i], buttonW[i], buttonH[i])
-                    && profile.attributes().get(ATTRIBUTES[i]) < 100) {
+                    && profile.attributes().get(ATTRIBUTES[i]) < WildboundConfig.maxAttribute) {
                 ClientPlayNetworking.send(new AttributeUpgradePayload(ATTRIBUTES[i].name()));
                 return true;
             }
