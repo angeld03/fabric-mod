@@ -554,6 +554,129 @@ public final class AquaSkillFxRenderer {
             quad(a, b, c, c, rgb, layerAlpha);
         }
 
+        private int remainingQuads() {
+            return Math.max(0, maxQuads - quads);
+        }
+
+        /**
+         * Builds one watertight, smoothly lofted serpent skin from the JSON spine.
+         * The spine uses Catmull-Rom interpolation and an adaptive radial frame,
+         * not a stack of overlapping primitive spheres.
+         */
+        private void serpentBody(WaterSerpentMeshDefinition definition, float swimPhase,
+                                 float travel, float summon, float widthScale,
+                                 int baseColor, int alpha, float detailScale) {
+            int radial = Math.max(14, Math.min(definition.radialSegments(),
+                    Math.round(definition.radialSegments() * detailScale)));
+            int longitudinal = Math.max(32, Math.min(definition.longitudinalSegments(),
+                    Math.round(definition.longitudinalSegments() * detailScale)));
+            longitudinal = Math.min(longitudinal, Math.max(24, remainingQuads() / radial));
+            if (longitudinal < 2 || radial < 3) return;
+
+            SerpentRing previous = serpentRing(definition, 0.0f, swimPhase, travel, summon, widthScale);
+            for (int i = 0; i < longitudinal && quads < maxQuads; i++) {
+                float u0 = i / (float) longitudinal;
+                float u1 = (i + 1) / (float) longitudinal;
+                SerpentRing next = serpentRing(definition, u1, swimPhase, travel, summon, widthScale);
+                for (int j = 0; j < radial && quads < maxQuads; j++) {
+                    float a0 = (float) (j * Math.PI * 2.0 / radial);
+                    float a1 = (float) ((j + 1) * Math.PI * 2.0 / radial);
+                    Vec3 p00 = serpentSurface(previous, a0);
+                    Vec3 p01 = serpentSurface(previous, a1);
+                    Vec3 p11 = serpentSurface(next, a1);
+                    Vec3 p10 = serpentSurface(next, a0);
+
+                    float upper = (float) Math.max(0.0, Math.sin((a0 + a1) * 0.5));
+                    float movingCaustic = (float) (0.5 + 0.5 * Math.sin(
+                            u0 * 44.0 - swimPhase * 2.1 + a0 * 3.0));
+                    int color = baseColor;
+                    int opacity = alpha;
+                    if (upper > 0.78f) {
+                        color = movingCaustic > 0.48f ? 0xA9F8FF : 0x45DDF8;
+                        opacity = Math.min(245, alpha + 22);
+                    } else if (upper > 0.15f) {
+                        color = movingCaustic > 0.62f ? 0x29C9EF : 0x087DBD;
+                    } else if (upper < -0.72f) {
+                        color = 0x034B87;
+                    }
+                    quad(p00, p01, p11, p10, color, opacity);
+                }
+                previous = next;
+            }
+        }
+
+        private SerpentRing serpentRing(WaterSerpentMeshDefinition definition, float t,
+                                        float phase, float travel, float summon, float widthScale) {
+            WaterSerpentMeshDefinition.SpinePoint sample = sampleSpine(definition.spine(), t);
+            Vec3 center = serpentCenter(sample, definition, t, phase, travel, summon);
+            float epsilon = 0.0025f;
+            Vec3 before = serpentCenter(sampleSpine(definition.spine(), Math.max(0f, t - epsilon)),
+                    definition, Math.max(0f, t - epsilon), phase, travel, summon);
+            Vec3 after = serpentCenter(sampleSpine(definition.spine(), Math.min(1f, t + epsilon)),
+                    definition, Math.min(1f, t + epsilon), phase, travel, summon);
+            Vec3 tangent = after.subtract(before);
+            if (tangent.lengthSqr() < 1.0E-8) tangent = new Vec3(0, 0, 1);
+            else tangent = tangent.normalize();
+
+            Vec3 side = new Vec3(0, 1, 0).cross(tangent);
+            if (side.lengthSqr() < 1.0E-8) side = new Vec3(1, 0, 0);
+            else side = side.normalize();
+            Vec3 vertical = tangent.cross(side).normalize();
+
+            float organicScale = (0.18f + 0.82f * summon) * widthScale;
+            float ripple = 1.0f + (float) Math.sin(phase * 1.4f + t * 28.0f) * 0.022f;
+            return new SerpentRing(center, side, vertical,
+                    sample.width() * organicScale * ripple,
+                    sample.height() * organicScale * ripple);
+        }
+
+        private Vec3 serpentCenter(WaterSerpentMeshDefinition.SpinePoint point,
+                                   WaterSerpentMeshDefinition definition, float t,
+                                   float phase, float travel, float summon) {
+            float tailWeight = (float) Math.pow(1.0f - t, 1.45);
+            float wave = phase * 1.45f - t * 8.2f;
+            float x = point.x() + (float) Math.sin(wave) * definition.lateralSway() * tailWeight * summon;
+            float y = point.y() * (0.28f + 0.72f * summon)
+                    + (float) Math.sin(wave * 0.78f + 0.7f) * definition.verticalSway() * tailWeight * summon;
+            float z = point.z() + travel * (0.12f + 0.88f * t);
+            return new Vec3(x, y, z);
+        }
+
+        private Vec3 serpentSurface(SerpentRing ring, float angle) {
+            return ring.center
+                    .add(ring.side.scale(Math.cos(angle) * ring.width))
+                    .add(ring.vertical.scale(Math.sin(angle) * ring.height));
+        }
+
+        private WaterSerpentMeshDefinition.SpinePoint sampleSpine(
+                java.util.List<WaterSerpentMeshDefinition.SpinePoint> points, float progress) {
+            float t = Math.max(0f, Math.min(1f, progress)) * (points.size() - 1);
+            int index = Math.min(points.size() - 2, (int) Math.floor(t));
+            float local = t - index;
+            WaterSerpentMeshDefinition.SpinePoint p0 = points.get(Math.max(0, index - 1));
+            WaterSerpentMeshDefinition.SpinePoint p1 = points.get(index);
+            WaterSerpentMeshDefinition.SpinePoint p2 = points.get(index + 1);
+            WaterSerpentMeshDefinition.SpinePoint p3 = points.get(Math.min(points.size() - 1, index + 2));
+            return new WaterSerpentMeshDefinition.SpinePoint(
+                    catmull(p0.x(), p1.x(), p2.x(), p3.x(), local),
+                    catmull(p0.y(), p1.y(), p2.y(), p3.y(), local),
+                    catmull(p0.z(), p1.z(), p2.z(), p3.z(), local),
+                    Math.max(0.025f, catmull(p0.width(), p1.width(), p2.width(), p3.width(), local)),
+                    Math.max(0.025f, catmull(p0.height(), p1.height(), p2.height(), p3.height(), local))
+            );
+        }
+
+        private float catmull(float p0, float p1, float p2, float p3, float t) {
+            float t2 = t * t;
+            float t3 = t2 * t;
+            return 0.5f * ((2f * p1)
+                    + (-p0 + p2) * t
+                    + (2f * p0 - 5f * p1 + 4f * p2 - p3) * t2
+                    + (-p0 + 3f * p1 - 3f * p2 + p3) * t3);
+        }
+
+        private record SerpentRing(Vec3 center, Vec3 side, Vec3 vertical, float width, float height) { }
+
         private void tube(Vec3 start, Vec3 end, float radius, int segments, int sides,
                           float twist, int rgb, int alpha) {
             Vec3 axis = end.subtract(start);
