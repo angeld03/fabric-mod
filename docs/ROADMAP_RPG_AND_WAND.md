@@ -400,3 +400,18 @@ Se inicia la migración desde las superficies muestreadas como partículas a geo
 - El renderer se conecta mediante `LevelRenderEvents.COLLECT_SUBMITS` y `SubmitNodeCollector.submitCustomGeometry`, usando el pipeline diferido de Minecraft 26.x.
 
 **Límites actuales y honestidad:** esta primera pasada dibuja una estructura de alambre luminosa mediante segmentos de línea; todavía no es una superficie sólida de triángulos con normales/UV/refracción ni una animación esquelética. El protocolo ya reserva UPDATE/STOP, pero el servicio servidor actual emite START y el cliente deja caducar cada efecto por duración; el seguimiento de entidades en movimiento y STOP explícito quedan para la siguiente iteración. El detalle visual, el comportamiento con OIT/shaderpacks y el rendimiento necesitan validación en cliente. No se ha ejecutado Gradle ni se ha probado dentro de Minecraft.
+
+
+### P4 — Segunda reconstrucción de Agua: superficies translúcidas y material animado (reemplaza el wireframe)
+
+La primera versión de líneas se ha sustituido por una malla de quads rellenos, con capas translúcidas y un material de agua propio:
+- Se añadió la textura seamless `aqua_water_flow.png` (64×64 RGBA) en `assets/wildbound/textures/misc`.
+- Los vértices ahora incluyen UV, color/alpha, overlay, luz y normales; el material usa `RenderTypes.entityTranslucent` con la textura animada mediante desplazamiento UV por tiempo y semilla.
+- Los volúmenes combinan núcleo azul profundo, bandas cian, crestas blancas, espuma, ondas, gotas y salpicaduras. Ya no se usa `RenderTypes.lines()` en este renderer.
+- Las diez habilidades tienen generadores de superficie propios: torpedos líquidos, columna curativa, látigo de lámina, escudo en expansión, ola curvada, manto de dash, cuenca/embudo de remolino, chorro cónico, muro de tsunami y leviatán segmentado.
+- Healing Stream se construye durante la animación; Bubble Shield nace compacto y se expande; Leviathan's Wrath articula la mandíbula y muestra una cavidad/flash interior.
+- Curación, escudo y remolino permanecen alineados con el eje vertical del mundo; no se inclinan cuando el jugador mira hacia arriba.
+- La geometría interpola el tiempo entre ticks del juego para evitar el movimiento escalonado a 20 FPS.
+- Se establece un presupuesto de hasta 16.000 quads por frame entre efectos visibles, además del límite de 2.600 por habilidad, LOD y culling por distancia.
+
+**Límites y validación:** son superficies 3D rellenas y texturizadas, no una simulación física de fluidos. Todavía no hay refracción real de escena, espuma física, normales derivadas de un campo de fluido, shaders personalizados ni OIT propio. Las animaciones se construyen proceduralmente y no con un esqueleto de huesos. No se ha ejecutado Gradle ni se ha validado en una sesión real de Minecraft: transparencia, orden de dibujo, repetición UV, rendimiento y legibilidad deben revisarse in-game.
