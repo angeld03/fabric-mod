@@ -9,7 +9,7 @@
   "wildbound.hud.off": "HUD RPG: DESACTIVADO",
   "wildbound.hud.level_up": "¡SUBIDA DE NIVEL!",
   "wildbound.hud.level_transition": "NIVEL %s  →  %s",
-  "wildbound.hud.level_rewards": "+%s puntos de atributo  ·  +%s puntos de habilidad",
+  "wildbound.hud.level_rewards": "+%s PA  ·  +%s PH",
   "wildbound.skills.title": "HABILIDADES",
   "wildbound.radial.title": "MENÚ RADIAL",
   "wildbound.skills.subtitle": "SISTEMA ELEMENTAL",
