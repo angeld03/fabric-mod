@@ -277,3 +277,14 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - Se mantienen los datos reales del attachment del jugador; el diseño no inventa mejoras ni altera el progreso del servidor.
 
 **Validación:** los dos JSON de idioma se han parseado correctamente. GitHub Actions ha terminado en fallo, pero el job no expone pasos ni logs descargables (el endpoint de logs devuelve BlobNotFound); por tanto no se declara compilación confirmada ni prueba visual dentro de Minecraft.
+
+
+### P5 — Feedback de subida de nivel en el HUD
+
+- Se añadió un anuncio central temporal al detectar un aumento de nivel en el perfil sincronizado.
+- La placa muestra la transición de nivel anterior al nuevo, con una cabecera luminosa, aparición/desvanecimiento, brillo pulsante y destellos laterales.
+- El anuncio incluye los puntos de atributo y habilidad ganados en el mismo cambio de perfil.
+- Se ha localizado en español e inglés. No concede recompensas desde el cliente; solo representa los valores ya sincronizados.
+- El HUD conserva su halo/pulso del medallón y el brillo de XP durante la subida.
+
+**Validación pendiente:** revisar la aparición real en cliente, especialmente cuando se ganan varios niveles en una sola concesión de XP y en resoluciones bajas.
