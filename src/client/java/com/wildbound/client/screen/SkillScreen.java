@@ -263,7 +263,7 @@ public final class SkillScreen extends Screen {
         g.text(font, level, x + 13, pillY + 4, GOLD_LIGHT, false);
 
         // Available points on the right; pulses while there is something to spend.
-        String points = tr("wildbound.skills.points", profile.skillPoints()) + "  ·  AP " + profile.attributePoints();
+        String points = tr("wildbound.skills.points", profile.skillPoints()) + "  ·  " + tr("wildbound.skills.attribute_points_short", profile.attributePoints());
         int pointsW = font.width(points) + 12;
         int pointsX = x + width - 13 - (headerH > 34 ? 14 : 11) - pointsW;
         boolean hasPoints = profile.skillPoints() > 0;
@@ -738,8 +738,9 @@ public final class SkillScreen extends Screen {
             if (state == UNLOCKED) {
                 var mastery = profile.getSkillProgress(focused.id());
                 String xp = mastery.rank() >= com.wildbound.player.SkillProgress.MAX_RANK
-                        ? "MAX" : mastery.experience() + "/" + mastery.experienceRequired() + " XP";
-                stateText = "R" + mastery.rank() + "  " + xp;
+                        ? tr("wildbound.skills.mastery_max")
+                        : tr("wildbound.skills.mastery_xp", mastery.experience(), mastery.experienceRequired());
+                stateText = tr("wildbound.skills.mastery_rank", mastery.rank()) + "  " + xp;
             } else {
                 stateText = state == READY ? tr("wildbound.skills.state_ready")
                         : tr("wildbound.skills.state_locked");
