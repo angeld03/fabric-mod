@@ -486,39 +486,55 @@ public final class AquaSkillExecutors {
                 Vec3 start = player.position();
                 double distance = Math.min(12.0, 8.5 + profile.level() * 0.15);
                 Vec3 end = safeDashEnd(level, player, start, look, distance);
+                Vec3 right = side(look);
+                Vec3 vertical = up(look);
 
                 SkillActivationService.playSound(level, start, SoundEvents.TRIDENT_RIPTIDE_1.value(), 1.0f, 1.4f);
                 SkillActivationService.playSound(level, start, SoundEvents.ENDERMAN_TELEPORT, 0.5f, 1.3f);
-
+                // The dash now travels over its animation window; hits occur as the player crosses them.
                 Set<UUID> hit = new HashSet<>();
-                double travelled = start.distanceTo(end);
-                for (double d = 0; d <= travelled; d += 0.6) {
-                    Vec3 point = start.add(look.scale(d)).add(0, 0.9, 0);
-                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class,
-                            new AABB(point, point).inflate(1.3), e -> e != player && e.isAlive())) {
+                final int steps = 12;
+                final double travelled = start.distanceTo(end);
+                SkillScheduler.run(player, 0, 1, steps, step -> {
+                    if (!player.isAlive() || player.isRemoved()) return;
+                    double progress = (step + 1) / (double) steps;
+                    Vec3 pos = start.add(end.subtract(start).scale(progress));
+                    player.teleportTo(pos.x, pos.y, pos.z);
+                    if (step == steps - 1) {
+                        player.resetFallDistance();
+                        player.setDeltaMovement(Vec3.ZERO);
+                    }
+
+                    Vec3 trailCenter = pos.add(0, 0.9, 0);
+                    for (int strand = 0; strand < 3; strand++) {
+                        double angle = step * 0.9 + strand * Math.PI * 2.0 / 3.0;
+                        Vec3 ribbon = trailCenter.add(right.scale(Math.cos(angle) * 0.55))
+                                .add(vertical.scale(Math.sin(angle) * 0.55));
+                        particle(level, ParticleTypes.SPLASH, ribbon, 3, 0.08, 0.05);
+                        particle(level, ParticleTypes.BUBBLE, ribbon, 2, 0.04, 0.03);
+                    }
+                    ring(level, trailCenter, right, vertical, 0.65 + Math.sin(progress * Math.PI) * 0.25,
+                            16, ParticleTypes.BUBBLE, 0.02, 0.03);
+                    if (step % 3 == 0) {
+                        SkillActivationService.playSound(level, pos, SoundEvents.PLAYER_SPLASH, 0.35f, 1.2f + (float) progress * 0.5f);
+                    }
+
+                    AABB impactBox = new AABB(trailCenter, trailCenter).inflate(1.25, 1.2, 1.25);
+                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, impactBox,
+                            entity -> entity != player && entity.isAlive() && !hit.contains(entity.getUUID()))) {
                         if (!hit.add(target.getUUID())) continue;
                         float damage = 8f + profile.level() * 0.4f;
                         SkillActivationService.damageEntity(target, player, damage);
                         SkillActivationService.applyKnockback(target, start, 2.0f);
                         spawnDamageNumber(level, target.position().add(0, 2.2, 0), (int) damage);
+                        impactBurst(level, target.position().add(0, 1.0, 0), right, vertical, 18, 1.0);
+                        triggerScreenShake(level, target.position(), 2, 0.18f);
                     }
-                }
 
-                player.teleportTo(end.x, end.y, end.z);
-                player.resetFallDistance();
-                player.setDeltaMovement(Vec3.ZERO);
-
-                SkillScheduler.run(player, 0, 1, 12, step -> {
-                    if (player.isRemoved()) return;
-                    double progress = step / 11.0;
-                    Vec3 pos = start.add(end.subtract(start).scale(progress)).add(0, 0.9, 0);
-                    double radius = 0.75 * (1.0 - progress * 0.7);
-                    ring(level, pos, side(look), up(look), radius, 12, ParticleTypes.BUBBLE, 0.03, 0.02);
-                    if (step % 3 == 0) {
-                        ring(level, pos, side(look), up(look), radius + 0.25, 8, ParticleTypes.SPLASH, 0.03, 0.02);
-                    }
-                    if (step == 11) {
-                        impactBurst(level, end.add(0, 1.0, 0), side(look), up(look), 36, 1.8);
+                    if (step == steps - 1) {
+                        impactBurst(level, end.add(0, 1.0, 0), right, vertical, 44, 2.0);
+                        ring(level, end.add(0, 0.15, 0), new Vec3(1, 0, 0), new Vec3(0, 0, 1),
+                                2.8, 36, ParticleTypes.SPLASH, 0.08, 0.18);
                         SkillActivationService.playSound(level, end, SoundEvents.PLAYER_SPLASH, 1.0f, 1.6f);
                         SkillActivationService.playSound(level, end, SoundEvents.PLAYER_ATTACK_SWEEP, 0.5f, 1.2f);
                         triggerScreenShake(level, end, 4, 0.3f);
@@ -528,9 +544,6 @@ public final class AquaSkillExecutors {
         });
     }
 
-    // ============================================================
-    // TIER 7 - WHIRLPOOL
-    // ============================================================
     private static void registerWhirlpool() {
         SkillActivationService.registerExecutor("aqua_whirlpool", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 18f; }
@@ -620,56 +633,70 @@ public final class AquaSkillExecutors {
                 Vec3 up = up(look);
                 Vec3 origin = player.getEyePosition().add(look.scale(1.0));
                 double range = 30.0;
-
-                SkillActivationService.playSound(level, origin, SoundEvents.TRIDENT_THROW.value(), 1.0f, 0.6f);
-                SkillActivationService.playSound(level, origin, SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 0.8f, 1.5f);
-
-                Set<UUID> hit = new HashSet<>();
                 Vec3 end = origin.add(look.scale(range));
-                AABB search = new AABB(origin, end).inflate(2.0);
-                for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, search,
-                        e -> e != player && e.isAlive())) {
-                    Vec3 center = target.position().add(0, target.getBbHeight() * 0.5, 0);
-                    Vec3 toTarget = center.subtract(origin);
-                    double projection = toTarget.dot(look);
-                    if (projection < 0 || projection > range) continue;
-                    double perpendicular = toTarget.subtract(look.scale(projection)).length();
-                    if (perpendicular > 1.6) continue;
-                    if (!hit.add(target.getUUID())) continue;
+                Set<UUID> hit = new HashSet<>();
 
-                    float damage = 24f + profile.level() * 0.9f;
-                    SkillActivationService.damageEntity(target, player, damage);
-                    SkillActivationService.applyKnockback(target, player.position(), 3.5f);
-                    spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) damage);
-                    impactBurst(level, center, side, up, 34, 1.3);
-                    triggerScreenShake(level, target.position(), 3, 0.25f);
-                }
-
-                SkillScheduler.run(player, 0, 1, 10, step -> {
+                // Pressure compresses before firing; the visible beam front and damage share one timeline.
+                SkillActivationService.playSound(level, origin, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, 0.9f, 0.55f);
+                SkillScheduler.run(player, 0, 1, 14, step -> {
                     if (player.isRemoved()) return;
-                    double visible = (step + 1) / 10.0 * range;
-                    for (double d = 0; d <= visible; d += 0.6) {
-                        Vec3 p = origin.add(look.scale(d));
-                        particle(level, ParticleTypes.BUBBLE, p, 1, 0, 0);
-                        if (((int) (d * 10)) % 3 == 0) {
-                            double a = d * 0.9;
-                            Vec3 sheath = p.add(side.scale(Math.cos(a) * 0.35)).add(up.scale(Math.sin(a) * 0.35));
-                            particle(level, ParticleTypes.SPLASH, sheath, 1, 0, 0.02);
+                    if (step < 4) {
+                        double charge = (step + 1) / 4.0;
+                        ring(level, origin, side, up, 0.25 + charge * 0.55, 20,
+                                ParticleTypes.BUBBLE, 0.015, 0.02);
+                        particle(level, ParticleTypes.ELECTRIC_SPARK, origin, 4 + step, 0.08, 0.04);
+                        if (step == 3) {
+                            SkillActivationService.playSound(level, origin, SoundEvents.TRIDENT_THROW.value(), 1.0f, 0.6f);
+                            SkillActivationService.playSound(level, origin, SoundEvents.PLAYER_SPLASH_HIGH_SPEED, 0.8f, 1.5f);
                         }
+                        return;
                     }
-                    if (step == 9) {
-                        impactBurst(level, origin.add(look.scale(range)), side, up, 26, 1.5);
-                        SkillActivationService.playSound(level, origin, SoundEvents.GENERIC_SPLASH, 1.2f, 0.6f);
-                        triggerScreenShake(level, origin.add(look.scale(range * 0.5)), 4, 0.3f);
+
+                    double progress = (step - 3) / 10.0;
+                    double visible = progress * range;
+                    double previous = Math.max(0.0, visible - range / 10.0);
+                    Vec3 head = origin.add(look.scale(visible));
+                    for (double d = 0; d <= visible; d += 0.45) {
+                        Vec3 p = origin.add(look.scale(d));
+                        double taper = 0.22 + 0.55 * (d / Math.max(1.0, visible));
+                        double angle = d * 1.1 + step * 0.8;
+                        Vec3 sheath = p.add(side.scale(Math.cos(angle) * taper))
+                                .add(up.scale(Math.sin(angle) * taper));
+                        particle(level, ParticleTypes.SPLASH, sheath, 2, 0.025, 0.04);
+                        if (((int) (d * 10)) % 4 == 0) particle(level, ParticleTypes.BUBBLE, p, 1, 0.01, 0.02);
+                    }
+                    ring(level, head, side, up, 0.7, 20, ParticleTypes.BUBBLE, 0.025, 0.04);
+                    particle(level, ParticleTypes.ELECTRIC_SPARK, head, 8, 0.08, 0.05);
+
+                    AABB search = new AABB(origin, head).inflate(2.0);
+                    for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, search,
+                            entity -> entity != player && entity.isAlive() && !hit.contains(entity.getUUID()))) {
+                        Vec3 center = target.position().add(0, target.getBbHeight() * 0.5, 0);
+                        Vec3 offset = center.subtract(origin);
+                        double projection = offset.dot(look);
+                        if (projection <= previous || projection > visible) continue;
+                        if (offset.subtract(look.scale(projection)).length() > 1.6) continue;
+                        if (!hit.add(target.getUUID())) continue;
+                        float damage = 24f + profile.level() * 0.9f;
+                        SkillActivationService.damageEntity(target, player, damage);
+                        SkillActivationService.applyKnockback(target, player.position(), 3.5f);
+                        spawnDamageNumber(level, target.position().add(0, 2.4, 0), (int) damage);
+                        impactBurst(level, center, side, up, 34, 1.3);
+                        SkillActivationService.playSound(level, center, SoundEvents.GENERIC_SPLASH, 0.8f, 0.8f);
+                        triggerScreenShake(level, target.position(), 3, 0.25f);
+                    }
+
+                    if (step == 13) {
+                        impactBurst(level, end, side, up, 42, 1.8);
+                        ring(level, end, side, up, 2.2, 32, ParticleTypes.SPLASH, 0.08, 0.16);
+                        SkillActivationService.playSound(level, end, SoundEvents.GENERIC_SPLASH, 1.2f, 0.6f);
+                        triggerScreenShake(level, end, 4, 0.3f);
                     }
                 });
             }
         });
     }
 
-    // ============================================================
-    // TIER 9 - TSUNAMI
-    // ============================================================
     private static void registerTsunami() {
         SkillActivationService.registerExecutor("aqua_tsunami", new SkillActivationService.SkillExecutor() {
             @Override public float getCooldown(SkillDefinition def, PlayerRpgProfile profile) { return 30f; }
