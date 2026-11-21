@@ -6,6 +6,7 @@ import com.wildbound.network.AquaSkillFxPayload;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
@@ -24,6 +25,8 @@ import java.util.Map;
  * instead of debug wireframe.</p>
  */
 public final class AquaSkillFxRenderer {
+    private static final Identifier WATER_TEXTURE =
+            Identifier.fromNamespaceAndPath("wildbound", "textures/misc/aqua_water_flow.png");
     private static final int MAX_EFFECTS = 24;
     private static final int MAX_QUADS_PER_EFFECT = 2_600;
     private static final double MAX_DISTANCE_SQR = 80.0 * 80.0;
@@ -111,7 +114,7 @@ public final class AquaSkillFxRenderer {
 
             context.submitNodeCollector().submitCustomGeometry(
                     pose,
-                    RenderTypes.debugQuads(),
+                    RenderTypes.entityTranslucent(WATER_TEXTURE),
                     (matrix, buffer) -> draw(effect, age, progress, alpha, lod, matrix, buffer)
             );
             pose.popPose();
@@ -430,22 +433,40 @@ public final class AquaSkillFxRenderer {
             this.seed = seed;
         }
 
-        private void vertex(Vec3 point, int rgb, int layerAlpha) {
+        private void vertex(Vec3 point, int rgb, int layerAlpha, float u, float v, Vec3 normal) {
             int a = Math.max(0, Math.min(255, Math.round(layerAlpha * effectAlpha)));
             int r = (rgb >> 16) & 255;
             int g = (rgb >> 8) & 255;
             int b = rgb & 255;
             out.addVertex(pose, (float) point.x, (float) point.y, (float) point.z)
-                    .setColor(r, g, b, a);
+                    .setColor(r, g, b, a)
+                    .setUv(u, v)
+                    .setOverlay(0)
+                    .setLight(15728880)
+                    .setNormal(pose, (float) normal.x, (float) normal.y, (float) normal.z);
         }
 
         private void quad(Vec3 a, Vec3 b, Vec3 c, Vec3 d, int rgb, int layerAlpha) {
             if (quads >= maxQuads) return;
-            vertex(a, rgb, layerAlpha);
-            vertex(b, rgb, layerAlpha);
-            vertex(c, rgb, layerAlpha);
-            vertex(d, rgb, layerAlpha);
+            Vec3 normal = b.subtract(a).cross(c.subtract(a));
+            if (normal.lengthSqr() < 1.0E-8) normal = new Vec3(0, 1, 0);
+            else normal = normal.normalize();
+            // World-space UV projection tiles the seamless caustic texture
+            // across the water; time offsets make highlights flow continuously.
+            vertex(a, rgb, layerAlpha, uvU(a), uvV(a), normal);
+            vertex(b, rgb, layerAlpha, uvU(b), uvV(b), normal);
+            vertex(c, rgb, layerAlpha, uvU(c), uvV(c), normal);
+            vertex(d, rgb, layerAlpha, uvU(d), uvV(d), normal);
             quads++;
+        }
+
+        private float uvU(Vec3 point) {
+            return (float) (point.x * 0.19 + point.z * 0.11 + phase * 0.34 + (seed & 255L) / 255.0);
+        }
+
+        private float uvV(Vec3 point) {
+            return (float) (point.y * 0.18 + point.z * 0.075 - phase * 0.29
+                    + ((seed >>> 8) & 255L) / 255.0);
         }
 
         private void triangle(Vec3 a, Vec3 b, Vec3 c, int rgb, int layerAlpha) {
