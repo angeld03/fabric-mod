@@ -224,11 +224,11 @@ public final class AquaSkillFxRenderer {
         float t = age * 0.075f;
         float pulse = 1f + 0.06f * (float) Math.sin(t * 1.8f);
         m.ellipsoid(0, 0.72f, 0, 1.45f * pulse, 1.78f * pulse, 1.45f * pulse,
-                30, 18, t, 0x087BC5, 45);
+                26, 16, t, 0x087BC5, 45);
         m.ellipsoid(0, 0.72f, 0, 1.29f, 1.63f, 1.29f,
-                28, 16, -t * 1.3f, 0x44DAFF, 52);
+                24, 14, -t * 1.3f, 0x44DAFF, 52);
         m.ellipsoid(0, 0.72f, 0, 1.08f, 1.43f, 1.08f,
-                24, 14, t * 0.7f, 0xA9F8FF, 25);
+                20, 12, t * 0.7f, 0xA9F8FF, 25);
         for (int i = 0; i < 5; i++) {
             float latitude = -0.95f + i * 0.47f;
             m.sphericalBand(0, 0.72f, 0, 1.48f, latitude, 1.43f,
@@ -279,7 +279,16 @@ public final class AquaSkillFxRenderer {
     // ---------------------------------------------------------------------
     private static void whirlpool(Mesh m, float age, float p) {
         float t = age * 0.11f;
-        float radius = 2.5f + smooth(p) * 1.65f;\n        m.whirlpoolSurface(0, -0.26f, 0, radius, 20, 38, t, 0x0875BE, 142);\n        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 15, 34, -t * 1.45f, 0x2BC7F0, 74);\n        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 18, 14, t, 0x086FB9, 116);\n        for (int i = 0; i < 3; i++) {\n            m.spiralRibbon(0, -0.15f, 0, radius * (0.62f + i * 0.07f),\n                    2.1f, 32, 0.24f, t + i * 1.8f, 0x74EDFF, 130);\n        }\n        m.rippleRing(0, -0.05f, 0, radius * 0.94f, 0.21f, 44, t, 0xB9FFFF, 150);\n        m.splashDroplets(0, 0.3f, 0, radius * 0.8f, 10, t, 0xD1FFFF);
+        float radius = 2.5f + smooth(p) * 1.65f;
+        m.whirlpoolSurface(0, -0.26f, 0, radius, 20, 38, t, 0x0875BE, 142);
+        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 15, 34, -t * 1.45f, 0x2BC7F0, 74);
+        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 18, 14, t, 0x086FB9, 116);
+        for (int i = 0; i < 3; i++) {
+            m.spiralRibbon(0, -0.15f, 0, radius * (0.62f + i * 0.07f),
+                    2.1f, 32, 0.24f, t + i * 1.8f, 0x74EDFF, 130);
+        }
+        m.rippleRing(0, -0.05f, 0, radius * 0.94f, 0.21f, 44, t, 0xB9FFFF, 150);
+        m.splashDroplets(0, 0.3f, 0, radius * 0.8f, 10, t, 0xD1FFFF);
     }
 
     // ---------------------------------------------------------------------
@@ -307,16 +316,16 @@ public final class AquaSkillFxRenderer {
         float z = 3.3f + expansion * 8.5f;
         float scale = 0.88f + expansion * 0.54f;
         m.waveWall(0, -0.4f, z, 10.5f * scale, 7.0f * scale,
-                1.65f, 42, 24, t, 0x075DAA, 158);
+                1.65f, 36, 20, t, 0x075DAA, 158);
         m.waveWall(0, -0.2f, z - 0.72f, 10.0f * scale, 6.65f * scale,
-                0.78f, 38, 22, -t * 1.3f, 0x149FD8, 122);
+                0.78f, 34, 18, -t * 1.3f, 0x149FD8, 122);
         m.waveCrest(0, 6.0f * scale, z + 0.25f, 10.1f * scale, 2.2f, t, 0xC7FFFF);
         m.foamArc(0, 5.8f * scale, z + 0.3f, 10.0f * scale, 0.85f,
                 64, t, 0xF0FFFF, 225);
         m.waterBase(0, -0.55f, z, 10.6f * scale, 3.5f, t, 0x0977C5, 128);
-        m.splashDroplets(0, 6.0f * scale, z, 3.0f * scale, 34, t, 0xD9FFFF);
-        m.splashDroplets(-7.3f, 1.2f, z + 0.3f, 1.3f, 10, -t, 0xA9F7FF);
-        m.splashDroplets(7.3f, 1.2f, z + 0.3f, 1.3f, 10, t, 0xA9F7FF);
+        m.splashDroplets(0, 6.0f * scale, z, 3.0f * scale, 12, t, 0xD9FFFF);
+        m.splashDroplets(-7.3f, 1.2f, z + 0.3f, 1.3f, 5, -t, 0xA9F7FF);
+        m.splashDroplets(7.3f, 1.2f, z + 0.3f, 1.3f, 5, t, 0xA9F7FF);
     }
 
     // ---------------------------------------------------------------------
