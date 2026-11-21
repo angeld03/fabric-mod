@@ -118,5 +118,7 @@
   "wildbound.mastery.select_unlocked": "Select an unlocked skill to view its mastery.",
   "wildbound.mastery.upgrade.hydrostatic_core": "Hydrostatic Core",
   "wildbound.mastery.upgrade.frostbite_current": "Frostbite Current",
-  "wildbound.mastery.upgrade.tidal_piercer": "Tidal Piercer"
+  "wildbound.mastery.upgrade.tidal_piercer": "Tidal Piercer",
+  "wildbound.skill.mastery_rank_up": "%1$s reached mastery rank %2$s!",
+  "wildbound.skill.upgrade_unlocked": "Skill upgrade unlocked: %1$s"
 }
