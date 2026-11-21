@@ -227,7 +227,7 @@ Esta fase es feedback de carga con partículas/cámara; todavía no anima los hu
 - Al enfocar una habilidad desbloqueada, el pie del menú muestra su rango individual y XP para el siguiente rango (o MAX).
 - El HUD ya existente continúa mostrando nivel, XP, salud, maná y stamina.
 
-Pendiente para completar P5: pantalla de atributos con inversión y preview de estadísticas derivadas, pantalla/ficha de personaje, y una vista detallada de mejoras de cada habilidad.
+P5 ya cuenta con una primera ficha de personaje, inversión de atributos validada por servidor y preview de estadísticas derivadas. Siguen pendientes una vista detallada de mejoras por habilidad, feedback visual de subida de nivel/desbloqueos y validación visual/jugable en Minecraft.
 
 
 ### P1/P2 — Corrección adicional de sincronización y conservación
@@ -246,3 +246,13 @@ Se ha añadido una primera pantalla de personaje, accesible con **J**:
 - La pantalla de habilidades permite abrir la ficha con J y muestra rango/XP de la habilidad seleccionada.
 
 **Pendiente:** no se ha añadido todavía una pantalla de respec; la asignación individual es de un punto por clic. La respuesta de aceptación llega por el mensaje del servidor y el attachment sincronizado actualiza la pantalla. Validar visualmente el layout en resoluciones pequeñas y grandes.
+
+
+### P5 — Pulido de interfaz (continuación)
+
+- Se han traducido al inglés y español los textos de la ficha de personaje: atributos, estadísticas derivadas, XP, puntos disponibles y límites.
+- El estado de rango/XP de la habilidad enfocada y los puntos de atributo del encabezado del árbol de habilidades ya usan claves de idioma, no texto fijo.
+- La ficha adapta su composición a ventanas estrechas: atributos arriba y estadísticas derivadas en dos columnas debajo; en ventanas amplias mantiene la distribución en dos paneles.
+- Se corrigió el ciclo de vida de los efectos de carga Water Bolt: se elimina una llamada duplicada al reset en JOIN y se resetea también al desconectar.
+
+**Validación pendiente:** estos cambios son una revisión de código y de recursos JSON; no se han podido compilar ni ver dentro del cliente Minecraft. La composición compacta requiere comprobación a distintas resoluciones.
