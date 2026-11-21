@@ -31,7 +31,8 @@ public record SkillProgress(
 
     public SkillProgress {
         rank = Math.max(1, Math.min(MAX_RANK, rank));
-        experience = Math.max(0L, experience);
+        long maxCurrentExperience = rank >= MAX_RANK ? 0L : 100L * rank - 1L;
+        experience = Math.max(0L, Math.min(experience, maxCurrentExperience));
         totalExperience = Math.max(experience, totalExperience);
         mastery = Float.isFinite(mastery) ? Math.max(0f, Math.min(100f, mastery)) : 0f;
         upgrades = List.copyOf(upgrades);
