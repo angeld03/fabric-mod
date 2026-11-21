@@ -3,12 +3,12 @@ package com.wildbound.skills;
 import com.wildbound.persistence.RpgPersistenceManager;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerRpgProvider;
+import com.wildbound.player.SkillProgress;
 import net.minecraft.server.level.ServerPlayer;
 
-/** Validates and applies skill unlocks on the server. */
+/** Server-authoritative unlock and mastery progression for skills. */
 public final class SkillProgressionService {
-    private SkillProgressionService() {
-    }
+    private SkillProgressionService() {}
 
     public static boolean isUnlocked(ServerPlayer player, String skillId) {
         return PlayerRpgProvider.getOrCreate(player).hasSkill(skillId);
@@ -35,13 +35,31 @@ public final class SkillProgressionService {
         if (!check.success()) return check;
         SkillDefinition definition = SkillRegistry.get(skillId).orElseThrow();
         PlayerRpgProfile profile = RpgPersistenceManager.load(player);
-        int points = profile.skillPoints() - definition.pointCost();
-        PlayerRpgProfile updated = new PlayerRpgProfile(
-                profile.schemaVersion(), profile.uuid(), profile.level(), profile.experience(),
-                profile.totalExperience(), profile.attributePoints(), points, profile.attributes(),
-                profile.mana(), profile.stamina(), profile.unlockedSkills(), profile.unlockedRealms(),
-                profile.radialSkills(), profile.stats()).withSkill(skillId);
+        PlayerRpgProfile updated = new PlayerRpgProfile(profile.schemaVersion(), profile.uuid(),
+                profile.level(), profile.experience(), profile.totalExperience(), profile.attributePoints(),
+                profile.skillPoints() - definition.pointCost(), profile.attributes(), profile.mana(),
+                profile.stamina(), profile.unlockedSkills(), profile.unlockedRealms(),
+                profile.radialSkills(), profile.stats(), profile.skillProgress()).withSkill(skillId);
         RpgPersistenceManager.save(player, updated);
         return SkillUnlockResult.OK;
+    }
+
+    /** Grants XP only after a server-side executor completed successfully. */
+    public static SkillProgressResult grantUseExperience(ServerPlayer player, String skillId, long amount) {
+        if (amount <= 0) return SkillProgressResult.NO_CHANGE;
+        PlayerRpgProfile profile = RpgPersistenceManager.load(player);
+        if (!profile.hasSkill(skillId)) return SkillProgressResult.NO_CHANGE;
+        SkillProgress before = profile.getSkillProgress(skillId);
+        SkillProgress after = before.addExperience(amount);
+        if (after.equals(before)) return SkillProgressResult.NO_CHANGE;
+        RpgPersistenceManager.save(player, profile.withSkillProgress(skillId, after));
+        return new SkillProgressResult(true, before.rank(), after.rank(), amount,
+                after.experience(), after.experienceRequired());
+    }
+
+    public record SkillProgressResult(boolean changed, int previousRank, int rank,
+                                      long gainedExperience, long experience, long requiredExperience) {
+        public static final SkillProgressResult NO_CHANGE =
+                new SkillProgressResult(false, 1, 1, 0L, 0L, 0L);
     }
 }
