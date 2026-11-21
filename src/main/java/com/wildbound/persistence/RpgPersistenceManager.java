@@ -5,9 +5,9 @@ import com.wildbound.player.PlayerRpgProvider;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
- * Facade for all profile persistence operations. Actual saving is handled by
- * Fabric Data Attachments; this class enforces migration and validation on
- * every read and write.
+ * Facade for all profile persistence operations. A persistent Fabric player
+ * attachment remains the live/synced copy and a world SavedData snapshot is
+ * kept as an independent recovery copy. All writes pass through validation.
  */
 public final class RpgPersistenceManager {
     private RpgPersistenceManager() {
