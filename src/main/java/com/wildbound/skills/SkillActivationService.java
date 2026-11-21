@@ -101,6 +101,10 @@ public final class SkillActivationService {
             return ActivationResult.fail("execution_failed", 0f);
         }
 
+        // Broadcast one compact cosmetic event after the authoritative executor succeeds.
+        // The client builds the water geometry locally; no mesh vertices cross the network.
+        AquaSkillFxService.start(player, skillId);
+
         // Only a completed server-side execution grants mastery experience.
         // Cooldown, resource and executor failures return before this point.
         // Higher-tier abilities grant more mastery XP, while a fully charged
