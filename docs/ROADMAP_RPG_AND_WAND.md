@@ -311,3 +311,10 @@ Se ha conectado el progreso individual a tres hitos permanentes del Water Bolt:
 Los hitos se registran en `SkillProgress.upgrades` desde el servicio del servidor, una sola vez, y se conservan en el perfil/codec existente. La pantalla de maestría presenta ahora nombres localizados en español e inglés en lugar de IDs técnicos. No se ha añadido una interfaz de elección todavía: estos tres hitos se desbloquean automáticamente al alcanzar sus rangos.
 
 **Validación pendiente:** no se ha ejecutado Gradle ni una sesión real de Minecraft. Revisar el efecto de Lentitud en jefes/inmunidades y el balance del daño/alcance en combate.
+
+
+### P4 — Corrección de colisión del Water Bolt
+
+Durante la ampliación del hechizo se detectó que una entidad podía permanecer dentro del volumen de colisión durante varios ticks del mismo proyectil y recibir daño repetido en cada tick. Ahora cada una de las tres lanzas mantiene un conjunto de UUID alcanzados y aplica el impacto directo una sola vez por objetivo y por lanza. Las tres lanzas todavía pueden alcanzar al mismo objetivo por separado, como parte del diseño del ataque.
+
+**Validación pendiente:** comprobar en juego el daño por objetivo, el solapamiento entre lanzas y el impacto de área de la detonación.
