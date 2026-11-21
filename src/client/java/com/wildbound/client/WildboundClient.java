@@ -79,8 +79,9 @@ public class WildboundClient implements ClientModInitializer {
                 if (client.gui.screen() != null || client.player == null) continue;
                 useSelectedRadialSkill(client.player);
             }
-            // Decay cinematic camera aim each client tick.
+            // Decay cinematic camera aim and update the Water Bolt's quiet idle FX.
             SkillCameraAim.tick();
+            WaterBoltIdlePresentation.tick(client);
         });
 
         ClientPlayNetworking.registerGlobalReceiver(SkillUnlockResultPayload.TYPE, (payload, context) ->
@@ -140,11 +141,13 @@ public class WildboundClient implements ClientModInitializer {
             RadialSkillState.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
+            WaterBoltIdlePresentation.reset();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             RadialSkillState.reset();
             SkillChargeState.reset();
             SkillCameraAim.reset();
+            WaterBoltIdlePresentation.reset();
         });
     }
 
