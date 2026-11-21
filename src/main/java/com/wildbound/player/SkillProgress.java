@@ -35,7 +35,15 @@ public record SkillProgress(
         experience = Math.max(0L, Math.min(experience, maxCurrentExperience));
         totalExperience = Math.max(experience, totalExperience);
         mastery = Float.isFinite(mastery) ? Math.max(0f, Math.min(100f, mastery)) : 0f;
-        upgrades = List.copyOf(upgrades);
+        java.util.LinkedHashSet<String> safeUpgrades = new java.util.LinkedHashSet<>();
+        if (upgrades != null) {
+            for (String upgrade : upgrades) {
+                if (upgrade == null || upgrade.isBlank() || upgrade.length() > 64) continue;
+                safeUpgrades.add(upgrade);
+                if (safeUpgrades.size() >= 64) break;
+            }
+        }
+        upgrades = List.copyOf(safeUpgrades);
     }
 
     public long experienceRequired() {
