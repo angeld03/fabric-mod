@@ -65,5 +65,6 @@
   "wildbound.radial.cleared": "Slot %s vaciado",
   "wildbound.radial.already_assigned": "%s ya está en el slot %s",
   "wildbound.radial.slot_already_empty": "El slot %s ya está vacío",
-  "wildbound.radial.empty_slot": "El slot %s está vacío"
+  "wildbound.radial.empty_slot": "El slot %s está vacío",
+  "key.wildbound.character": "Abrir ficha del personaje"
 }
