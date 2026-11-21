@@ -3,6 +3,10 @@ package com.wildbound.persistence;
 import com.wildbound.player.AttributeContainer;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.PlayerStatistics;
+import com.wildbound.player.SkillProgress;
+
+import java.util.HashMap;
+import java.util.Map;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -37,8 +41,21 @@ public final class RpgDataCodec {
         PlayerStatistics stats = new PlayerStatistics(
                 buf.readLong(), buf.readLong(), buf.readLong(),
                 buf.readLong(), buf.readLong(), buf.readLong());
+        int progressCount = Math.max(0, Math.min(buf.readVarInt(), 512));
+        Map<String, SkillProgress> skillProgress = new HashMap<>();
+        for (int i = 0; i < progressCount; i++) {
+            String skillId = buf.readUtf(MAX_STRING);
+            int rank = buf.readVarInt();
+            long skillXp = buf.readLong();
+            long totalSkillXp = buf.readLong();
+            float mastery = buf.readFloat();
+            int upgradeCount = Math.max(0, Math.min(buf.readVarInt(), 64));
+            List<String> upgrades = new ArrayList<>(upgradeCount);
+            for (int j = 0; j < upgradeCount; j++) upgrades.add(buf.readUtf(MAX_STRING));
+            skillProgress.put(skillId, new SkillProgress(rank, skillXp, totalSkillXp, mastery, upgrades));
+        }
         return new PlayerRpgProfile(schema, uuid, level, experience, total, attributePoints,
-                skillPoints, attributes, mana, stamina, skills, realms, radial, stats);
+                skillPoints, attributes, mana, stamina, skills, realms, radial, stats, skillProgress);
     }
 
     private static void encode(RegistryFriendlyByteBuf buf, PlayerRpgProfile profile) {
@@ -67,6 +84,16 @@ public final class RpgDataCodec {
         buf.writeLong(s.dimensionsDiscovered());
         buf.writeLong(s.creaturesDiscovered());
         buf.writeLong(s.dungeonsCompleted());
+        buf.writeVarInt(profile.skillProgress().size());
+        profile.skillProgress().forEach((skillId, progress) -> {
+            buf.writeUtf(skillId, MAX_STRING);
+            buf.writeVarInt(progress.rank());
+            buf.writeLong(progress.experience());
+            buf.writeLong(progress.totalExperience());
+            buf.writeFloat(progress.mastery());
+            buf.writeVarInt(progress.upgrades().size());
+            for (String upgrade : progress.upgrades()) buf.writeUtf(upgrade, MAX_STRING);
+        });
     }
 
     private static List<String> readStrings(RegistryFriendlyByteBuf buf) {
