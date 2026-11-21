@@ -379,10 +379,10 @@ public final class AquaSkillFxRenderer {
         // Continuous Catmull-Rom body loft loaded from the JSON creature profile.
         // Two nested skins give the serpent a deep cobalt body and a moving cyan flow layer.
         m.serpentBody(LEVIATHAN_MODEL, phase, travel, summon, 1.0f,
-                0x075FA9, 190, 1.0f);
-        if (m.remainingQuads() > 2_000) {
+                0x075FA9, 190, 1.0f, 0.52f);
+        if (m.remainingQuads() > 900) {
             m.serpentBody(LEVIATHAN_MODEL, phase * 1.17f + 1.8f, travel, summon, 0.91f,
-                    0x19BDEB, 92, 0.62f);
+                    0x19BDEB, 92, 0.62f, 0.23f);
         }
 
         WaterSerpentMeshDefinition.Head head = LEVIATHAN_MODEL.head();
@@ -572,20 +572,23 @@ public final class AquaSkillFxRenderer {
          */
         private void serpentBody(WaterSerpentMeshDefinition definition, float swimPhase,
                                  float travel, float summon, float widthScale,
-                                 int baseColor, int alpha, float detailScale) {
+                                 int baseColor, int alpha, float detailScale, float budgetFraction) {
             int radial = Math.max(14, Math.min(definition.radialSegments(),
                     Math.round(definition.radialSegments() * detailScale)));
             int longitudinal = Math.max(32, Math.min(definition.longitudinalSegments(),
                     Math.round(definition.longitudinalSegments() * detailScale)));
-            longitudinal = Math.min(longitudinal, Math.max(24, remainingQuads() / radial));
+            int bodyBudget = Math.max(180, Math.min(remainingQuads(),
+                    (int) (maxQuads * budgetFraction)));
+            int bodyLimit = Math.min(maxQuads, quads + bodyBudget);
+            longitudinal = Math.min(longitudinal, Math.max(8, bodyBudget / radial));
             if (longitudinal < 2 || radial < 3) return;
 
             SerpentRing previous = serpentRing(definition, 0.0f, swimPhase, travel, summon, widthScale);
-            for (int i = 0; i < longitudinal && quads < maxQuads; i++) {
+            for (int i = 0; i < longitudinal && quads < bodyLimit; i++) {
                 float u0 = i / (float) longitudinal;
                 float u1 = (i + 1) / (float) longitudinal;
                 SerpentRing next = serpentRing(definition, u1, swimPhase, travel, summon, widthScale);
-                for (int j = 0; j < radial && quads < maxQuads; j++) {
+                for (int j = 0; j < radial && quads < bodyLimit; j++) {
                     float a0 = (float) (j * Math.PI * 2.0 / radial);
                     float a1 = (float) ((j + 1) * Math.PI * 2.0 / radial);
                     Vec3 p00 = serpentSurface(previous, a0);
