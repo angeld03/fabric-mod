@@ -95,6 +95,22 @@ class PersistenceTest {
     }
 
     @Test
+    void skillProgressSanitizesAndDeduplicatesUpgradeIds() {
+        SkillProgress progress = new SkillProgress(3, 20L, 220L, 45f,
+                java.util.Arrays.asList("hydrostatic_core", "hydrostatic_core", "", null,
+                        "x".repeat(65), "frostbite_current"));
+        assertEquals(List.of("hydrostatic_core", "frostbite_current"), progress.upgrades());
+    }
+
+    @Test
+    void skillProgressCanCrossSeveralRanksInOneAward() {
+        SkillProgress progress = SkillProgress.INITIAL.addExperience(600L);
+        assertEquals(4, progress.rank());
+        assertEquals(0L, progress.experience());
+        assertEquals(600L, progress.totalExperience());
+    }
+
+    @Test
     void missingFieldsUseSafeDefaults() {
         String json = "{\"uuid\":\"00000000-0000-0000-0000-000000000000\"}";
         PlayerRpgProfile profile = PlayerRpgProfile.CODEC.parse(
