@@ -34,5 +34,7 @@ class SkillMasteryRulesTest {
         assertEquals(0.25f, SkillMasteryRules.cooldown(0.1f, 10), 0.0001f);
         assertEquals(10f, SkillMasteryRules.manaCost(10f, -5, false), 0.0001f);
         assertEquals(10L, SkillMasteryRules.experienceAward(-10, Float.NaN));
+        assertEquals(0f, SkillMasteryRules.cooldown(Float.NaN, 10), 0.0001f);
+        assertEquals(0f, SkillMasteryRules.manaCost(Float.POSITIVE_INFINITY, 10, false), 0.0001f);
     }
 }
