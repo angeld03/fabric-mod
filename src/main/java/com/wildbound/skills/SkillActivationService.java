@@ -225,7 +225,7 @@ public final class SkillActivationService {
         // Entity#getLookAngle is the authoritative view direction. Recomputing
         // it by hand is easy to get wrong (a swapped X/Z axis makes every
         // projectile fly 90 degrees away from the crosshair).
-        return player.getLookAngle();
+        return SkillAimContext.direction(player);
     }
 
     protected static Optional<LivingEntity> getTargetEntity(ServerPlayer player, double range) {
