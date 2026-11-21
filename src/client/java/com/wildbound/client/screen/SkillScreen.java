@@ -3,6 +3,7 @@ package com.wildbound.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.wildbound.Wildbound;
 import com.wildbound.client.RadialSkillState;
+import com.wildbound.client.screen.CharacterScreen;
 import com.wildbound.client.WildboundClient;
 import com.wildbound.network.RadialSkillsResultPayload;
 import com.wildbound.network.SkillUnlockResultPayload;
@@ -1002,6 +1003,10 @@ public final class SkillScreen extends Screen {
 
     @Override
     public boolean keyPressed(KeyEvent event) {
+        if (WildboundClient.OPEN_CHARACTER.matches(event)) {
+            Minecraft.getInstance().setScreenAndShow(new CharacterScreen());
+            return true;
+        }
         if (WildboundClient.OPEN_SKILLS.matches(event) || event.key() == InputConstants.KEY_ESCAPE) {
             while (WildboundClient.OPEN_SKILLS.consumeClick()) {
             }
