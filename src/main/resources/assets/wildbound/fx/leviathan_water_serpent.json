@@ -2,8 +2,8 @@
   "format": "wildbound:procedural_water_serpent",
   "version": 1,
   "body": {
-    "longitudinal_segments": 168,
-    "radial_segments": 28,
+    "longitudinal_segments": 192,
+    "radial_segments": 36,
     "lateral_sway": 0.62,
     "vertical_sway": 0.22,
     "wave_frequency": 1.12,
