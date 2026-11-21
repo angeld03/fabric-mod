@@ -102,4 +102,11 @@ public record PlayerRpgProfile(
     public PlayerRpgProfile withRadialSkills(List<String> radial) {
         return copyWith(unlockedSkills, unlockedRealms, RadialSkillConfig.normalize(radial), skillProgress);
     }
+
+    /** Updates current resources without discarding skill mastery or other profile fields. */
+    public PlayerRpgProfile withResources(float newMana, float newStamina) {
+        return new PlayerRpgProfile(schemaVersion, uuid, level, experience, totalExperience,
+                attributePoints, skillPoints, attributes, newMana, newStamina,
+                unlockedSkills, unlockedRealms, radialSkills, stats, skillProgress);
+    }
 }
