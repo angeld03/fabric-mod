@@ -265,12 +265,12 @@ public final class RpgHud {
 
         int goldGlow = alpha(GOLD_LIGHT, Math.round(0x45 * opacity * (0.65f + pulse * 0.35f)));
         g.fill(x - 3, y - 3, x + bannerW + 3, y + bannerH + 3, goldGlow);
-        g.fill(x - 1, y - 1, x + bannerW + 1, y + bannerH + 1, alpha(GOLD_DEEP, opacity));
-        g.fill(x, y, x + bannerW, y + bannerH, alpha(0xFF101A2A, 0.94f * opacity));
+        g.fill(x - 1, y - 1, x + bannerW + 1, y + bannerH + 1, alpha(GOLD_DEEP, Math.round(255f * opacity)));
+        g.fill(x, y, x + bannerW, y + bannerH, alpha(0xFF101A2A, Math.round(240f * opacity)));
         g.fillGradient(x + 1, y + 1, x + bannerW - 1, y + 3,
-                alpha(GOLD_LIGHT, opacity), alpha(0xFF55DFFF, opacity));
+                alpha(GOLD_LIGHT, Math.round(255f * opacity)), alpha(0xFF55DFFF, Math.round(255f * opacity)));
         g.fill(x + 1, y + bannerH - 2, x + bannerW - 1, y + bannerH - 1,
-                alpha(0xFF55DFFF, 0.55f * opacity));
+                alpha(0xFF55DFFF, Math.round(140f * opacity)));
 
         String title = Component.translatable("wildbound.hud.level_up").getString();
         int titleX = x + (bannerW - font.width(title)) / 2;
@@ -278,13 +278,13 @@ public final class RpgHud {
                 lerpColor(GOLD_LIGHT, 0xFFFFFFFF, pulse * 0.45f), 0xFF56DFFF);
         String level = Component.translatable("wildbound.hud.level_transition", ANIMATION.levelUpFrom, ANIMATION.levelUpTo).getString();
         int levelX = x + (bannerW - font.width(level)) / 2;
-        g.text(font, level, levelX, y + 20, alpha(TEXT, opacity), true);
+        g.text(font, level, levelX, y + 20, alpha(TEXT, Math.round(255f * opacity)), true);
 
         String rewards = Component.translatable("wildbound.hud.level_rewards",
                 ANIMATION.levelUpAttributePoints, ANIMATION.levelUpSkillPoints).getString();
         if (font.width(rewards) <= bannerW - 12) {
             int rewardX = x + (bannerW - font.width(rewards)) / 2;
-            g.text(font, rewards, rewardX, y + 32, alpha(MUTED, opacity), false);
+            g.text(font, rewards, rewardX, y + 32, alpha(MUTED, Math.round(255f * opacity)), false);
         }
 
         // Tiny animated starbursts on both ends of the plaque.
@@ -293,8 +293,8 @@ public final class RpgHud {
             int sy = y + 9 + Math.round((0.5f + 0.5f * (float) Math.sin(phase)) * 21f);
             int size = 1 + (int) (pulse * 2f);
             int sx = i % 2 == 0 ? x + 7 + i * 3 : x + bannerW - 8 - (i - 1) * 3;
-            g.fill(sx - size, sy, sx + size + 1, sy + 1, alpha(GOLD_LIGHT, opacity));
-            g.fill(sx, sy - size, sx + 1, sy + size + 1, alpha(0xFF8CEEFF, opacity));
+            g.fill(sx - size, sy, sx + size + 1, sy + 1, alpha(GOLD_LIGHT, Math.round(255f * opacity)));
+            g.fill(sx, sy - size, sx + 1, sy + size + 1, alpha(0xFF8CEEFF, Math.round(255f * opacity)));
         }
     }
 
