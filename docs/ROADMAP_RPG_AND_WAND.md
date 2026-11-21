@@ -337,3 +337,8 @@ La maestría ya no es solo un contador ni una ventaja exclusiva de Water Bolt:
 - Se añadieron pruebas para progresión de varios rangos con una sola concesión y saneamiento de datos de mejoras.
 
 **Balance inicial:** son bonificaciones moderadas y universales para dar valor inmediato al rango de cualquier habilidad. Queda pendiente ajustar porcentajes tras pruebas reales de combate y añadir especializaciones ramificadas por habilidad. No se declara compilación o prueba en Minecraft.
+
+
+### P2 — Reglas de maestría extraídas y cubiertas por pruebas
+
+Se centralizaron las fórmulas de XP por tier/carga, reducción de cooldown y eficiencia de maná en `SkillMasteryRules`. Esto permite verificar balance y límites sin instanciar un mundo de Minecraft. Se añadieron pruebas para rango 1/10, límites superiores, curvas personalizadas de Water Bolt, cargas inválidas y parámetros fuera de rango.
