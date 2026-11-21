@@ -2,7 +2,6 @@ package com.wildbound.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import com.wildbound.network.AquaSkillFxPayload;
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents;
 import net.minecraft.client.Minecraft;
@@ -235,7 +234,7 @@ public final class AquaSkillFxRenderer {
             m.sphericalBand(0, 0.72f, 0, 1.48f, latitude, 1.43f,
                     48, t + i * 1.2f, 0xB9FFFF, 115);
         }
-        m.floatingDrops(0, 0.75f, 0, 1.55f, 1.68f, 18, t, 0xC8FFFF);
+        m.floatingDrops(0, 0.75f, 0, 1.55f, 1.68f, 10, t, 0xC8FFFF);
     }
 
     // ---------------------------------------------------------------------
@@ -280,16 +279,7 @@ public final class AquaSkillFxRenderer {
     // ---------------------------------------------------------------------
     private static void whirlpool(Mesh m, float age, float p) {
         float t = age * 0.11f;
-        float radius = 2.5f + smooth(p) * 1.65f;
-        m.whirlpoolSurface(0, -0.26f, 0, radius, 30, 54, t, 0x0875BE, 142);
-        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 25, 46, -t * 1.45f, 0x2BC7F0, 74);
-        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 22, 16, t, 0x086FB9, 116);
-        for (int i = 0; i < 4; i++) {
-            m.spiralRibbon(0, -0.15f, 0, radius * (0.62f + i * 0.07f),
-                    2.1f, 40, 0.24f, t + i * 1.8f, 0x74EDFF, 130);
-        }
-        m.rippleRing(0, -0.05f, 0, radius * 0.94f, 0.21f, 52, t, 0xB9FFFF, 150);
-        m.splashDroplets(0, 0.3f, 0, radius * 0.8f, 17, t, 0xD1FFFF);
+        float radius = 2.5f + smooth(p) * 1.65f;\n        m.whirlpoolSurface(0, -0.26f, 0, radius, 20, 38, t, 0x0875BE, 142);\n        m.whirlpoolSurface(0, -0.18f, 0, radius * 0.82f, 15, 34, -t * 1.45f, 0x2BC7F0, 74);\n        m.funnelVolume(0, -0.72f, 0, 1.3f, 2.2f, 18, 14, t, 0x086FB9, 116);\n        for (int i = 0; i < 3; i++) {\n            m.spiralRibbon(0, -0.15f, 0, radius * (0.62f + i * 0.07f),\n                    2.1f, 32, 0.24f, t + i * 1.8f, 0x74EDFF, 130);\n        }\n        m.rippleRing(0, -0.05f, 0, radius * 0.94f, 0.21f, 44, t, 0xB9FFFF, 150);\n        m.splashDroplets(0, 0.3f, 0, radius * 0.8f, 10, t, 0xD1FFFF);
     }
 
     // ---------------------------------------------------------------------
@@ -379,9 +369,7 @@ public final class AquaSkillFxRenderer {
 
     private static final class Effect {
         private final String skillId;
-        private final long casterIdMost;
-        private final long casterIdLeast;
-        private final java.util.UUID casterId;
+                private final java.util.UUID casterId;
         private final long startTick;
         private final int duration;
         private final long seed;
@@ -393,8 +381,6 @@ public final class AquaSkillFxRenderer {
         private Effect(AquaSkillFxPayload payload) {
             skillId = payload.skillId();
             casterId = payload.casterId();
-            casterIdMost = casterId.getMostSignificantBits();
-            casterIdLeast = casterId.getLeastSignificantBits();
             startTick = Minecraft.getInstance().level == null ? 0L : Minecraft.getInstance().level.getGameTime();
             duration = payload.durationTicks();
             seed = payload.seed();
@@ -436,7 +422,7 @@ public final class AquaSkillFxRenderer {
         }
 
         private void vertex(Vec3 point, int rgb, int layerAlpha) {
-            int a = clamp(Math.round(layerAlpha * effectAlpha), 0, 255);
+            int a = Math.max(0, Math.min(255, Math.round(layerAlpha * effectAlpha)));
             int r = (rgb >> 16) & 255;
             int g = (rgb >> 8) & 255;
             int b = rgb & 255;
