@@ -1,12 +1,16 @@
 package com.wildbound.client;
 
 import com.wildbound.item.WildboundItems;
+import com.wildbound.skills.AimUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.phys.Vec3;
 
-/** Client-only, charge-scaled visual feedback around the Water Wand crystal. */
+/**
+ * Client-only, charge-scaled visual feedback around the Water Wand crystal.
+ * Anchored to {@link AimUtil#wandTip}, the shared crosshair-ray tip locator.
+ */
 public final class WaterBoltChargePresentation {
     private static float phase;
 
@@ -31,16 +35,10 @@ public final class WaterBoltChargePresentation {
         phase += 0.24f + charge * 0.12f;
         if (client.level.getGameTime() % 2L != 0L) return;
 
-        Vec3 forward = player.getViewVector(1.0F).normalize();
-        Vec3 right = forward.cross(new Vec3(0.0, 1.0, 0.0));
-        if (right.lengthSqr() < 1.0E-5) right = new Vec3(1.0, 0.0, 0.0);
-        else right = right.normalize();
-        Vec3 up = right.cross(forward).normalize();
-
-        Vec3 crystal = player.getEyePosition()
-                .add(forward.scale(0.78))
-                .add(right.scale(0.36))
-                .subtract(up.scale(0.30));
+        Vec3 look = AimUtil.lookDir(player, 1.0F);
+        Vec3 right = AimUtil.right(look);
+        Vec3 up = AimUtil.up(look);
+        Vec3 crystal = AimUtil.wandTip(player, 1.0F);
 
         // The orbit tightens as energy compresses into the crystal.
         double radius = 0.28 - charge * 0.17;
@@ -51,7 +49,7 @@ public final class WaterBoltChargePresentation {
                     .add(right.scale(Math.cos(angle) * radius))
                     .add(up.scale(Math.sin(angle) * radius));
             double speed = 0.012 + charge * 0.025;
-            Vec3 velocity = forward.scale(speed)
+            Vec3 velocity = look.scale(speed)
                     .add(right.scale(-Math.sin(angle) * speed))
                     .add(up.scale(Math.cos(angle) * speed));
             client.level.addParticle(ParticleTypes.BUBBLE,
@@ -63,7 +61,7 @@ public final class WaterBoltChargePresentation {
         if (charge > 0.35f) {
             client.level.addParticle(ParticleTypes.ELECTRIC_SPARK,
                     crystal.x, crystal.y, crystal.z,
-                    right.x * 0.02, up.y * 0.02, forward.z * 0.02);
+                    right.x * 0.02, up.y * 0.02, look.z * 0.02);
         }
         if (charge > 0.85f && client.level.getGameTime() % 4L == 0L) {
             client.level.addParticle(ParticleTypes.ENCHANT,

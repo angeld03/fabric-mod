@@ -14,6 +14,7 @@ import com.wildbound.network.SkillCameraShakePayload;
 import com.wildbound.network.SkillUnlockResultPayload;
 import com.wildbound.player.PlayerRpgProfile;
 import com.wildbound.player.RpgAttachments;
+import com.wildbound.skills.AimUtil;
 import com.wildbound.skills.SkillActivationService;
 import com.wildbound.skills.SkillCatalog;
 import com.wildbound.skills.SkillDefinition;
@@ -97,6 +98,7 @@ public class WildboundClient implements ClientModInitializer {
             AquaSkillFxRenderer.tick();
             WaterBoltIdlePresentation.tick(client);
             WaterBoltChargePresentation.tick(client);
+            WandAimState.tick(client);
         });
 
         ClientPlayNetworking.registerGlobalReceiver(SkillUnlockResultPayload.TYPE, (payload, context) ->
@@ -162,6 +164,7 @@ public class WildboundClient implements ClientModInitializer {
             SkillCameraAim.reset();
             WaterBoltIdlePresentation.reset();
             WaterBoltChargePresentation.reset();
+            WandAimState.reset();
         });
         ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
             RadialSkillState.reset();
@@ -170,6 +173,7 @@ public class WildboundClient implements ClientModInitializer {
             SkillCameraAim.reset();
             WaterBoltIdlePresentation.reset();
             WaterBoltChargePresentation.reset();
+            WandAimState.reset();
         });
     }
 
@@ -187,7 +191,7 @@ public class WildboundClient implements ClientModInitializer {
         if (!ClientPlayNetworking.canSend(ActivateSkillPayload.TYPE)) return false;
         // Do not send a request the server is guaranteed to reject.
         if (SkillActivationService.getClientCooldown(skillId) > 0f) return false;
-        var aim = player.getLookAngle().normalize();
+        var aim = AimUtil.lookDir(player);
         ClientPlayNetworking.send(new ActivateSkillPayload(skillId, aim.x, aim.y, aim.z));
         return true;
     }

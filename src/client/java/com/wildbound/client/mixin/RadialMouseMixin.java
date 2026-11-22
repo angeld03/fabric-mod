@@ -5,6 +5,7 @@ import com.wildbound.client.SkillChargeState;
 import com.wildbound.client.WildboundClient;
 import com.wildbound.item.WildboundItems;
 import com.wildbound.network.SkillChargePayload;
+import com.wildbound.skills.AimUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -63,7 +64,7 @@ public class RadialMouseMixin {
             if (SkillChargeState.isCharging()) {
                 float level = SkillChargeState.stop();
                 if (canCast && level > 0f) {
-                    var aim = player.getLookAngle().normalize();
+                    var aim = AimUtil.lookDir(player);
                     ClientPlayNetworking.send(new SkillChargePayload(skillId, level, aim.x, aim.y, aim.z));
                 }
                 callback.cancel(); // suppress vanilla use/item on release
