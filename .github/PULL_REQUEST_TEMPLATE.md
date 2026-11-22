@@ -1,6 +1,6 @@
-## Â¿QuÃ© hace este PR?
+## ¿Qué hace este PR?
 
-<!-- Describe el cambio en 2-3 lÃ­neas -->
+<!-- Describe el cambio en 2-3 líneas -->
 
 ## Comprobaciones
 

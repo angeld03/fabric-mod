@@ -1,6 +1,6 @@
 # fabric-mod
 
-Mod de Minecraft **Fabric** para la versiÃ³n **26.3** (Java 25), desarrollado por dos personas sin pisarse el trabajo.
+Mod de Minecraft **Fabric** para la versión **26.3** (Java 25), desarrollado por dos personas sin pisarse el trabajo.
 
 ## Estado
 
@@ -15,7 +15,7 @@ Mod de Minecraft **Fabric** para la versiÃ³n **26.3** (Java 25), desarrollado 
 
 ## Puesta en marcha
 
-Necesitas **JDK 25** (Microsoft o Temurin). El wrapper de Gradle ya estÃ¡ incluido.
+Necesitas **JDK 25** (Microsoft o Temurin). El wrapper de Gradle ya está incluido.
 
 ```powershell
 # Windows (PowerShell)
@@ -28,20 +28,20 @@ En Linux/macOS usa `./gradlew` en vez de `.\gradlew`.
 
 Importa el proyecto en IntelliJ IDEA abriendo `settings.gradle` como proyecto Gradle.
 
-## ColaboraciÃ³n
+## Colaboración
 
-Todo el flujo y las reglas estÃ¡n en [CONTRIBUTING.md](CONTRIBUTING.md). Resumen:
+Todo el flujo y las reglas están en [CONTRIBUTING.md](CONTRIBUTING.md). Resumen:
 
-1. **Nadie commitea directamente en `main`.** `main` estÃ¡ protegida.
+1. **Nadie commitea directamente en `main`.** `main` está protegida.
 2. Cada cambio va en su propia rama: `nombre/cosa-que-hago`.
 3. Se abre un **Pull Request** y se fusiona con *Squash and merge*.
-4. Cada persona trabajan en archivos distintos siempre que sea posible; los `CODEOWNERS` fuerzan revisiÃ³n.
+4. Cada persona trabajan en archivos distintos siempre que sea posible; los `CODEOWNERS` fuerzan revisión.
 
 ## Estructura
 
 ```
-src/main/java/com/ejemplo/          lÃ³gica comÃºn (servidor + cliente)
+src/main/java/com/ejemplo/          lógica común (servidor + cliente)
 src/main/java/com/ejemplo/mixin/    mixins comunes
-src/client/java/com/ejemplo/client/ lÃ³gica y mixins SOLO de cliente
+src/client/java/com/ejemplo/client/ lógica y mixins SOLO de cliente
 src/main/resources/                 fabric.mod.json, mixins, texturas, datos
 ```

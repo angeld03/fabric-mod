@@ -1,8 +1,8 @@
-# CÃ³mo colaborar sin pisarnos
+# Cómo colaborar sin pisarnos
 
 La regla es simple: **main es sagrada**. Nadie escribe en ella directamente. Todo pasa por una rama propia + Pull Request.
 
-## 1. PreparaciÃ³n inicial (solo una vez)
+## 1. Preparación inicial (solo una vez)
 
 ```bash
 git clone https://github.com/angeld03/fabric-mod.git
@@ -20,27 +20,27 @@ git pull --ff-only
 git switch -c tu-nombre/breve-descripcion
 # ... editasARCHIVOS ...
 git add .
-git commit -m "AÃ±ade tal cosa"
+git commit -m "Añade tal cosa"
 git push -u origin tu-nombre/breve-descripcion
 ```
 
-DespuÃ©s abres el Pull Request en GitHub (la URL te la da el propio `git push`).
+Después abres el Pull Request en GitHub (la URL te la da el propio `git push`).
 
 ## 3. Normas anti-conflictos
 
 - **Un archivo, un responsable.** Si vas a tocar un archivo que no es tuyo, avisa por el PR antes.
-- **Nada de `git push --force`** (estÃ¡ bloqueado en `main` y desaconsejado en tus ramas: fuerza a los demÃ¡s a reescribir su historial).
-- **Nada de `git commit --amend`** despuÃ©s de haber hecho `push`.
+- **Nada de `git push --force`** (está bloqueado en `main` y desaconsejado en tus ramas: fuerza a los demás a reescribir su historial).
+- **Nada de `git commit --amend`** después de haber hecho `push`.
 - **Sincroniza a menudo:** `git fetch origin` + `git rebase origin/main` en tu rama antes del PR.
 - **No edites `gradle.properties`, `build.gradle` ni `fabric.mod.json` a la vez.** Cambios de versiones van en un PR aparte y lo revisan ambos.
-- **Textos nuevos, archivos nuevos.** Cada nueva funcionalidad debe estar en su propio archivo Java; asÃ­ dos personas casi nunca tocan el mismo fichero.
-- `.gitattributes` fuerza finales de lÃ­nea LF para que no haya conflictos raros entre Windows y Linux.
+- **Textos nuevos, archivos nuevos.** Cada nueva funcionalidad debe estar en su propio archivo Java; así dos personas casi nunca tocan el mismo fichero.
+- `.gitattributes` fuerza finales de línea LF para que no haya conflictos raros entre Windows y Linux.
 
 ## 4. Fusionar
 
 - Se usa **Squash and merge**: el historial de `main` queda lineal y limpio.
 - El PR debe pasar el check de GitHub Actions `build` (compila con `./gradlew build`).
-- Se borra la rama despuÃ©s de fusionar.
+- Se borra la rama después de fusionar.
 
 ## 5. Si aparece un conflicto
 
@@ -55,4 +55,4 @@ git rebase --continue
 git push --force-with-lease   # solo en TU rama, nunca en main
 ```
 
-Y comÃ©ntalo en el PR para que el otro lo vea.
+Y coméntalo en el PR para que el otro lo vea.
