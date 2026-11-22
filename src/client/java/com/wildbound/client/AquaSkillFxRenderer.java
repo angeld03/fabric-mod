@@ -186,12 +186,12 @@ public final class AquaSkillFxRenderer {
         int volley = Math.min(2, (int) (p * 3.0f));
         float local = clamp((p * 3.0f) - volley, 0f, 1f);
         float travel = smooth(local);
-        float z = 2.5f + travel * 15.5f;
+        float z = 0.4f + travel * 16.0f;
         for (int i = 0; i < 3; i++) {
             float start = 0.08f + i * 0.31f;
             float q = clamp((p - start) / 0.25f, 0f, 1f);
             if (q <= 0.001f || q >= 1.0f && i > volley) continue;
-            float headZ = 2.2f + smooth(q) * 15.5f;
+            float headZ = 0.3f + smooth(q) * 16.0f;
             float side = (i - 1) * 0.42f;
             m.tube(new Vec3(side, 0.0, 0.0), new Vec3(side, 0.0, headZ),
                     0.29f, 38, 20, t + i * 1.7f, 0x087FCB, 116);

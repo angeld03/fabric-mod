@@ -29,8 +29,9 @@ import java.util.UUID;
  * {@link SkillScheduler}. Nothing here calls {@code Thread.sleep} or spawns a
  * whole animation inside a single tick, so the server stays responsive and the
  * client can actually see the animation. All directions come from
- * {@link ServerPlayer#getLookAngle()} at cast time, which means every skill
- * travels exactly where the player is aiming.</p>
+ * {@link SkillAimContext} (the client's {@link AimUtil} look vector at cast
+ * time) and wand-born effects start at {@link AimUtil#wandTip}, so every skill
+ * travels exactly where the crosshair points.</p>
  */
 public final class AquaSkillExecutors {
     private static final Random RNG = new Random();
@@ -66,7 +67,7 @@ public final class AquaSkillExecutors {
                 Vec3 look = look(player);
                 Vec3 side = side(look);
                 Vec3 up = up(look);
-                Vec3 origin = player.getEyePosition().add(look.scale(1.0));
+                Vec3 origin = AimUtil.wandTip(player.getEyePosition(), look);
 
                 float charge = SkillActivationService.getChargeLevel();
                 float chargeMult = 1.0f + charge;
@@ -303,7 +304,7 @@ public final class AquaSkillExecutors {
                 Vec3 look = look(player);
                 Vec3 side = side(look);
                 Vec3 up = up(look);
-                Vec3 origin = player.getEyePosition().add(look.scale(0.8));
+                Vec3 origin = AimUtil.wandTip(player.getEyePosition(), look);
                 double range = 8.0;
 
                 SkillActivationService.playSound(level, origin, SoundEvents.TRIDENT_THROW.value(), 0.7f, 1.6f);
@@ -630,7 +631,7 @@ public final class AquaSkillExecutors {
                 Vec3 look = look(player);
                 Vec3 side = side(look);
                 Vec3 up = up(look);
-                Vec3 origin = player.getEyePosition().add(look.scale(1.0));
+                Vec3 origin = AimUtil.wandTip(player.getEyePosition(), look);
                 double range = 30.0;
                 Vec3 end = origin.add(look.scale(range));
                 Set<UUID> hit = new HashSet<>();

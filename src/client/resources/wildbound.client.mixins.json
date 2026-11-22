@@ -5,7 +5,12 @@
 	"client": [
 		"WildboundClientMixin",
 		"RadialMouseMixin",
-		"CameraShakeMixin"
+		"CameraShakeMixin",
+		"WandAimHandMixin",
+		"WandAimItemPoseMixin",
+		"WandArmPoseMixin",
+		"WandAimRenderStateMixin",
+		"WandArmModelMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

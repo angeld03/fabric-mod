@@ -26,7 +26,7 @@ public final class AquaSkillFxService {
         Vec3 look = SkillAimContext.direction(caster);
         Vec3 origin = switch (skillId) {
             case "aqua_water_bolt", "aqua_aqua_whip", "aqua_pressure_lance" ->
-                    caster.getEyePosition().add(look.scale(0.18));
+                    AimUtil.wandTip(caster.getEyePosition(), look);
             default -> caster.position().add(0.0, 0.15, 0.0);
         };
         long id = NEXT_ID.getAndIncrement();
